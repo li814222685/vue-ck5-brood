@@ -24,7 +24,7 @@
 
 <script>
 // import * as ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import FormControls from '@/plgins/formControls/formControls';
+import FormControls from '@/plugins/formControls/formControls';
 import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
 import Essentials from '@ckeditor/ckeditor5-essentials/src/essentials';
 import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph';
@@ -33,11 +33,11 @@ import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
 import Heading from '@ckeditor/ckeditor5-heading/src/heading';
 import Link from '@ckeditor/ckeditor5-link/src/link';
 import RestrictedEditingMode from '@ckeditor/ckeditor5-restricted-editing/src/restrictededitingmode';
-import { getMarkerAtPosition } from '@/plgins/other/restrictededitingmode/utils.js';
+import { getMarkerAtPosition } from '@/plugins/other/restrictededitingmode/utils.js';
 import { replace } from '@ckeditor/ckeditor5-utils/src/elementreplacer';
 import { ClickObserver } from '@ckeditor/ckeditor5-engine';
 import { Observer } from '@ckeditor/ckeditor5-engine/src/view/observer/observer';
-import { createSimpleBox } from '@/plgins/formControls/insertsimpleboxcommand';
+import { createSimpleBox } from '@/plugins/formControls/insertsimpleboxcommand';
 // import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport";
 const HIDDEN_CLASS = 'hidden-item';
 
