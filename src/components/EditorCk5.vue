@@ -93,12 +93,14 @@ export default {
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
         const isSelected = Array.from(clickDom.classList).includes(EDITABLE_CLASS);
         if (isSelected) {
+          const modelSelection = window.editor.model.document.selection;
+          const marker = getMarkerAtPosition(window.editor, modelSelection.anchor);
+          console.log(marker);
+          const itemRange = marker.getRange();
           // 改变视图
           window.editor.model.change(writer => {
             //Todo：替换掉当前点击命中元素，而不是插入
-            window.editor.model.insertObject(createSimpleBox(writer), null, null, {
-              setSelection: "on",
-            });
+            window.editor.model.insertObject(createSimpleBox(writer), itemRange, null);
           });
           //Todo：select 选值/失焦 以后正常的文字回显示
         }

@@ -3,14 +3,8 @@
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import {
-  InsertSimpleBoxCommand,
-  createSimpleBox,
-} from "./insertsimpleboxcommand";
-import {
-  toWidget,
-  toWidgetEditable,
-} from "@ckeditor/ckeditor5-widget/src/utils";
+import { InsertSimpleBoxCommand, createSimpleBox } from "./insertsimpleboxcommand";
+import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
 import { getMarkerAtPosition } from "../other/restrictededitingmode/utils";
 export default class FormControlEditing extends Plugin {
@@ -26,10 +20,7 @@ export default class FormControlEditing extends Plugin {
     this._defineConverters();
     this._markerToSelect();
 
-    this.editor.commands.add(
-      "insertSimpleBox",
-      new InsertSimpleBoxCommand(this.editor)
-    );
+    this.editor.commands.add("insertSimpleBox", new InsertSimpleBoxCommand(this.editor));
 
     // editingView.change((writer) => {
     //   const section = writer.createContainerElement("span", {
@@ -55,7 +46,7 @@ export default class FormControlEditing extends Plugin {
     schema.register("simpleBox", {
       isObject: true,
       isInline: true,
-      allowWhere: "$block",
+      allowWhere: "$text",
     });
     schema.register("select", {
       isObject: true,
@@ -83,10 +74,7 @@ export default class FormControlEditing extends Plugin {
       allowContentOf: "$root",
     });
     schema.addChildCheck((context, childDefinition) => {
-      if (
-        context.endsWith("simpleBoxDescriptions") &&
-        childDefinition.name == "simpleBox"
-      ) {
+      if (context.endsWith("simpleBoxDescriptions") && childDefinition.name == "simpleBox") {
         return false;
       }
     });
@@ -215,11 +203,7 @@ export default class FormControlEditing extends Plugin {
       model: "simpleBoxDescriptions",
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
-        const option = viewWriter.createEditableElement(
-          "option",
-          { class: "simple-box-descriptions", value: true, label: "是" },
-          ["no"]
-        );
+        const option = viewWriter.createEditableElement("option", { class: "simple-box-descriptions", value: true, label: "是" }, ["no"]);
 
         return toWidgetEditable(option, viewWriter);
       },

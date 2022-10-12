@@ -21,12 +21,12 @@ export function getMarkerAtPosition(editor, position) {
   for (const marker of editor.model.markers) {
     const markerRange = marker.getRange();
     console.log(markerRange, position);
-    // if (isPositionInRangeBoundaries(markerRange, position)) {
-    if (marker.name.startsWith("restrictedEditingException:")) {
-      console.log(marker);
-      return marker;
+    if (isPositionInRangeBoundaries(markerRange, position)) {
+      if (marker.name.startsWith("restrictedEditingException:")) {
+        console.log(marker);
+        return marker;
+      }
     }
-    // }
   }
 }
 
@@ -42,11 +42,7 @@ export function isPositionInRangeBoundaries(range, position) {
   console.log(range.end.isEqual(position));
   console.log(range.start.isEqual(position));
 
-  return (
-    range.containsPosition(position) ||
-    range.end.isEqual(position) ||
-    range.start.isEqual(position)
-  );
+  return range.containsPosition(position) || range.end.isEqual(position) || range.start.isEqual(position);
 }
 
 /**
