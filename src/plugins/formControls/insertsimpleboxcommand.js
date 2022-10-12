@@ -2,15 +2,15 @@
  * @description Commands
  */
 
-import Command from "@ckeditor/ckeditor5-core/src/command";
+import Command from '@ckeditor/ckeditor5-core/src/command';
 
 export class InsertSimpleBoxCommand extends Command {
   execute() {
-    this.editor.model.change((writer) => {
+    this.editor.model.change(writer => {
       // Insert <simpleBox>*</simpleBox> at the current selection position
       // in a way that will result in creating a valid model structure.
       this.editor.model.insertObject(createSimpleBox(writer), null, null, {
-        setSelection: "on",
+        setSelection: 'on',
       });
     });
     // this.editor.conversion.elementToElement({
@@ -23,19 +23,16 @@ export class InsertSimpleBoxCommand extends Command {
   refresh() {
     const model = this.editor.model;
     const selection = model.document.selection;
-    const allowedIn = model.schema.findAllowedParent(
-      selection.getFirstPosition(),
-      "simpleBox"
-    );
+    const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), 'simpleBox');
 
     this.isEnabled = allowedIn !== null;
   }
 }
 export function createSimpleBox(writer) {
-  const simpleBox = writer.createElement("simpleBox");
-  const simpleBoxTitle = writer.createElement("simpleBoxTitle");
-  const simpleBoxDescription = writer.createElement("simpleBoxDescription");
-  const simpleBoxDescriptions = writer.createElement("simpleBoxDescriptions");
+  const simpleBox = writer.createElement('simpleBox'); // => span
+  const simpleBoxTitle = writer.createElement('simpleBoxTitle'); // => select
+  const simpleBoxDescription = writer.createElement('simpleBoxDescription'); // => option
+  const simpleBoxDescriptions = writer.createElement('simpleBoxDescriptions');
   // const aa = writer.createElement( 'aa' );
 
   writer.append(simpleBoxTitle, simpleBox);
