@@ -94,20 +94,25 @@ export default {
      */
     onGlobalClick(e) {
       setTimeout(() => {
+        const editor = window.editor;
+        const { model } = editor;
+
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
         const isSelected = Array.from(clickDom.classList).includes(EDITABLE_CLASS);
         console.log(_.toPlainObject(clickDom));
         if (isSelected) {
-          const modelSelection = window.editor.model.document.selection;
-          const marker = getMarkerAtPosition(window.editor, modelSelection.anchor);
+          const modelSelection = model.document.selection;
+          const marker = getMarkerAtPosition(editor, modelSelection.anchor);
           console.log(marker);
           if (!marker) return;
           //Todo: 替换完毕后 控件的聚焦
           const itemRange = marker.getRange();
-          window.editor.model.change(writer => {
-            window.editor.model.insertObject(createSimpleBox(writer), itemRange);
+          const viewElement = model.change(writer => {
+            const newRange = model.insertObject(createSimpleBox(writer), itemRange);
             writer.removeMarker(marker);
+            return newRange;
           });
+          console.log(viewElement);
           //Todo：select 选值/失焦 以后正常的文字回显示
         }
       }, 1);
