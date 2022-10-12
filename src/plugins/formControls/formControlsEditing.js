@@ -91,25 +91,19 @@ export default class FormControlEditing extends Plugin {
         classes: "simple-box",
       },
     });
-    conversion.for("dataDowncast").elementToElement({
-      model: "simpleBox",
-      view: {
-        name: "span",
-        classes: "simple-box",
-      },
-    });
+
     conversion.for("downcast").elementToElement({
       model: "simpleBox",
       view: {
         name: "span",
-        classes: "simple-box",
+        classes: "simple-box restricted-editing-exception extendBackground",
       },
     });
     conversion.for("downcast").elementToElement({
       model: "simpleBox",
       view: (modelElement, { writer: viewWriter }) => {
         const section = viewWriter.createContainerElement("span", {
-          class: "simple-box",
+          class: "simple-box ",
         });
 
         return toWidget(section, viewWriter, { abbr: "simple box widget" });
@@ -132,19 +126,13 @@ export default class FormControlEditing extends Plugin {
         });
       },
     });
-    conversion.for("dataDowncast").elementToElement({
-      model: "simpleBoxTitle",
-      view: {
-        name: "select",
-        classes: "simple-box-title",
-      },
-    });
+
     conversion.for("downcast").elementToElement({
       model: "simpleBoxTitle",
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
         const select = viewWriter.createEditableElement("select", {
-          class: "simple-box-title",
+          class: "simple-box-title extendBackground",
         });
         return toWidgetEditable(select, viewWriter);
       },
@@ -161,15 +149,6 @@ export default class FormControlEditing extends Plugin {
       },
     });
 
-    conversion.for("dataDowncast").elementToElement({
-      model: "simpleBoxDescription",
-      view: {
-        name: "option",
-        classes: "simple-box-description",
-        label: "999",
-        value: "999",
-      },
-    });
     conversion.for("downcast").elementToElement({
       model: "simpleBoxDescription",
       view: (modelElement, { writer }) => {
@@ -191,14 +170,7 @@ export default class FormControlEditing extends Plugin {
         label: "666",
       },
     });
-    conversion.for("dataDowncast").elementToElement({
-      model: "simpleBoxDescriptions",
-      view: {
-        name: "option",
-        classes: "simple-box-descriptions",
-        label: "666",
-      },
-    });
+
     conversion.for("downcast").elementToElement({
       model: "simpleBoxDescriptions",
       view: (modelElement, { writer: viewWriter }) => {
