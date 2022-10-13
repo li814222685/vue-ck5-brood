@@ -46,7 +46,7 @@ import Heading from "@ckeditor/ckeditor5-heading/src/heading";
 import Link from "@ckeditor/ckeditor5-link/src/link";
 import RestrictedEditingMode from "@ckeditor/ckeditor5-restricted-editing/src/restrictededitingmode";
 import { getMarkerAtPosition } from "@/plugins/other/restrictededitingmode/utils.js";
-import { replace } from "@ckeditor/ckeditor5-utils/src/elementreplacer";
+import { ElementReplacer } from "@ckeditor/ckeditor5-utils/src/elementreplacer";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
 import { Observer } from "@ckeditor/ckeditor5-engine/src/view/observer/observer";
 import { createSimpleBox, createSimpleBox2 } from "@/plugins/formControls/insertsimpleboxcommand";
@@ -63,6 +63,7 @@ export default {
       deposit: {
         viewElement: null,
         range: null,
+        marker: null,
       },
     };
   },
@@ -107,6 +108,7 @@ export default {
         const { model } = editor;
 
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
+        console.log(clickDom);
         const isSelected = Array.from(clickDom.classList).includes(EDITABLE_CLASS);
         // 点击可编辑区域时候执行
         if (isSelected) {
@@ -129,6 +131,7 @@ export default {
               this.deposit = _.cloneDeep({
                 viewElement,
                 range,
+                marker,
               });
               const name = marker.name;
               writer.removeMarker(marker);
@@ -147,26 +150,31 @@ export default {
      */
     onSelectChange() {
       const { model, editing } = window.editor;
+      const domConverter = editing.view.domConverter;
       const view = editing.view;
 
       const select = document.querySelector(".simple-box-title");
       const box = document.querySelector(".simple-box");
 
-      const { viewElement: oldViewElement, range: oldRange } = toRaw(this.deposit);
+      const { viewElement: oldViewElement, range: oldRange, marker: oldMarker } = toRaw(this.deposit);
       console.log(select);
       const value = select.options[select.selectedIndex].value;
-
-      const newSpan = document.createElement("span");
-      newSpan.innerHTML = value;
-      newSpan.class = "restricted-editing-exception restricted-editing-exception_selected";
-      console.log(select.parentNode);
-      box.parentNode.replaceChild(newSpan, box);
-
       console.log(value);
       // const marker = getMarkerAtPosition(window.editor, modelSelection.anchor);
-      // model.change(writer => {
-      //   writer.removeMarker(marker);
-      // });
+
+      model.change(writer => {
+        // const span = document.createElement("span");
+        // span.className = EDITABLE_CLASS;
+        // span.innerHTML = 666;
+        // box.parentNode.replaceChild(domConverter.viewToDom(oldViewElement), box);
+        console.log(oldViewElement.getAncestors());
+        writer.insert(oldViewElement.getAncestors()[1], oldViewElement, "end");
+        // console.log(editing.mapper.toModelElement(oldViewElement.getAncestors()));
+        // model.insertObject(editing.mapper.toModelElement(oldViewElement), oldRange);
+        // console.log(oldViewElement);
+        // console.log(domConverter.viewToDom(oldViewElement));
+        // writer.insertText("foo", { bold: true });
+      });
     },
   },
 };
