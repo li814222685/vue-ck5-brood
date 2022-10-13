@@ -99,17 +99,6 @@ export default class FormControlEditing extends Plugin {
         classes: "simple-box restricted-editing-exception extendBackground",
       },
     });
-    conversion.for("downcast").elementToElement({
-      model: "simpleBox",
-      view: (modelElement, { writer: viewWriter }) => {
-        const section = viewWriter.createContainerElement("span", {
-          class: "simple-box ",
-        });
-
-        return toWidget(section, viewWriter, { abbr: "simple box widget" });
-      },
-    });
-
     // <simpleBoxTitle> converters
 
     conversion.for("upcast").elementToElement({
@@ -131,13 +120,19 @@ export default class FormControlEditing extends Plugin {
       model: "simpleBoxTitle",
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
-        const select = viewWriter.createEditableElement("select", {
-          class: "simple-box-title extendBackground",
-        });
+        const select = viewWriter.createEditableElement(
+          "select",
+          {
+            class: "simple-box-title extendBackground ",
+          },
+          {
+            renderUnsafeAttributes: ["onchange"],
+          }
+        );
+
         return toWidgetEditable(select, viewWriter);
       },
     });
-
     // <simpleBoxDescription> converters
     conversion.for("upcast").elementToElement({
       model: "simpleBoxDescription",

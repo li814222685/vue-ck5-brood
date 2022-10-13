@@ -18,6 +18,10 @@
       </p>
     </div>
     <button v-on:click="getDom">getDom</button>
+    <select v-on:change="onchangeSelect" name="" id="">
+      <option value="2">2</option>
+      <option value="3">3</option>
+    </select>
   </div>
 </template>
 <style>
@@ -30,7 +34,7 @@
 </style>
 
 <script>
-// import * as ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { toRaw } from "vue";
 import _ from "lodash";
 import FormControls from "@/plugins/formControls/formControls";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
@@ -45,7 +49,7 @@ import { getMarkerAtPosition } from "@/plugins/other/restrictededitingmode/utils
 import { replace } from "@ckeditor/ckeditor5-utils/src/elementreplacer";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
 import { Observer } from "@ckeditor/ckeditor5-engine/src/view/observer/observer";
-import { createSimpleBox } from "@/plugins/formControls/insertsimpleboxcommand";
+import { createSimpleBox, createSimpleBox2 } from "@/plugins/formControls/insertsimpleboxcommand";
 // import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport";
 const HIDDEN_CLASS = "hidden-item";
 const HIGHLIGHT_CLASS = "restricted-editing-exception_selected";
@@ -56,9 +60,14 @@ export default {
     return {
       editor: {},
       anchor: null,
+      deposit: {
+        viewElement: null,
+        range: null,
+      },
     };
   },
   mounted() {
+    // this.listenToSelectAttr();
     // 注册点击事件监听
     window.addEventListener("mousedown", this.onGlobalClick);
     ClassicEditor.create(document.querySelector("#editor"), {
@@ -99,23 +108,65 @@ export default {
 
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
         const isSelected = Array.from(clickDom.classList).includes(EDITABLE_CLASS);
-        console.log(_.toPlainObject(clickDom));
+        // 点击可编辑区域时候执行
         if (isSelected) {
+          console.log("又又");
           const modelSelection = model.document.selection;
+          console.log(modelSelection.anchor);
           const marker = getMarkerAtPosition(editor, modelSelection.anchor);
-          console.log(marker);
           if (!marker) return;
           //Todo: 替换完毕后 控件的聚焦
           const itemRange = marker.getRange();
-          const viewElement = model.change(writer => {
-            const newRange = model.insertObject(createSimpleBox(writer), itemRange);
-            writer.removeMarker(marker);
-            return newRange;
+          const itemEnd = marker.getEnd();
+          // replace编辑器指定位置的DOM
+          new Promise(res => {
+            model.change(writer => {
+              const struct = createSimpleBox(writer);
+              const range = model.insertObject(struct, itemRange);
+              console.log(itemRange);
+              //缓存将要移除的marker 和 当前的range
+              const [viewElement] = [...editor.editing.mapper.markerNameToElements(marker.name)];
+              this.deposit = _.cloneDeep({
+                viewElement,
+                range,
+              });
+              const name = marker.name;
+              writer.removeMarker(marker);
+              // writer.addMarker(name, { range, usingOperation: true });
+              res();
+            });
+          }).then(res => {
+            const select = document.querySelector(".simple-box-title");
+            select.onchange = this.onSelectChange;
           });
-          console.log(viewElement);
-          //Todo：select 选值/失焦 以后正常的文字回显示
         }
       }, 1);
+    },
+    /**
+     * @desc select onchange callBack
+     */
+    onSelectChange() {
+      const { model, editing } = window.editor;
+      const view = editing.view;
+
+      const select = document.querySelector(".simple-box-title");
+      const box = document.querySelector(".simple-box");
+
+      const { viewElement: oldViewElement, range: oldRange } = toRaw(this.deposit);
+      console.log(select);
+      const value = select.options[select.selectedIndex].value;
+
+      const newSpan = document.createElement("span");
+      newSpan.innerHTML = value;
+      newSpan.class = "restricted-editing-exception restricted-editing-exception_selected";
+      console.log(select.parentNode);
+      box.parentNode.replaceChild(newSpan, box);
+
+      console.log(value);
+      // const marker = getMarkerAtPosition(window.editor, modelSelection.anchor);
+      // model.change(writer => {
+      //   writer.removeMarker(marker);
+      // });
     },
   },
 };
