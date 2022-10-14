@@ -5,13 +5,11 @@
 import Command from "@ckeditor/ckeditor5-core/src/command";
 
 export class InsertSimpleBoxCommand extends Command {
-  execute() {
-    this.editor.model.change(writer => {
+  execute(range) {
+    return this.editor.model.change(writer => {
       // Insert <simpleBox>*</simpleBox> at the current selection position
       // in a way that will result in creating a valid model structure.
-      this.editor.model.insertObject(createSimpleBox(writer), null, null, {
-        setSelection: "on",
-      });
+      return this.editor.model.insertObject(createSimpleBox(writer), range);
     });
     // this.editor.conversion.elementToElement({
     //   model: "simpleBox",
@@ -48,14 +46,10 @@ export function createSimpleBox(writer) {
   return simpleBox;
 }
 
-export function createSimpleBox2(writer) {
-  const simpleBox = writer.createElement("simpleBox"); // => span
-  const simpleBoxTitle = writer.createElement("simpleBoxTitle"); // => select
-  const simpleBoxDescription = writer.createElement("simpleBoxDescription"); // => option
-  const simpleBoxDescriptions = writer.createElement("simpleBoxDescriptions");
-  // const aa = writer.createElement( 'aa' );
+export function createSpan(writer) {
+  const simpleBox = writer.createElement("simpleSpan"); // => span
 
-  writer.append(simpleBoxTitle, simpleBox);
+  // const aa = writer.createElement( 'aa' );
 
   // writer.append( aa, simpleBox );
   // horizontalLine
@@ -70,4 +64,5 @@ export function createSimpleBox2(writer) {
 export default {
   InsertSimpleBoxCommand,
   createSimpleBox,
+  createSpan,
 };

@@ -48,6 +48,11 @@ export default class FormControlEditing extends Plugin {
       isInline: true,
       allowWhere: "$text",
     });
+    schema.register("simpleSpan", {
+      isObject: true,
+      isInline: true,
+      allowWhere: "$text",
+    });
     schema.register("select", {
       isObject: true,
       isInline: true,
@@ -56,6 +61,7 @@ export default class FormControlEditing extends Plugin {
 
     schema.register("simpleBoxTitle", {
       isLimit: true,
+      isSelectable: true,
       isInline: true,
       allowIn: "simpleBox",
       allowContentOf: "$block",
@@ -64,12 +70,14 @@ export default class FormControlEditing extends Plugin {
     schema.register("simpleBoxDescription", {
       // Cannot be split or left by the caret.
       isLimit: true,
+      isSelectable: true,
       isInline: true,
       allowIn: "simpleBoxTitle",
       allowContentOf: "$root",
     });
     schema.register("simpleBoxDescriptions", {
       isLimit: true,
+      isSelectable: true,
       allowIn: "simpleBoxTitle",
       allowContentOf: "$root",
     });
@@ -97,6 +105,13 @@ export default class FormControlEditing extends Plugin {
       view: {
         name: "span",
         classes: "simple-box restricted-editing-exception extendBackground",
+      },
+    });
+    conversion.for("downcast").elementToElement({
+      model: "simpleSpan",
+      view: {
+        name: "span",
+        classes: "restricted-editing-exception ",
       },
     });
     // <simpleBoxTitle> converters
@@ -149,8 +164,8 @@ export default class FormControlEditing extends Plugin {
       view: (modelElement, { writer }) => {
         const option = writer.createEditableElement("option", {
           class: "simple-box-description",
-          label: "否",
-          value: false,
+          label: "Lee",
+          value: "Lee",
         });
 
         return toWidgetEditable(option, writer);
@@ -170,7 +185,7 @@ export default class FormControlEditing extends Plugin {
       model: "simpleBoxDescriptions",
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
-        const option = viewWriter.createEditableElement("option", { class: "simple-box-descriptions", value: true, label: "是" }, ["no"]);
+        const option = viewWriter.createEditableElement("option", { class: "simple-box-descriptions", value: "李浩", label: "李浩" }, ["no"]);
 
         return toWidgetEditable(option, viewWriter);
       },

@@ -18,7 +18,7 @@
       </p>
     </div>
     <button v-on:click="getDom">getDom</button>
-    <select v-on:change="onchangeSelect" name="" id="">
+    <select v-on:change="onchangeSelect" name="" id="" value="3">
       <option value="2">2</option>
       <option value="3">3</option>
     </select>
@@ -49,11 +49,12 @@ import { getMarkerAtPosition } from "@/plugins/other/restrictededitingmode/utils
 import { ElementReplacer } from "@ckeditor/ckeditor5-utils/src/elementreplacer";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
 import { Observer } from "@ckeditor/ckeditor5-engine/src/view/observer/observer";
-import { createSimpleBox, createSimpleBox2 } from "@/plugins/formControls/insertsimpleboxcommand";
+import { createSimpleBox, createSpan } from "@/plugins/formControls/insertsimpleboxcommand";
 // import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport";
 const HIDDEN_CLASS = "hidden-item";
 const HIGHLIGHT_CLASS = "restricted-editing-exception_selected";
 const EDITABLE_CLASS = "restricted-editing-exception";
+const V_SELECT = ".simple-box-title";
 
 export default {
   data() {
@@ -105,7 +106,7 @@ export default {
     onGlobalClick(e) {
       setTimeout(() => {
         const editor = window.editor;
-        const { model } = editor;
+        const { model, editing } = editor;
 
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
         console.log(clickDom);
@@ -122,24 +123,31 @@ export default {
           const itemEnd = marker.getEnd();
           // replace编辑器指定位置的DOM
           new Promise(res => {
-            model.change(writer => {
-              const struct = createSimpleBox(writer);
-              const range = model.insertObject(struct, itemRange);
-              console.log(itemRange);
+            editing.view.change(writer => {
+              const range = editor.execute("insertSimpleBox", itemEnd);
+              const vSelect = document.querySelector(V_SELECT);
+
+              console.log(marker.getData());
+
+              console.log(range);
               //缓存将要移除的marker 和 当前的range
               const [viewElement] = [...editor.editing.mapper.markerNameToElements(marker.name)];
-              this.deposit = _.cloneDeep({
+              this.deposit = {
+                viewElement,
+              };
+              writer.addClass(HIDDEN_CLASS, viewElement);
+
+              this.deposit = {
                 viewElement,
                 range,
-                marker,
-              });
-              const name = marker.name;
-              writer.removeMarker(marker);
-              // writer.addMarker(name, { range, usingOperation: true });
+              };
               res();
             });
           }).then(res => {
             const select = document.querySelector(".simple-box-title");
+            const textNode = document.querySelector(".hidden-item");
+            console.log(textNode.innerText);
+            select.value = textNode.innerText;
             select.onchange = this.onSelectChange;
           });
         }
@@ -150,30 +158,19 @@ export default {
      */
     onSelectChange() {
       const { model, editing } = window.editor;
-      const domConverter = editing.view.domConverter;
-      const view = editing.view;
 
       const select = document.querySelector(".simple-box-title");
-      const box = document.querySelector(".simple-box");
 
       const { viewElement: oldViewElement, range: oldRange, marker: oldMarker } = toRaw(this.deposit);
-      console.log(select);
       const value = select.options[select.selectedIndex].value;
-      console.log(value);
-      // const marker = getMarkerAtPosition(window.editor, modelSelection.anchor);
-
       model.change(writer => {
-        // const span = document.createElement("span");
-        // span.className = EDITABLE_CLASS;
-        // span.innerHTML = 666;
-        // box.parentNode.replaceChild(domConverter.viewToDom(oldViewElement), box);
-        console.log(oldViewElement.getAncestors());
-        writer.insert(oldViewElement.getAncestors()[1], oldViewElement, "end");
-        // console.log(editing.mapper.toModelElement(oldViewElement.getAncestors()));
-        // model.insertObject(editing.mapper.toModelElement(oldViewElement), oldRange);
-        // console.log(oldViewElement);
-        // console.log(domConverter.viewToDom(oldViewElement));
-        // writer.insertText("foo", { bold: true });
+        writer.remove(oldRange);
+      });
+      editing.view.change(writer => {
+        const span = document.querySelector("." + HIGHLIGHT_CLASS);
+        console.log(span, value);
+        span.innerText = value;
+        writer.removeClass(HIDDEN_CLASS, oldViewElement);
       });
     },
   },

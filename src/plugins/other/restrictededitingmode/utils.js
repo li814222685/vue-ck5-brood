@@ -20,7 +20,7 @@ export function getMarkerAtPosition(editor, position) {
   console.log(editor.model.markers);
   for (const marker of editor.model.markers) {
     const markerRange = marker.getRange();
-    console.log(markerRange, position);
+    console.log(markerRange, position, marker);
     if (isPositionInRangeBoundaries(markerRange, position)) {
       if (marker.name.startsWith("restrictedEditingException:")) {
         console.log(marker);
