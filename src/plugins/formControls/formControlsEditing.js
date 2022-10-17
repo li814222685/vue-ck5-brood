@@ -107,25 +107,25 @@ export default class FormControlEditing extends Plugin {
         classes: "simple-box restricted-editing-exception extendBackground",
       },
     });
-    conversion.for("downcast").elementToElement({
-      model: "simpleSpan",
-      view: {
-        name: "span",
-        classes: "restricted-editing-exception ",
-      },
-    });
+    // conversion.for("downcast").elementToElement({
+    //   model: "simpleSpan",
+    //   view: {
+    //     name: "span",
+    //     classes: "restricted-editing-exception ",
+    //   },
+    // });
     // <simpleBoxTitle> converters
 
     conversion.for("upcast").elementToElement({
       // model: 'simpleBoxTitle',
       view: {
         name: "select",
-        classes: "simple-box-title",
+        classes: "virtual-select",
       },
       model: (viewElement, conversionApi) => {
         const modelWriter = conversionApi.writer;
 
-        return modelWriter.createElement("simple-box-title", {
+        return modelWriter.createElement("virtual-select", {
           level: viewElement.getAttribute("data-level"),
         });
       },
@@ -138,7 +138,7 @@ export default class FormControlEditing extends Plugin {
         const select = viewWriter.createEditableElement(
           "select",
           {
-            class: "simple-box-title extendBackground ",
+            class: "virtual-select extendBackground ",
           },
           {
             renderUnsafeAttributes: ["onchange"],
@@ -196,7 +196,7 @@ export default class FormControlEditing extends Plugin {
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
         const select = viewWriter.createEditableElement("select", {
-          class: "simple-box-title",
+          class: "virtual-select",
         });
         return toWidgetEditable(select, viewWriter);
       },
