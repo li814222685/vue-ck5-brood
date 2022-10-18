@@ -113,6 +113,8 @@ export default {
           }).then(res => {
             const select = document.querySelector(V_SELECT);
             const textNode = document.querySelector(".hidden-item");
+            select.focus();
+            console.log(textNode.innerText);
             select.value = textNode.innerText;
             select.onchange = this.onSelectChange;
           });

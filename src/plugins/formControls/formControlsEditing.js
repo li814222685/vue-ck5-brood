@@ -139,9 +139,10 @@ export default class FormControlEditing extends Plugin {
           "select",
           {
             class: "virtual-select extendBackground ",
+            "data-cke-ignore-events": true,
           },
           {
-            renderUnsafeAttributes: ["onchange"],
+            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events"],
           }
         );
 
