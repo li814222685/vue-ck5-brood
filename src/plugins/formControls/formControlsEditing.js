@@ -18,7 +18,6 @@ export default class FormControlEditing extends Plugin {
     // const position = selection.getFirstRange();
     this._defineSchema();
     this._defineConverters();
-    this._markerToSelect();
 
     this.editor.commands.add("insertSimpleBox", new InsertSimpleBoxCommand(this.editor));
 
@@ -31,17 +30,24 @@ export default class FormControlEditing extends Plugin {
     // });
   }
 
-  _markerToSelect() {
-    const view = this.editor.editing.view;
-    const model = this.editor.model;
-    const markers = new Set();
-
-    const modelSelection = model.document.selection;
-    const marker = getMarkerAtPosition(this.editor, modelSelection.anchor);
-  }
-
   _defineSchema() {
     const schema = this.editor.model.schema;
+    schema.register("span", {
+      // Allow wherever text is allowed:
+      allowWhere: "$text",
+
+      // The placeholder will act as an inline node:
+      isInline: true,
+
+      // The inline widget is self-contained so it cannot be split by the caret and it can be selected:
+      isObject: true,
+
+      // The inline widget can have the same attributes as text (for example linkHref, bold).
+      allowAttributesOf: "$text",
+
+      // The placeholder can have many types, like date, name, surname, etc:
+      allowAttributes: ["class", "controlType"],
+    });
 
     schema.register("simpleBox", {
       isObject: true,
@@ -115,6 +121,23 @@ export default class FormControlEditing extends Plugin {
     //   },
     // });
     // <simpleBoxTitle> converters
+
+    conversion.for("downcast").markerToHighlight({
+      model: "restrictedEditingException",
+      // Use callback to return new object every time new marker instance is created - otherwise it will be seen as the same marker.
+      view: (data, { writer }) => {
+        console.log(data);
+        return {
+          name: "span",
+          classes: "restricted-editing-exception lee",
+          attributes: {
+            controlType: "select",
+          },
+        };
+      },
+      renderUnsafeAttributes: ["classes", "controlType"],
+      converterPriority: "high",
+    });
 
     conversion.for("upcast").elementToElement({
       // model: 'simpleBoxTitle',

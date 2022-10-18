@@ -10,7 +10,7 @@
       <p class="adc">Life is like a boat：</p>
       <span>
         Input ur Name：
-        <span class="restricted-editing-exception">李浩</span>
+        <span class="restricted-editing-exception isSelect" controlType="select">李浩</span>
       </span>
       <p>
         ur Age:
@@ -108,7 +108,6 @@ export default {
             const textNode = document.querySelector(".hidden-item");
             select.focus();
             select.value = textNode.innerText;
-            select.onchange = this.onSelectChange;
             select.onblur = this.onSelectBlur;
           });
         }
@@ -135,6 +134,7 @@ export default {
 
     onSelectBlur() {
       const { oldViewElement, newRange } = toRaw(this.deposit);
+      this.onSelectChange();
       removeClass(HIDDEN_CLASS, oldViewElement);
       removeElement(newRange);
       //reset 缓存
