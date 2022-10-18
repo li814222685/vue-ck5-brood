@@ -36,23 +36,10 @@
 <script>
 import { toRaw } from "vue";
 import _ from "lodash";
-import FormControls from "@/plugins/formControls/formControls";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
-import Essentials from "@ckeditor/ckeditor5-essentials/src/essentials";
-import Paragraph from "@ckeditor/ckeditor5-paragraph/src/paragraph";
-import Bold from "@ckeditor/ckeditor5-basic-styles/src/bold";
-import Italic from "@ckeditor/ckeditor5-basic-styles/src/italic";
-import Heading from "@ckeditor/ckeditor5-heading/src/heading";
-import Link from "@ckeditor/ckeditor5-link/src/link";
-import RestrictedEditingMode from "@ckeditor/ckeditor5-restricted-editing/src/restrictededitingmode";
 import { getMarkerAtPosition } from "@/plugins/other/restrictededitingmode/utils.js";
-import { ElementReplacer } from "@ckeditor/ckeditor5-utils/src/elementreplacer";
-import { ClickObserver } from "@ckeditor/ckeditor5-engine";
-import { Observer } from "@ckeditor/ckeditor5-engine/src/view/observer/observer";
-import { createSimpleBox, createSpan } from "@/plugins/formControls/insertsimpleboxcommand";
-import getDataFromElement from "@ckeditor/ckeditor5-utils/src/dom/getdatafromelement";
-import { setData } from "@ckeditor/ckeditor5-engine/src/dev-utils/view";
-import MarkerCollection from "@ckeditor/ckeditor5-engine/src/model/markercollection";
+import { EDITOR_CONFIG } from "./config";
+import { regExpReplacer } from "./utils";
 
 // import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport";
 const HIDDEN_CLASS = "hidden-item";
@@ -66,35 +53,18 @@ export default {
       editor: {},
       anchor: null,
       deposit: {
-        viewElement: null,
-        range: null,
-        marker: null,
+        oldViewElement: null,
+        //v-select的range区间
+        newRange: null,
+        oldMarker: null,
         dom: null,
       },
     };
   },
   mounted() {
-    // this.listenToSelectAttr();
     // 注册点击事件监听
     window.addEventListener("mousedown", this.onGlobalClick);
-    ClassicEditor.create(document.querySelector("#editor"), {
-      plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, RestrictedEditingMode, FormControls],
-      restrictedEditing: {
-        allowedCommands: ["bold", "simpleBox", "heading", "insertSimpleBox"],
-        allowedAttributes: ["bold", "simpleBox", "heading", "class"],
-      },
-      toolbar: ["heading", "|", "bold", "italic", "link", "numberedList", "bulletedList", "|", "abbreviation", "abbreviations", "bubble", "simpleBox", "restrictedEditing"],
-      htmlSupport: {
-        allow: [
-          {
-            name: /.*/,
-            attributes: true,
-            classes: true,
-            styles: true,
-          },
-        ],
-      },
-    })
+    ClassicEditor.create(document.querySelector("#editor"), EDITOR_CONFIG)
       .then(editor => {
         //编辑器实例挂载到 Window
         window.editor = editor;
@@ -124,27 +94,25 @@ export default {
           const marker = getMarkerAtPosition(editor, modelSelection.anchor);
           console.log(marker);
           if (!marker) return;
-          //Todo: 替换完毕后 控件的聚焦
-          const itemRange = marker.getRange();
           const itemEnd = marker.getEnd();
           // replace编辑器指定位置的DOM
           new Promise(res => {
             editing.view.change(writer => {
-              const range = editor.execute("insertSimpleBox", itemEnd);
+              const newRange = editor.execute("insertSimpleBox", itemEnd);
               //缓存将要移除的marker 和 当前的range
-              const [viewElement] = [...editor.editing.mapper.markerNameToElements(marker.name)];
+              const [oldViewElement] = [...editor.editing.mapper.markerNameToElements(marker.name)];
               this.deposit = {
-                viewElement,
+                oldViewElement,
                 dom: clickDom,
-                range,
+                newRange,
+                oldMarker: marker,
               };
-              writer.addClass(HIDDEN_CLASS, viewElement);
+              writer.addClass(HIDDEN_CLASS, oldViewElement);
               res();
             });
           }).then(res => {
             const select = document.querySelector(V_SELECT);
             const textNode = document.querySelector(".hidden-item");
-            console.log(textNode.innerText);
             select.value = textNode.innerText;
             select.onchange = this.onSelectChange;
           });
@@ -157,49 +125,20 @@ export default {
     onSelectChange() {
       const editor = window.editor;
       const { model, editing } = editor;
+      const { oldViewElement, newRange, oldMarker } = toRaw(this.deposit);
       const select = document.querySelector(V_SELECT);
-
-      const { viewElement: oldViewElement, range: oldRange, marker: oldMarker, dom } = toRaw(this.deposit);
       const value = select.options[select.selectedIndex].value;
-      //移除vselect
+      const range = oldMarker.getRange();
+
       model.change(writer => {
-        writer.remove(oldRange);
+        //移除vselect
+        writer.remove(newRange);
+        const text = writer.createText(value, oldViewElement.getAttributes());
+        model.insertContent(text, range);
       });
-      //赋值给原本的marker span
+      //展示原本的文本节点
       editing.view.change(writer => {
-        //第itemIndex个 可编辑字符
-        const [__, itemIndex] = oldViewElement._id.split(":");
-        const data = editor.getData();
-        console.log(value);
-        console.log(data);
-        console.log(dom.innerText);
-        const oldText = dom.innerText;
-        for (const marker of editor.model.markers) {
-          model.change(writer => {
-            writer.removeMarker(marker);
-          });
-        }
-        const res = this.domStringReplacer(data, oldText, value, itemIndex);
-        editor.setData(res);
-        console.log(data);
-        console.log(oldText);
-        console.log(value);
-        console.log(itemIndex);
         writer.removeClass(HIDDEN_CLASS, oldViewElement);
-      });
-    },
-    /**
-     * @description 替换DomString内的指定字符
-     * @params str: 字符源
-     * @params target:目标字符
-     * @params fillText: 填充字符
-     * @params idx: 第n次出现的
-     */
-    domStringReplacer(str, target, fillText, idx) {
-      let count = 0;
-      return str.replace(new RegExp(target, "g"), p => {
-        count++;
-        return count == idx ? fillText : target;
       });
     },
   },
