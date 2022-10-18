@@ -10,7 +10,7 @@
       <p class="adc">Life is like a boat：</p>
       <span>
         Input ur Name：
-        <span class="restricted-editing-exception">李浩</span>
+        <span class="restricted-editing-exception ">李浩</span>
       </span>
       <p>
         ur Age:
@@ -144,6 +144,7 @@ export default {
           }).then(res => {
             const select = document.querySelector(V_SELECT);
             const textNode = document.querySelector(".hidden-item");
+            select.focus()
             console.log(textNode.innerText);
             select.value = textNode.innerText;
             select.onchange = this.onSelectChange;
