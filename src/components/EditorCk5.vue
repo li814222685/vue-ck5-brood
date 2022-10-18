@@ -39,7 +39,7 @@ import _ from "lodash";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 import { getMarkerAtPosition } from "@/plugins/other/restrictededitingmode/utils.js";
 import { EDITOR_CONFIG } from "./config";
-import { regExpReplacer } from "./utils";
+import { regExpReplacer, removeClass, removeElement } from "./utils";
 
 // import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport";
 const HIDDEN_CLASS = "hidden-item";
@@ -69,9 +69,7 @@ export default {
         //编辑器实例挂载到 Window
         window.editor = editor;
       })
-      .catch(error => {
-        console.error(error.stack);
-      });
+      .catch(error => {});
   },
   methods: {
     /**
@@ -82,17 +80,12 @@ export default {
       setTimeout(() => {
         const editor = window.editor;
         const { model, editing } = editor;
-
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
-        console.log(clickDom);
         const isSelected = Array.from(clickDom.classList).includes(EDITABLE_CLASS);
         // 点击可编辑区域时候执行
         if (isSelected) {
-          console.log("又又");
           const modelSelection = model.document.selection;
-          console.log(modelSelection.anchor);
           const marker = getMarkerAtPosition(editor, modelSelection.anchor);
-          console.log(marker);
           if (!marker) return;
           const itemEnd = marker.getEnd();
           // replace编辑器指定位置的DOM
@@ -114,9 +107,9 @@ export default {
             const select = document.querySelector(V_SELECT);
             const textNode = document.querySelector(".hidden-item");
             select.focus();
-            console.log(textNode.innerText);
             select.value = textNode.innerText;
             select.onchange = this.onSelectChange;
+            select.onblur = this.onSelectBlur;
           });
         }
       }, 1);
@@ -134,14 +127,23 @@ export default {
 
       model.change(writer => {
         //移除vselect
-        writer.remove(newRange);
+        select.blur();
         const text = writer.createText(value, oldViewElement.getAttributes());
         model.insertContent(text, range);
       });
-      //展示原本的文本节点
-      editing.view.change(writer => {
-        writer.removeClass(HIDDEN_CLASS, oldViewElement);
-      });
+    },
+
+    onSelectBlur() {
+      const { oldViewElement, newRange } = toRaw(this.deposit);
+      removeClass(HIDDEN_CLASS, oldViewElement);
+      removeElement(newRange);
+      //reset 缓存
+      this.deposit = {
+        oldViewElement: null,
+        newRange: null,
+        oldMarker: null,
+        dom: null,
+      };
     },
   },
 };
