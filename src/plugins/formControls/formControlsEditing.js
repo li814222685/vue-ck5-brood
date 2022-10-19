@@ -129,10 +129,7 @@ export default class FormControlEditing extends Plugin {
         console.log(data);
         return {
           name: "span",
-          classes: "restricted-editing-exception lee",
-          attributes: {
-            controlType: "select",
-          },
+          classes: "restricted-editing-exception",
         };
       },
       renderUnsafeAttributes: ["classes", "controlType"],

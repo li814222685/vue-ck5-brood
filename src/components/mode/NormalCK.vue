@@ -1,10 +1,8 @@
 <template>
   <div>
-    <el-button type="primary" @click="getEditorData" plain>导出</el-button>
+    <el-button type="primary" @click="exportData" plain>导出</el-button>
     <br />
-    <div id="devEditor">
-      {{ data }}
-    </div>
+    <div id="devEditor"></div>
   </div>
 </template>
 <style>
@@ -27,10 +25,7 @@ import { EditorClasses } from "./define";
 const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
 
 export default {
-  props: {
-    data: String,
-    nowMode: String,
-  },
+  props: ["htmlData", "nowMode", "onchange"],
   data() {
     return {
       editor: {},
@@ -43,19 +38,19 @@ export default {
       .then(editor => {
         //编辑器实例挂载到 Window
         window.devEditor = editor;
+        editor.setData(this.htmlData);
       })
       .catch(error => {});
   },
   methods: {
-    getEditorData() {
-      console.log(window.devEditor.getData());
+    exportData() {
+      this.onchange(window.devEditor.getData());
     },
   },
-  watch: {
-    nowMode(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        console.log("changed");
-        onchange(window.editor.getData());
+  computed: {
+    nowMode() {
+      if (this.nowMode) {
+        return this.nowMode;
       }
     },
   },

@@ -1,8 +1,7 @@
 <template>
   <div>
-    <div id="editor">
-      {{ data }}
-    </div>
+    <el-button type="primary" @click="exportData" plain>导出</el-button>
+    <div id="editor"></div>
   </div>
 </template>
 <style>
@@ -25,11 +24,7 @@ import { EditorClasses } from "./define";
 const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
 
 export default {
-  props: {
-    data: String,
-    nowMode: String,
-    onchange: Function,
-  },
+  props: ["htmlData", "nowMode", "onchange"],
 
   data() {
     return {
@@ -46,11 +41,13 @@ export default {
   },
   mounted() {
     // 注册点击事件监听
+    console.log(this.htmlData);
     window.addEventListener("mousedown", this.onGlobalClick);
     ClassicEditor.create(document.querySelector("#editor"), RESTRICT_CONFIG)
       .then(editor => {
         //编辑器实例挂载到 Window
         window.editor = editor;
+        editor.setData(this.htmlData);
       })
       .catch(error => {});
   },
@@ -128,14 +125,27 @@ export default {
         dom: null,
       };
     },
+    exportData() {
+      this.onchange(window.devEditor.getData());
+    },
+  },
+  computed: {
+    nowMode() {
+      if (this.nowMode) {
+        console.log(this.nowMode);
+        return this.nowMode;
+      }
+    },
   },
   watch: {
-    nowMode(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        console.log("changed");
-
-        onchange(window.editor.getData());
-      }
+    htmlData: {
+      immediate: true,
+      handler(val) {
+        console.log(window.editor);
+        if (window.editor) {
+          window.editor.setData(val);
+        }
+      },
     },
   },
 };
