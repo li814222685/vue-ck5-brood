@@ -6,6 +6,7 @@ module.exports = {
   // The source of CKEditor is encapsulated in ES6 modules. By default, the code
   // from the node_modules directory is not transpiled, so you must explicitly tell
   // the CLI tools to transpile JavaScript files in all ckeditor5-* modules.
+  lintOnSave: false,
   transpileDependencies: [/ckeditor5-[^/\\]+[/\\]src[/\\].+\.js$/],
   parallel: false,
   configureWebpack: {
@@ -19,6 +20,24 @@ module.exports = {
         translationsOutputFile: /app/,
       }),
     ],
+    module: {
+      rules: [
+        {
+          test: /\.ts|\.tsx$/,
+          exclude: /node_modules/,
+          use: [
+            "babel-loader",
+
+            {
+              loader: "ts-loader",
+              options: {
+                transpileOnly: true,
+              },
+            },
+          ],
+        },
+      ],
+    },
   },
 
   // Vue CLI would normally use its own loader to load .svg and .css files, however:

@@ -6,10 +6,10 @@
 </template>
 
 <script>
-import EditorCk5 from './components/EditorCk5.vue';
+import EditorCk5 from "./components/EditorCk5.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     EditorCk5,
   },
