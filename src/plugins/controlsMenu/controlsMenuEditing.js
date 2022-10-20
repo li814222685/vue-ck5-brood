@@ -141,7 +141,7 @@ export default class ControlsMenuEditing extends Plugin {
           }
         );
 
-        return toWidgetEditable(select, viewWriter);
+        return toWidget(select, viewWriter);
       },
     });
     // <v-option> converters
@@ -164,7 +164,7 @@ export default class ControlsMenuEditing extends Plugin {
           value: "Lee",
         });
 
-        return toWidgetEditable(option, writer);
+        return toWidget(option, writer);
       },
     });
 
@@ -183,7 +183,7 @@ export default class ControlsMenuEditing extends Plugin {
         // Note: You use a more specialized createEditableElement() method here.
         const option = viewWriter.createEditableElement("option", { class: "simple-box-descriptions", value: "李浩", label: "李浩" }, ["no"]);
 
-        return toWidgetEditable(option, viewWriter);
+        return toWidget(option, viewWriter);
       },
     });
 
@@ -194,7 +194,7 @@ export default class ControlsMenuEditing extends Plugin {
         const select = viewWriter.createEditableElement("select", {
           class: "virtual-select",
         });
-        return toWidgetEditable(select, viewWriter);
+        return toWidget(select, viewWriter);
       },
     });
     /** dataDowncast */
