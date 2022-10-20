@@ -126,6 +126,7 @@ export default class FormControlEditing extends Plugin {
         classes: "simple-box restricted-editing-exception extendBackground",
       },
     });
+
     // conversion.for("downcast").elementToElement({
     //   model: "simpleSpan",
     //   view: {
@@ -142,6 +143,7 @@ export default class FormControlEditing extends Plugin {
       },
       converterPriority: "highest",
     });
+
     conversion.for("downcast").elementToElement({
       model: "control-select",
       view: (ele, { writer }) => {
@@ -153,7 +155,7 @@ export default class FormControlEditing extends Plugin {
           [writer.createText("我就是控件点我试试？")]
         );
         console.log(span);
-        return toWidgetEditable(span, writer);
+        return span;
       },
       converterPriority: "highest",
     });

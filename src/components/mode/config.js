@@ -13,7 +13,7 @@ export const RESTRICT_CONFIG = {
   plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, RestrictedEditingMode, FormControls],
   restrictedEditing: {
     allowedCommands: ["bold", "simpleBox", "heading", "insertSimpleBox"],
-    allowedAttributes: ["bold", "simpleBox", "heading", "class"],
+    allowedAttributes: ["bold", "simpleBox", "heading", "class", "control-select", "controlType"],
   },
   toolbar: ["heading", "|", "bold", "italic", "link", "numberedList", "bulletedList", "|", "abbreviation", "abbreviations", "bubble", "simpleBox", "restrictedEditing"],
 };

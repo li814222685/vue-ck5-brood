@@ -3,7 +3,7 @@
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import { InsertSimpleBoxCommand, createSimpleBox } from "./insertsimpleboxcommand";
+import { InsertControlsCommand, createSimpleBox } from "./insertControlsCommand";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
 import { getMarkerAtPosition } from "../other/restrictededitingmode/utils";
@@ -13,21 +13,10 @@ export default class ControlsMenuEditing extends Plugin {
   }
 
   init() {
-    const editingView = this.editor.editing.view;
-    const position = editingView.createPositionAfter;
-    // const position = selection.getFirstRange();
     this._defineSchema();
     this._defineConverters();
 
-    this.editor.commands.add("insertSimpleBox", new InsertSimpleBoxCommand(this.editor));
-
-    // editingView.change((writer) => {
-    //   const section = writer.createContainerElement("span", {
-    //     class: "simple-box",
-    //   });
-
-    //   writer.insert(docFrag);
-    // });
+    this.editor.commands.add("insertSelect", new InsertControlsCommand(this.editor));
   }
 
   _defineSchema() {
@@ -49,46 +38,36 @@ export default class ControlsMenuEditing extends Plugin {
       allowAttributes: ["class", "controlType"],
     });
 
-    schema.register("simpleBox", {
+    schema.register("controls", {
       isObject: true,
       isInline: true,
       allowWhere: "$text",
-    });
-    schema.register("simpleSpan", {
-      isObject: true,
-      isInline: true,
-      allowWhere: "$text",
-    });
-    schema.register("select", {
-      isObject: true,
-      isInline: true,
-      allowWhere: "$block",
     });
 
-    schema.register("simpleBoxTitle", {
+    schema.register("v-select", {
       isLimit: true,
       isSelectable: true,
       isInline: true,
-      allowIn: "simpleBox",
+      allowIn: "controls",
       allowContentOf: "$block",
     });
 
-    schema.register("simpleBoxDescription", {
+    schema.register("v-option", {
       // Cannot be split or left by the caret.
       isLimit: true,
       isSelectable: true,
       isInline: true,
-      allowIn: "simpleBoxTitle",
+      allowIn: "v-select",
       allowContentOf: "$root",
     });
-    schema.register("simpleBoxDescriptions", {
+    schema.register("v-options", {
       isLimit: true,
       isSelectable: true,
-      allowIn: "simpleBoxTitle",
+      allowIn: "v-select",
       allowContentOf: "$root",
     });
     schema.addChildCheck((context, childDefinition) => {
-      if (context.endsWith("simpleBoxDescriptions") && childDefinition.name == "simpleBox") {
+      if (context.endsWith("v-options") && childDefinition.name == "controls") {
         return false;
       }
     });
@@ -97,9 +76,9 @@ export default class ControlsMenuEditing extends Plugin {
   _defineConverters() {
     const conversion = this.editor.conversion;
 
-    // <simpleBox> converters
+    // <controls> converters
     conversion.for("upcast").elementToElement({
-      model: "simpleBox",
+      model: "controls",
       view: {
         name: "span",
         classes: "simple-box",
@@ -107,20 +86,12 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("downcast").elementToElement({
-      model: "simpleBox",
+      model: "controls",
       view: {
         name: "span",
         classes: "simple-box restricted-editing-exception extendBackground",
       },
     });
-    // conversion.for("downcast").elementToElement({
-    //   model: "simpleSpan",
-    //   view: {
-    //     name: "span",
-    //     classes: "restricted-editing-exception ",
-    //   },
-    // });
-    // <simpleBoxTitle> converters
 
     conversion.for("downcast").markerToHighlight({
       model: "restrictedEditingException",
@@ -140,7 +111,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("upcast").elementToElement({
-      // model: 'simpleBoxTitle',
+      // model: 'v-select',
       view: {
         name: "select",
         classes: "virtual-select",
@@ -155,7 +126,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("downcast").elementToElement({
-      model: "simpleBoxTitle",
+      model: "v-select",
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
         const select = viewWriter.createEditableElement(
@@ -173,9 +144,9 @@ export default class ControlsMenuEditing extends Plugin {
         return toWidgetEditable(select, viewWriter);
       },
     });
-    // <simpleBoxDescription> converters
+    // <v-option> converters
     conversion.for("upcast").elementToElement({
-      model: "simpleBoxDescription",
+      model: "v-option",
       view: {
         name: "option",
         classes: "simple-box-description",
@@ -185,7 +156,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("downcast").elementToElement({
-      model: "simpleBoxDescription",
+      model: "v-option",
       view: (modelElement, { writer }) => {
         const option = writer.createEditableElement("option", {
           class: "simple-box-description",
@@ -198,7 +169,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("upcast").elementToElement({
-      model: "simpleBoxDescriptions",
+      model: "v-options",
       view: {
         name: "option",
         classes: "simple-box-descriptions",
@@ -207,7 +178,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("downcast").elementToElement({
-      model: "simpleBoxDescriptions",
+      model: "v-options",
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
         const option = viewWriter.createEditableElement("option", { class: "simple-box-descriptions", value: "李浩", label: "李浩" }, ["no"]);
@@ -217,7 +188,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("downcast").elementToElement({
-      model: "simpleBoxTitle",
+      model: "v-select",
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
         const select = viewWriter.createEditableElement("select", {
@@ -228,13 +199,13 @@ export default class ControlsMenuEditing extends Plugin {
     });
     /** dataDowncast */
     conversion.for("dataDowncast").elementToElement({
-      model: "simpleBox",
+      model: "controls",
       view: "span",
       converterPriority: "high",
     });
     conversion.for("dataDowncast").elementToElement({
       model: {
-        name: "simpleBoxTitle",
+        name: "v-select",
         attributes: ["controlType"],
       },
       view: (modelElement, { writer }) => {
@@ -252,14 +223,14 @@ export default class ControlsMenuEditing extends Plugin {
       converterPriority: "high",
     });
     conversion.for("dataDowncast").elementToElement({
-      model: "simpleBoxDescription",
+      model: "v-option",
       view: (modelElement, { writer }) => {
         return writer.createText("Lee");
       },
       converterPriority: "high",
     });
     conversion.for("dataDowncast").elementToElement({
-      model: "simpleBoxDescriptions",
+      model: "v-options",
       view: (modelElement, { writer }) => {
         return writer.createText("");
       },
