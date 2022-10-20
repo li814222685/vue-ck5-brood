@@ -239,9 +239,9 @@ export default class ControlsMenuEditing extends Plugin {
       },
       view: (modelElement, { writer }) => {
         return writer.createEditableElement(
-          "span",
+          "control-select",
           {
-            class: "restricted-editing-exception",
+            class: "restricted-editing-exception control-select",
             controlType: "select",
           },
           {

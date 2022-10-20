@@ -4,7 +4,7 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { InsertSimpleBoxCommand, createSimpleBox } from "./insertsimpleboxcommand";
-import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
+import { toWidget, toWidgetEditable, viewToModelPositionOutsideModelElement } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
 import { getMarkerAtPosition } from "../other/restrictededitingmode/utils";
 export default class FormControlEditing extends Plugin {
@@ -20,6 +20,11 @@ export default class FormControlEditing extends Plugin {
     this._defineConverters();
 
     this.editor.commands.add("insertSimpleBox", new InsertSimpleBoxCommand(this.editor));
+
+    this.editor.editing.mapper.on(
+      "viewToModelPosition",
+      viewToModelPositionOutsideModelElement(this.editor.model, viewElement => viewElement.hasClass("restricted-editing-exception"))
+    );
 
     // editingView.change((writer) => {
     //   const section = writer.createContainerElement("span", {
@@ -54,6 +59,13 @@ export default class FormControlEditing extends Plugin {
       isInline: true,
       allowWhere: "$text",
     });
+    schema.register("control-select", {
+      isObject: false,
+      isInline: true,
+      allowWhere: "$text",
+      isContent: true,
+      isSelectable: true,
+    });
     schema.register("simpleSpan", {
       isObject: true,
       isInline: true,
@@ -87,6 +99,7 @@ export default class FormControlEditing extends Plugin {
       allowIn: "simpleBoxTitle",
       allowContentOf: "$root",
     });
+
     schema.addChildCheck((context, childDefinition) => {
       if (context.endsWith("simpleBoxDescriptions") && childDefinition.name == "simpleBox") {
         return false;
@@ -121,6 +134,29 @@ export default class FormControlEditing extends Plugin {
     //   },
     // });
     // <simpleBoxTitle> converters
+    conversion.for("upcast").elementToElement({
+      view: "control-select",
+      model: (ele, { writer }) => {
+        console.log(ele.getClassNames());
+        return writer.createElement("control-select", { class: [...ele.getClassNames()].join(" ") });
+      },
+      converterPriority: "highest",
+    });
+    conversion.for("downcast").elementToElement({
+      model: "control-select",
+      view: (ele, { writer }) => {
+        const span = writer.createContainerElement(
+          "span",
+          {
+            class: ele.getAttribute("class"),
+          },
+          [writer.createText("我就是控件点我试试？")]
+        );
+        console.log(span);
+        return toWidgetEditable(span, writer);
+      },
+      converterPriority: "highest",
+    });
 
     conversion.for("downcast").markerToHighlight({
       model: "restrictedEditingException",
