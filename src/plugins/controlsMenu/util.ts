@@ -5,7 +5,6 @@ import { CUSTOM_PROPERTY__SELECT } from "./constant";
 /** 获取选中的控件 */
 export function getSelectedWidget(selection: Selection) {
   const viewElement = selection.getSelectedElement();
-  console.log(viewElement);
   if (viewElement && isControls(viewElement)) {
     return viewElement;
   }
