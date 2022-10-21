@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "yarn && vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "formatAll": "prettier --config .prettierrc.js --write ./**/**/*.{js,css,vue}"
@@ -21,6 +21,8 @@
     "@ckeditor/ckeditor5-restricted-editing": "^35.1.0",
     "@ckeditor/ckeditor5-theme-lark": "^35.0.1",
     "@ckeditor/ckeditor5-vue": "^4.0.1",
+    "@types/ckeditor__ckeditor5-engine": "^32.0.11",
+    "@vue/cli-plugin-typescript": "^5.0.8",
     "core-js": "^3.8.3",
     "element-plus": "^2.2.18",
     "lodash": "^4.17.21",

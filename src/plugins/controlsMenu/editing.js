@@ -3,10 +3,11 @@
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import { InsertControlsCommand, createSimpleBox } from "./insertControlsCommand";
+import { InsertControlsCommand, createSimpleBox } from "./command";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { getMarkerAtPosition } from "../other/restrictededitingmode/utils";
+import { COMMAND_NAME__INSERT_SELECT, CONTROLS_CONTAINER, CUSTOM_PROPERTY__SELECT, V_OPTIONS, V_SELECT } from "./constant";
+import { V_OPTION } from "./constant";
 export default class ControlsMenuEditing extends Plugin {
   static get requires() {
     return [Widget];
@@ -16,7 +17,7 @@ export default class ControlsMenuEditing extends Plugin {
     this._defineSchema();
     this._defineConverters();
 
-    this.editor.commands.add("insertSelect", new InsertControlsCommand(this.editor));
+    this.editor.commands.add(COMMAND_NAME__INSERT_SELECT, new InsertControlsCommand(this.editor));
   }
 
   _defineSchema() {
@@ -38,36 +39,36 @@ export default class ControlsMenuEditing extends Plugin {
       allowAttributes: ["class", "controlType"],
     });
 
-    schema.register("controls", {
+    schema.register(CONTROLS_CONTAINER, {
       isObject: true,
       isInline: true,
       allowWhere: "$text",
     });
 
-    schema.register("v-select", {
+    schema.register(V_SELECT, {
       isLimit: true,
       isSelectable: true,
       isInline: true,
-      allowIn: "controls",
+      allowIn: CONTROLS_CONTAINER,
       allowContentOf: "$block",
     });
 
-    schema.register("v-option", {
+    schema.register(V_OPTION, {
       // Cannot be split or left by the caret.
       isLimit: true,
       isSelectable: true,
       isInline: true,
-      allowIn: "v-select",
+      allowIn: V_SELECT,
       allowContentOf: "$root",
     });
-    schema.register("v-options", {
+    schema.register(V_OPTIONS, {
       isLimit: true,
       isSelectable: true,
-      allowIn: "v-select",
+      allowIn: V_SELECT,
       allowContentOf: "$root",
     });
     schema.addChildCheck((context, childDefinition) => {
-      if (context.endsWith("v-options") && childDefinition.name == "controls") {
+      if (context.endsWith(V_OPTIONS) && childDefinition.name == CONTROLS_CONTAINER) {
         return false;
       }
     });
@@ -78,18 +79,24 @@ export default class ControlsMenuEditing extends Plugin {
 
     // <controls> converters
     conversion.for("upcast").elementToElement({
-      model: "controls",
+      model: CONTROLS_CONTAINER,
       view: {
         name: "span",
-        classes: "simple-box",
+        classes: CUSTOM_PROPERTY__SELECT,
+      },
+      attributes: {
+        [CUSTOM_PROPERTY__SELECT]: true,
       },
     });
 
     conversion.for("downcast").elementToElement({
-      model: "controls",
+      model: CONTROLS_CONTAINER,
       view: {
         name: "span",
-        classes: "simple-box restricted-editing-exception extendBackground",
+        classes: "restricted-editing-exception",
+        attributes: {
+          [CUSTOM_PROPERTY__SELECT]: true,
+        },
       },
     });
 
@@ -126,7 +133,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("downcast").elementToElement({
-      model: "v-select",
+      model: V_SELECT,
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
         const select = viewWriter.createEditableElement(
@@ -146,7 +153,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
     // <v-option> converters
     conversion.for("upcast").elementToElement({
-      model: "v-option",
+      model: V_OPTION,
       view: {
         name: "option",
         classes: "simple-box-description",
@@ -156,7 +163,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("downcast").elementToElement({
-      model: "v-option",
+      model: V_OPTION,
       view: (modelElement, { writer }) => {
         const option = writer.createEditableElement("option", {
           class: "simple-box-description",
@@ -169,7 +176,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("upcast").elementToElement({
-      model: "v-options",
+      model: V_OPTIONS,
       view: {
         name: "option",
         classes: "simple-box-descriptions",
@@ -178,7 +185,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("downcast").elementToElement({
-      model: "v-options",
+      model: V_OPTIONS,
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
         const option = viewWriter.createEditableElement("option", { class: "simple-box-descriptions", value: "李浩", label: "李浩" }, ["no"]);
@@ -188,7 +195,7 @@ export default class ControlsMenuEditing extends Plugin {
     });
 
     conversion.for("downcast").elementToElement({
-      model: "v-select",
+      model: V_SELECT,
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
         const select = viewWriter.createEditableElement("select", {
@@ -199,13 +206,13 @@ export default class ControlsMenuEditing extends Plugin {
     });
     /** dataDowncast */
     conversion.for("dataDowncast").elementToElement({
-      model: "controls",
+      model: CONTROLS_CONTAINER,
       view: "span",
       converterPriority: "high",
     });
     conversion.for("dataDowncast").elementToElement({
       model: {
-        name: "v-select",
+        name: V_SELECT,
         attributes: ["controlType"],
       },
       view: (modelElement, { writer }) => {
@@ -223,14 +230,14 @@ export default class ControlsMenuEditing extends Plugin {
       converterPriority: "high",
     });
     conversion.for("dataDowncast").elementToElement({
-      model: "v-option",
+      model: V_OPTION,
       view: (modelElement, { writer }) => {
         return writer.createText("Lee");
       },
       converterPriority: "high",
     });
     conversion.for("dataDowncast").elementToElement({
-      model: "v-options",
+      model: V_OPTIONS,
       view: (modelElement, { writer }) => {
         return writer.createText("");
       },

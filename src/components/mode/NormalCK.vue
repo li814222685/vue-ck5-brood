@@ -18,7 +18,6 @@
 import { toRaw } from "vue";
 import _ from "lodash";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
-import { getMarkerAtPosition } from "@/plugins/other/restrictededitingmode/utils.js";
 import { NORMAL_CONFIG } from "./config.js";
 import { removeClass, removeElement } from "../utils";
 import { EditorClasses } from "./define";

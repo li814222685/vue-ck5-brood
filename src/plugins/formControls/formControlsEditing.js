@@ -6,7 +6,7 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { InsertSimpleBoxCommand, createSimpleBox } from "./insertsimpleboxcommand";
 import { toWidget, toWidgetEditable, viewToModelPositionOutsideModelElement } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { getMarkerAtPosition } from "../other/restrictededitingmode/utils";
+import { getMarkerAtPosition } from "./utils";
 export default class FormControlEditing extends Plugin {
   static get requires() {
     return [Widget];

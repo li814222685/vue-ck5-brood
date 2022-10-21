@@ -7,6 +7,7 @@ import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import { addListToDropdown, createDropdown } from "@ckeditor/ckeditor5-ui/src/dropdown/utils";
 import Collection from "@ckeditor/ckeditor5-utils/src/collection";
 import Model from "@ckeditor/ckeditor5-ui/src/model";
+import { COMMAND_NAME__INSERT_SELECT } from "./constant";
 
 export default class ControlsMenuUI extends Plugin {
   init() {
@@ -25,13 +26,14 @@ export default class ControlsMenuUI extends Plugin {
       const dropButton = new ButtonView(locale);
       dropdownView.bind("isOn", "isEnabled").to(command, "value", "isEnabled");
 
-      this.listenTo(dropdownView, "execute", () => editor.execute("insertSelect"));
+      this.listenTo(dropdownView, "execute", ({ source }) => editor.execute(source?.cmd));
 
       dropButton.set({
         type: "button",
         model: new Model({
           withText: true,
           label: "插入选择框",
+          cmd: COMMAND_NAME__INSERT_SELECT,
         }),
       });
 

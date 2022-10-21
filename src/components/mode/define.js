@@ -4,3 +4,6 @@ export const EditorClasses = {
   EDITABLE_CLASS: "restricted-editing-exception",
   V_SELECT: ".virtual-select",
 };
+export const UP_CAST = "upcast";
+export const DOWN_CAST = "downcast";
+export const EDITING_DOWNCAST = "editingDowncast";
