@@ -1,0 +1,100 @@
+/**
+ * @description Commands
+ */
+
+import Command from "@ckeditor/ckeditor5-core/src/command";
+import { Model } from "@ckeditor/ckeditor5-engine";
+import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
+import { CONTROLS_CONTAINER, V_OPTION, V_OPTIONS, V_SELECT } from "./constant";
+import _ from "lodash";
+
+interface Option {
+  label: string | number;
+  value: string | number | boolean;
+}
+
+export class InsertControlsCommand extends Command {
+  execute() {
+    return this.editor.model.change((writer: Writer) => {
+      return (this.editor.model as any).insertObject(createSimpleBox(writer));
+    });
+  }
+
+  refresh() {
+    const model = this.editor.model;
+    const selection = model.document.selection;
+    const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), CONTROLS_CONTAINER);
+
+    this.isEnabled = allowedIn !== null;
+  }
+}
+
+export class InsertOptionsCommand extends Command {
+  execute(options) {
+    const model = this.editor.model;
+
+    const select = model.document.selection.getSelectedElement();
+    model.change(writer => {
+      writer.remove(select);
+      insertSelect(model, options);
+    });
+  }
+}
+
+export const insertSelect = (model, options: Option[]) => {
+  if (!options || _.isEmpty(options)) {
+    return;
+  }
+
+  console.log(
+    "%c🍉Lee%cline:48%c888888",
+    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+    "color:#fff;background:rgb(60, 79, 57);padding:3px;border-radius:2px",
+    options
+  );
+  try {
+    model.change(writer => {
+      console.log(writer);
+      const selectElement = createSimpleBox(writer, options);
+      console.log(selectElement);
+      // 使用 findOptimalInsertionPosition 方法来获取最佳位置
+      // 如果某个选择位于段落的中间，则将返回该段落之前的位置，不拆分当前段落
+      // 如果选择位于段落的末尾，则将返回该段落之后的位置
+      model.insertObject(selectElement, model.document.selection);
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export function createSimpleBox(writer: Writer, attrs?: Option[]) {
+  //指令传入第二个参数时，动态创建 select - option
+  if (attrs?.length > 0) {
+    const controls = writer.createElement(CONTROLS_CONTAINER); // => span
+    const v_select = writer.createElement(V_SELECT); // => select
+
+    (attrs || []).forEach(opt => {
+      const v_option = writer.createElement(V_OPTION, opt as any); // => option
+      console.log(v_option);
+      writer.append(v_option, v_select);
+    });
+    writer.append(v_select, controls);
+    return controls;
+  }
+
+  const controls = writer.createElement(CONTROLS_CONTAINER); // => span
+  const v_select = writer.createElement(V_SELECT); // => select
+  const v_option = writer.createElement(V_OPTION); // => option
+  const v_options = writer.createElement(V_OPTIONS); // => option
+
+  writer.append(v_select, controls);
+  writer.append(v_option, v_select);
+  writer.append(v_options, v_select);
+
+  return controls;
+}
+
+export default {
+  InsertControlsCommand,
+};

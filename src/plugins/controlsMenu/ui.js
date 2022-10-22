@@ -8,6 +8,7 @@ import { addListToDropdown, createDropdown } from "@ckeditor/ckeditor5-ui/src/dr
 import Collection from "@ckeditor/ckeditor5-utils/src/collection";
 import Model from "@ckeditor/ckeditor5-ui/src/model";
 import { COMMAND_NAME__INSERT_SELECT, CONTROLS_TOOLBAR, WIDGET_TOOLBAR_NAME__MENU, COMMAND_NAME__OPEN_CONTROL_MODAL } from "./constant";
+import { emitter, SWITCH_MODAL } from "../../components/mode/mitt";
 
 export default class ControlsMenuUI extends Plugin {
   init() {
@@ -75,7 +76,7 @@ export const createControlsToolbar = context => {
         label: "配置",
       });
       console.log(dropButton);
-      context.listenTo(dropButton, "execute", ({ source }) => console.log("🍉插件插件"));
+      context.listenTo(dropButton, "execute", ({ source }) => emitter.emit(SWITCH_MODAL));
 
       return dropButton;
     } catch (error) {

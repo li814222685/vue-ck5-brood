@@ -20,6 +20,8 @@ export const CONTROLS_TOOLBAR = "controlsToolBar";
 export const COMMAND_NAME__INSERT_SELECT = "insertSelect";
 export const COMMAND_NAME__OPEN_CONTROL_MODAL = "openControlModal";
 
+export const COMMAND_NAME__INSERT_OPTIONS = "insertOptions";
+
 /* 功能类
 -------------------------- */
 export const IGNORE_EVENTS = "data-cke-ignore-events";

@@ -2,8 +2,11 @@
   <div>
     <el-button type="primary" @click="exportData" plain>导出</el-button>
     <br />
+    <br />
+
     <div id="devEditor"></div>
   </div>
+  <SelectDialog :visible="dialogVisible" :change-visible="swtichModal" :table-data="[]" :insert-options-to-select="insertOptionsToSelect" />
 </template>
 <style>
 .hidden-item {
@@ -14,14 +17,15 @@
 }
 </style>
 
-<script>
-import { toRaw } from "vue";
+<script lang="ts">
 import _ from "lodash";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 import { NORMAL_CONFIG } from "./config.js";
-import { removeClass, removeElement } from "../utils";
 import { EditorClasses } from "./define";
 const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
+import { emitter, SWITCH_MODAL } from "./mitt";
+import SelectDialog from "./SelectDialog/index.vue";
+import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
@@ -30,20 +34,30 @@ export default {
       editor: {},
       anchor: null,
       deposit: {},
+      dialogVisible: false,
     };
   },
+  components: { SelectDialog },
   mounted() {
+    //挂载Emitter
+    emitter.on(SWITCH_MODAL, this.swtichModal);
     ClassicEditor.create(document.querySelector("#devEditor"), NORMAL_CONFIG)
       .then(editor => {
         //编辑器实例挂载到 Window
-        window.devEditor = editor;
+        (window as any).devEditor = editor;
         editor.setData(this.htmlData);
       })
       .catch(error => {});
   },
   methods: {
     exportData() {
-      this.onchange(window.devEditor.getData());
+      this.onchange((window as any).devEditor.getData());
+    },
+    swtichModal() {
+      this.dialogVisible = !this.dialogVisible;
+    },
+    insertOptionsToSelect(options) {
+      (window as any).devEditor.execute(COMMAND_NAME__INSERT_OPTIONS, options);
     },
   },
   computed: {
@@ -55,3 +69,4 @@ export default {
   },
 };
 </script>
+<style scoped></style>

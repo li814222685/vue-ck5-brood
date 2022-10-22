@@ -6,6 +6,15 @@ module.exports = {
   // The source of CKEditor is encapsulated in ES6 modules. By default, the code
   // from the node_modules directory is not transpiled, so you must explicitly tell
   // the CLI tools to transpile JavaScript files in all ckeditor5-* modules.
+  pluginOptions: {
+    "style-resources-loader": {
+      preProcessor: "less",
+      patterns: [
+        // 存放less变量文件的路径
+        path.resolve(__dirname, "./src/assets/less/parameter.less"),
+      ],
+    },
+  },
   lintOnSave: false,
   transpileDependencies: [/ckeditor5-[^/\\]+[/\\]src[/\\].+\.js$/],
   parallel: false,

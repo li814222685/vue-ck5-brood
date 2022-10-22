@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <el-radio-group v-model="nowMode" class="ml-4">
       <el-radio :label="EditorMode.Normal" size="large">编辑模式</el-radio>
       <el-radio :label="EditorMode.Restrict" size="large">模版模式</el-radio>
@@ -35,3 +35,9 @@ const changeHtmlData = (val: string) => {
   htmlData.value = val;
 };
 </script>
+<style scoped>
+.container {
+  width: 80%;
+  margin: 0 auto;
+}
+</style>
