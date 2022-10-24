@@ -18,6 +18,9 @@ export const CONTROLS_TOOLBAR = "controlsToolBar";
 /* 工具栏 - 指令
 -------------------------- */
 export const COMMAND_NAME__INSERT_SELECT = "insertSelect";
+export const COMMAND_NAME__OPEN_CONTROL_MODAL = "openControlModal";
+
+export const COMMAND_NAME__INSERT_OPTIONS = "insertOptions";
 
 /* 功能类
 -------------------------- */

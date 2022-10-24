@@ -3,10 +3,10 @@
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import { InsertControlsCommand, createSimpleBox } from "./command";
+import { InsertControlsCommand, InsertOptionsCommand } from "./command";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { COMMAND_NAME__INSERT_SELECT, CONTROLS_CONTAINER, CUSTOM_PROPERTY__SELECT, V_OPTIONS, V_SELECT } from "./constant";
+import { COMMAND_NAME__INSERT_SELECT, CONTROLS_CONTAINER, CUSTOM_PROPERTY__SELECT, V_OPTIONS, V_SELECT, COMMAND_NAME__INSERT_OPTIONS } from "./constant";
 import { V_OPTION } from "./constant";
 export default class ControlsMenuEditing extends Plugin {
   static get requires() {
@@ -18,6 +18,7 @@ export default class ControlsMenuEditing extends Plugin {
     this._defineConverters();
 
     this.editor.commands.add(COMMAND_NAME__INSERT_SELECT, new InsertControlsCommand(this.editor));
+    this.editor.commands.add(COMMAND_NAME__INSERT_OPTIONS, new InsertOptionsCommand(this.editor));
   }
 
   _defineSchema() {
@@ -60,6 +61,7 @@ export default class ControlsMenuEditing extends Plugin {
       isInline: true,
       allowIn: V_SELECT,
       allowContentOf: "$root",
+      allowAttributes: ["label", "value"],
     });
     schema.register(V_OPTIONS, {
       isLimit: true,
@@ -165,14 +167,17 @@ export default class ControlsMenuEditing extends Plugin {
     conversion.for("downcast").elementToElement({
       model: V_OPTION,
       view: (modelElement, { writer }) => {
+        console.log(modelElement);
+        console.log(modelElement.getAttribute("label"), modelElement.getAttribute("value"));
         const option = writer.createEditableElement("option", {
           class: "simple-box-description",
-          label: "Lee",
-          value: "Lee",
+          label: modelElement.getAttribute("label"),
+          value: modelElement.getAttribute("value"),
         });
 
         return toWidget(option, writer);
       },
+      renderUnsafeAttributes: ["label", "value"],
     });
 
     conversion.for("upcast").elementToElement({

@@ -7,7 +7,9 @@ import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import { addListToDropdown, createDropdown } from "@ckeditor/ckeditor5-ui/src/dropdown/utils";
 import Collection from "@ckeditor/ckeditor5-utils/src/collection";
 import Model from "@ckeditor/ckeditor5-ui/src/model";
-import { COMMAND_NAME__INSERT_SELECT } from "./constant";
+import { COMMAND_NAME__INSERT_SELECT, CONTROLS_TOOLBAR, WIDGET_TOOLBAR_NAME__MENU, COMMAND_NAME__OPEN_CONTROL_MODAL } from "./constant";
+import { emitter, SWITCH_MODAL } from "../../components/mode/mitt";
+import { getMarkerAtPosition } from "@/plugins/formControls/utils.js";
 
 export default class ControlsMenuUI extends Plugin {
   init() {
@@ -18,7 +20,7 @@ export default class ControlsMenuUI extends Plugin {
 
     // The "simpleBox" button must be registered among the UI components of the editor
     // to be displayed in the toolbar.
-    editor.ui.componentFactory.add("controlsMenu", locale => {
+    editor.ui.componentFactory.add(WIDGET_TOOLBAR_NAME__MENU, locale => {
       // The state of the button will be bound to the widget command.
       const command = editor.commands.get("insertSelect");
 
@@ -55,5 +57,31 @@ export default class ControlsMenuUI extends Plugin {
 
       return dropdownView;
     });
+    createControlsToolbar(this);
   }
 }
+
+export const createControlsToolbar = context => {
+  const { editor } = context;
+  editor.ui.componentFactory.add(CONTROLS_TOOLBAR, locale => {
+    // The state of the button will be bound to the widget command.
+    try {
+      const command = editor.commands.get("insertSelect");
+
+      const dropButton = new ButtonView(locale);
+      dropButton.bind("isOn", "isEnabled").to(command, "value", "isEnabled");
+      console.log(dropButton);
+      console.log(dropButton.set);
+      dropButton.set({
+        withText: true,
+        label: "配置",
+      });
+      console.log(dropButton);
+      context.listenTo(dropButton, "execute", val => emitter.emit(SWITCH_MODAL));
+
+      return dropButton;
+    } catch (error) {
+      console.error(error);
+    }
+  });
+};
