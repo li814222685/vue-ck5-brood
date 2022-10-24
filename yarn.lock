@@ -1071,6 +1071,11 @@
     "ckeditor5" "^35.2.1"
     "lodash-es" "^4.17.15"
 
+"@ckeditor/ckeditor5-inspector@^4.1.0":
+  "integrity" "sha512-yKoIFpaSVQQIhgFEyoltwG40OSsWX5psYdYvNxW84nfxgrs90DJrbMQDtdchVZNMXBu6CkJfPiPG0WBLU9su3g=="
+  "resolved" "https://registry.npmjs.org/@ckeditor/ckeditor5-inspector/-/ckeditor5-inspector-4.1.0.tgz"
+  "version" "4.1.0"
+
 "@ckeditor/ckeditor5-link@^35.0.1":
   "integrity" "sha512-eie6C8pYttBeTpXVNSrRUE8LQ091CJVWUOESo0bgjFG9+/1H6lXWcfGy/ZyQiWpEDzaQ+qJrOrWhkiU6TAmxaA=="
   "resolved" "https://registry.npmjs.org/@ckeditor/ckeditor5-link/-/ckeditor5-link-35.2.1.tgz"

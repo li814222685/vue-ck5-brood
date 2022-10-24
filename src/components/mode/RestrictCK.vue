@@ -21,6 +21,8 @@ import { getMarkerAtPosition } from "@/plugins/formControls/utils.js";
 import { RESTRICT_CONFIG } from "./config.js";
 import { regExpReplacer, removeClass, removeElement } from "../utils";
 import { EditorClasses } from "./define";
+import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
+
 const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
 
 export default {
@@ -45,6 +47,8 @@ export default {
     window.addEventListener("mousedown", this.onGlobalClick);
     ClassicEditor.create(document.querySelector("#editor"), RESTRICT_CONFIG)
       .then(editor => {
+        CKEditorInspector.attach(editor);
+
         //编辑器实例挂载到 Window
         window.editor = editor;
         editor.setData(this.htmlData);

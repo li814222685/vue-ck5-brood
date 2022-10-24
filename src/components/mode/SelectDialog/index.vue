@@ -1,6 +1,6 @@
 <template>
   <el-dialog v-model="props.visible" title="下拉选项设置" width="30%">
-    <el-table :data="refTableData" style="width: 100%">
+    <el-table :data="tableData" style="width: 100%">
       <el-table-column prop="label" label="名称" width="180">
         <template #default="scope">
           <el-input v-if="targetRow == scope.$index" v-model="scope.row.label" placeholder="Please input" />
@@ -31,7 +31,7 @@
   </el-dialog>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, toRaw } from "vue";
+import { reactive, ref, toRaw, toRefs } from "vue";
 
 export interface Option {
   label: string | number;
@@ -57,17 +57,19 @@ const mock = [
 ];
 const props = defineProps<SelectDialogProps>();
 // const refTableData = reactive(props.tableData);
-const refTableData = reactive<Option[]>(mock);
+const state = reactive<SelectDialogProps>(props);
+const { tableData } = toRefs(state);
 const targetRow = ref<number>(null);
 
 const deleteRow = (rowIndex: number) => {
-  refTableData.splice(rowIndex, 1);
+  tableData.value.splice(rowIndex, 1);
 };
 
 const onAddItem = () => {
   const newOption = { label: "", value: "" };
-  refTableData.push(newOption);
-  targetRow.value = refTableData.length - 1;
+  console.log(tableData.value);
+  tableData.value.push(newOption);
+  targetRow.value = tableData.value.length - 1;
 };
 
 const editRow = (rowIndex: number) => {
@@ -76,13 +78,13 @@ const editRow = (rowIndex: number) => {
 
 const saveRow = (rowIndex: number, rowVal: Option) => {
   const value = toRaw(rowVal);
-  refTableData[rowIndex] = value;
+  tableData.value[rowIndex] = value;
   targetRow.value = null;
 };
 
 const submitOptions = () => {
   try {
-    props.insertOptionsToSelect(toRaw(refTableData));
+    props.insertOptionsToSelect(toRaw(tableData.value) as any);
     props.changeVisible();
   } catch (error) {
     console.log(error);

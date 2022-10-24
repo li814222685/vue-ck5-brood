@@ -6,7 +6,7 @@
 
     <div id="devEditor"></div>
   </div>
-  <SelectDialog :visible="dialogVisible" :change-visible="swtichModal" :table-data="[]" :insert-options-to-select="insertOptionsToSelect" />
+  <SelectDialog :visible="dialogVisible" :change-visible="swtichModal" :table-data="selectedOptions" :insert-options-to-select="insertOptionsToSelect" />
 </template>
 <style>
 .hidden-item {
@@ -21,11 +21,10 @@
 import _ from "lodash";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 import { NORMAL_CONFIG } from "./config.js";
-import { EditorClasses } from "./define";
-const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
-import { emitter, SWITCH_MODAL } from "./mitt";
+import { emitter, SWITCH_MODAL, Option, GET_OPTIONS } from "./mitt";
 import SelectDialog from "./SelectDialog/index.vue";
 import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
+import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
@@ -35,14 +34,16 @@ export default {
       anchor: null,
       deposit: {},
       dialogVisible: false,
+      selectedOptions: [], //当前选中select 有哪些options，用来将options传递到弹窗表格内
     };
   },
   components: { SelectDialog },
   mounted() {
     //挂载Emitter
-    emitter.on(SWITCH_MODAL, this.swtichModal);
+    this.hangUpAllEmitFunctions();
     ClassicEditor.create(document.querySelector("#devEditor"), NORMAL_CONFIG)
       .then(editor => {
+        CKEditorInspector.attach(editor);
         //编辑器实例挂载到 Window
         (window as any).devEditor = editor;
         editor.setData(this.htmlData);
@@ -55,9 +56,25 @@ export default {
     },
     swtichModal() {
       this.dialogVisible = !this.dialogVisible;
+      //每次关闭MODAL后都清空 Table 数据
+      emitter.emit(GET_OPTIONS, []);
     },
-    insertOptionsToSelect(options) {
+
+    /** emitter函数挂起 */
+    hangUpAllEmitFunctions() {
+      emitter.on(SWITCH_MODAL, this.swtichModal);
+      emitter.on(GET_OPTIONS, this.setOptionListFromSelect);
+    },
+
+    /** 向当前select 插入options */
+    insertOptionsToSelect(options: Option[]) {
       (window as any).devEditor.execute(COMMAND_NAME__INSERT_OPTIONS, options);
+    },
+
+    /** 获取当前select的options list */
+    setOptionListFromSelect(options: Option[]) {
+      console.log(options);
+      this.selectedOptions = _.cloneDeep(options);
     },
   },
   computed: {

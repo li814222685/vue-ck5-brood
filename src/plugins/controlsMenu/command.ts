@@ -85,12 +85,8 @@ export function createSimpleBox(writer: Writer, attrs?: Option[]) {
 
   const controls = writer.createElement(CONTROLS_CONTAINER); // => span
   const v_select = writer.createElement(V_SELECT); // => select
-  const v_option = writer.createElement(V_OPTION); // => option
-  const v_options = writer.createElement(V_OPTIONS); // => option
 
   writer.append(v_select, controls);
-  writer.append(v_option, v_select);
-  writer.append(v_options, v_select);
 
   return controls;
 }
