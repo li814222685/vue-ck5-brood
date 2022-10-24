@@ -6,7 +6,7 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { InsertSimpleBoxCommand, createSimpleBox } from "./insertsimpleboxcommand";
 import { toWidget, toWidgetEditable, viewToModelPositionOutsideModelElement } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { getMarkerAtPosition } from "./utils";
+import { upcastHighlightToMarker } from "./utils";
 export default class FormControlEditing extends Plugin {
   static get requires() {
     return [Widget];
@@ -21,10 +21,10 @@ export default class FormControlEditing extends Plugin {
 
     this.editor.commands.add("insertSimpleBox", new InsertSimpleBoxCommand(this.editor));
 
-    this.editor.editing.mapper.on(
-      "viewToModelPosition",
-      viewToModelPositionOutsideModelElement(this.editor.model, viewElement => viewElement.hasClass("restricted-editing-exception"))
-    );
+    // this.editor.editing.mapper.on(
+    //   "viewToModelPosition",
+    //   viewToModelPositionOutsideModelElement(this.editor.model, viewElement => viewElement.hasClass("restricted-editing-exception"))
+    // );
 
     // editingView.change((writer) => {
     //   const section = writer.createContainerElement("span", {
@@ -109,23 +109,9 @@ export default class FormControlEditing extends Plugin {
 
   _defineConverters() {
     const conversion = this.editor.conversion;
+    this._vSelectConversion(conversion);
 
     // <simpleBox> converters
-    conversion.for("upcast").elementToElement({
-      model: "simpleBox",
-      view: {
-        name: "span",
-        classes: "simple-box",
-      },
-    });
-
-    conversion.for("downcast").elementToElement({
-      model: "simpleBox",
-      view: {
-        name: "span",
-        classes: "simple-box restricted-editing-exception extendBackground",
-      },
-    });
 
     // conversion.for("downcast").elementToElement({
     //   model: "simpleSpan",
@@ -135,57 +121,81 @@ export default class FormControlEditing extends Plugin {
     //   },
     // });
     // <simpleBoxTitle> converters
-    conversion.for("upcast").elementToElement({
-      view: "control-select",
-      model: (ele, { writer }) => {
-        console.log(ele.getClassNames());
-        return writer.createElement("control-select", { class: [...ele.getClassNames()].join(" ") });
-      },
-      converterPriority: "highest",
-    });
+    console.log(666);
+    let markerNumber = 0;
+    conversion.for("upcast").add(
+      upcastHighlightToMarker({
+        view: {
+          name: "control-select",
+        },
+        model: () => {
+          console.log(7777);
+          console.log(
+            "%c🍉Lee%cline:132%cupMarker",
+            "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+            "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+            "color:#fff;background:rgb(17, 63, 61);padding:3px;border-radius:2px",
+            "upMarker"
+          );
+          markerNumber++; // Starting from restrictedEditingException:1 marker.
 
-    conversion.for("downcast").elementToElement({
-      model: "control-select",
-      view: (ele, { writer }) => {
-        const span = writer.createContainerElement(
-          "span",
-          {
-            class: ele.getAttribute("class"),
-          },
-          [writer.createText("我就是控件点我试试？")]
-        );
-        console.log(span);
-        return span;
-      },
-      converterPriority: "highest",
-    });
+          return `controlSelect:${markerNumber}`;
+        },
+        converterPriority: "high",
+      })
+    );
 
     conversion.for("downcast").markerToHighlight({
-      model: "restrictedEditingException",
+      model: "controlSelect",
       // Use callback to return new object every time new marker instance is created - otherwise it will be seen as the same marker.
-      view: (data, { writer }) => {
-        console.log(data);
+      view: () => {
+        console.log(
+          "%c🍉Lee%cline:143%cdowncast",
+          "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+          "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+          "color:#fff;background:rgb(20, 68, 106);padding:3px;border-radius:2px",
+          "downcast"
+        );
         return {
           name: "span",
-          classes: "restricted-editing-exception",
+          classes: "restricted-editing-exception v-select",
         };
       },
-      renderUnsafeAttributes: ["classes", "controlType"],
-      converterPriority: "high",
     });
 
-    conversion.for("upcast").elementToElement({
-      // model: 'simpleBoxTitle',
-      view: {
-        name: "select",
-        classes: "virtual-select",
-      },
-      model: (viewElement, conversionApi) => {
-        const modelWriter = conversionApi.writer;
-
-        return modelWriter.createElement("virtual-select", {
-          level: viewElement.getAttribute("data-level"),
+    conversion.for("editingDowncast").markerToElement({
+      model: "control-select",
+      view: (markerData, { writer }) => {
+        console.log(
+          "%c🍉Lee%cline:153%cediting",
+          "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+          "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+          "color:#fff;background:rgb(153, 80, 84);padding:3px;border-radius:2px",
+          "editing"
+        );
+        return writer.createUIElement("span", {
+          class: "restricted-editing-exception restricted-editing-exception_collapsed",
         });
+      },
+    });
+
+    conversion.for("dataDowncast").markerToElement({
+      model: "control-select",
+      view: (markerData, { writer }) => {
+        return writer.createEmptyElement("span", {
+          class: "restricted-editing-exception",
+        });
+      },
+    });
+  }
+
+  /** Select 以及option的转换Logic */
+  _vSelectConversion(conversion) {
+    conversion.for("downcast").elementToElement({
+      model: "simpleBox",
+      view: {
+        name: "span",
+        classes: "simple-box restricted-editing-exception extendBackground",
       },
     });
 
@@ -207,16 +217,6 @@ export default class FormControlEditing extends Plugin {
         return toWidgetEditable(select, viewWriter);
       },
     });
-    // <simpleBoxDescription> converters
-    conversion.for("upcast").elementToElement({
-      model: "simpleBoxDescription",
-      view: {
-        name: "option",
-        classes: "simple-box-description",
-        value: "666",
-        label: "666",
-      },
-    });
 
     conversion.for("downcast").elementToElement({
       model: "simpleBoxDescription",
@@ -228,15 +228,6 @@ export default class FormControlEditing extends Plugin {
         });
 
         return toWidgetEditable(option, writer);
-      },
-    });
-
-    conversion.for("upcast").elementToElement({
-      model: "simpleBoxDescriptions",
-      view: {
-        name: "option",
-        classes: "simple-box-descriptions",
-        label: "666",
       },
     });
 

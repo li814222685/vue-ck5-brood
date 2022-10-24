@@ -21,9 +21,10 @@ enum EditorMode {
   Restrict = "restrict",
 }
 
-const nowMode = ref(EditorMode.Normal);
-const htmlData = ref("<p>你的姓名：Lee  nickName:<span class='restricted-editing-exception'>Lee</span></p>");
-const { value: editorMode } = nowMode;
+const nowMode = ref(EditorMode.Restrict);
+const htmlData =
+  ref(`<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span><control-select class="restricted-editing-exception control-select" controltype="select">ControlSelect</control-select></p>
+`);
 
 onUpdated(() => {
   const { value: editorMode } = nowMode;

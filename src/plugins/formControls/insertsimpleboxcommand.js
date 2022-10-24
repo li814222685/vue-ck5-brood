@@ -6,6 +6,7 @@ import Command from "@ckeditor/ckeditor5-core/src/command";
 
 export class InsertSimpleBoxCommand extends Command {
   execute(range) {
+    console.log("执行了");
     return this.editor.model.change(writer => {
       // Insert <simpleBox>*</simpleBox> at the current selection position
       // in a way that will result in creating a valid model structure.
@@ -27,6 +28,13 @@ export class InsertSimpleBoxCommand extends Command {
   }
 }
 export function createSimpleBox(writer) {
+  console.log(
+    "%c🍉Lee%cline:30%c创建创建",
+    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+    "color:#fff;background:rgb(227, 160, 93);padding:3px;border-radius:2px",
+    "创建创建"
+  );
   const simpleBox = writer.createElement("simpleBox"); // => span
   const simpleBoxTitle = writer.createElement("simpleBoxTitle"); // => select
   const simpleBoxDescription = writer.createElement("simpleBoxDescription"); // => option

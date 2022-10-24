@@ -22,6 +22,7 @@ import { RESTRICT_CONFIG } from "./config.js";
 import { regExpReplacer, removeClass, removeElement } from "../utils";
 import { EditorClasses } from "./define";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
+import { createSimpleBox } from "@/plugins/formControls/insertsimpleboxcommand";
 
 const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
 
@@ -65,17 +66,30 @@ export default {
         const editor = window.editor;
         const { model, editing } = editor;
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
-        const isSelected = Array.from(clickDom.classList).includes(EDITABLE_CLASS);
+        console.log(clickDom.classList);
+        const isSelected = Array.from(clickDom.classList).includes("v-select");
         // 点击可编辑区域时候执行
         if (isSelected) {
           const modelSelection = model.document.selection;
           const marker = getMarkerAtPosition(editor, modelSelection.anchor);
           if (!marker) return;
           const itemEnd = marker.getEnd();
+          console.log(itemEnd);
           // replace编辑器指定位置的DOM
           new Promise(res => {
             editing.view.change(writer => {
               const newRange = editor.execute("insertSimpleBox", itemEnd);
+              model.change(downcastWriter => {
+                const range = model.insertObject(createSimpleBox(downcastWriter), itemEnd);
+                console.log("9999:", range);
+              });
+              console.log(
+                "%c🍉Lee%cline:79%cNewRange",
+                "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+                "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+                "color:#fff;background:rgb(248, 214, 110);padding:3px;border-radius:2px",
+                "执行后"
+              );
               //缓存将要移除的marker 和 当前的range
               const [oldViewElement] = [...editor.editing.mapper.markerNameToElements(marker.name)];
               this.deposit = {
@@ -113,6 +127,7 @@ export default {
         //移除vselect
         select.blur();
         const text = writer.createText(value, oldViewElement.getAttributes());
+        console.log(text);
         model.insertContent(text, range);
       });
     },

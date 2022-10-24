@@ -3,6 +3,8 @@
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
 
+import { Matcher } from "ckeditor5/src/engine";
+
 /**
  * @module restricted-editing/restrictededitingmode/utils
  */
@@ -22,7 +24,7 @@ export function getMarkerAtPosition(editor, position) {
     const markerRange = marker.getRange();
     console.log(markerRange, position, marker);
     if (isPositionInRangeBoundaries(markerRange, position)) {
-      if (marker.name.startsWith("restrictedEditingException:")) {
+      if (marker.name.startsWith("restrictedEditingException:") || marker.name.startsWith("controlSelect:")) {
         console.log(marker);
         return marker;
       }
@@ -69,4 +71,54 @@ export function isSelectionInMarker(selection, marker) {
   }
 
   return markerRange.containsRange(selection.getFirstRange(), true);
+}
+
+export function upcastHighlightToMarker(config) {
+  console.log("上传助手");
+  return dispatcher =>
+    dispatcher.on("element:control-select", (evt, data, conversionApi) => {
+      console.log(
+        "%c🍉Lee%cline:80%cdisPatcher",
+        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+        "color:#fff;background:rgb(114, 83, 52);padding:3px;border-radius:2px",
+        "disPatcher"
+      );
+      const { writer } = conversionApi;
+
+      const matcher = new Matcher(config.view);
+      console.log("view🍉：", config.view, "viewItem🤔:", data.viewItem);
+      const matcherResult = matcher.match(data.viewItem);
+
+      console.log(
+        "%c🍉Lee%cline:91%cmathcerResult",
+        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+        "color:#fff;background:rgb(3, 101, 100);padding:3px;border-radius:2px",
+        matcherResult
+      );
+      // If there is no match, this callback should not do anything.
+      if (!matcherResult) {
+        return;
+      }
+
+      const match = matcherResult.match;
+
+      // Force consuming element's name (taken from upcast helpers elementToElement converter).
+      match.name = true;
+
+      const { modelRange: convertedChildrenRange } = conversionApi.convertChildren(data.viewItem, data.modelCursor);
+      conversionApi.consumable.consume(data.viewItem, match);
+
+      const markerName = config.model(data.viewItem);
+      const fakeMarkerStart = writer.createElement("$marker", { "data-name": markerName });
+      const fakeMarkerEnd = writer.createElement("$marker", { "data-name": markerName });
+
+      // Insert in reverse order to use converter content positions directly (without recalculating).
+      writer.insert(fakeMarkerEnd, convertedChildrenRange.end);
+      writer.insert(fakeMarkerStart, convertedChildrenRange.start);
+
+      data.modelRange = writer.createRange(writer.createPositionBefore(fakeMarkerStart), writer.createPositionAfter(fakeMarkerEnd));
+      data.modelCursor = data.modelRange.end;
+    });
 }
