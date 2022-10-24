@@ -23,8 +23,9 @@ import { regExpReplacer, removeClass, removeElement } from "../utils";
 import { EditorClasses } from "./define";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import { createSimpleBox } from "@/plugins/formControls/insertsimpleboxcommand";
+import { V_SELECT } from "../../plugins/controlsMenu/constant.ts";
 
-const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
+const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT_CLASS } = EditorClasses;
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
@@ -67,7 +68,7 @@ export default {
         const { model, editing } = editor;
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
         console.log(clickDom.classList);
-        const isSelected = Array.from(clickDom.classList).includes("v-select");
+        const isSelected = Array.from(clickDom.classList).includes(V_SELECT);
         // 点击可编辑区域时候执行
         if (isSelected) {
           const modelSelection = model.document.selection;
@@ -102,7 +103,7 @@ export default {
               res();
             });
           }).then(res => {
-            const select = document.querySelector(V_SELECT);
+            const select = document.querySelector(V_SELECT_CLASS);
             const textNode = document.querySelector(".hidden-item");
             select.focus();
             select.value = textNode.innerText;
@@ -119,7 +120,7 @@ export default {
       const editor = window.editor;
       const { model, editing } = editor;
       const { oldViewElement, newRange, oldMarker } = toRaw(this.deposit);
-      const select = document.querySelector(V_SELECT);
+      const select = document.querySelector(V_SELECT_CLASS);
       const value = select.options[select.selectedIndex].value;
       const range = oldMarker.getRange();
 
