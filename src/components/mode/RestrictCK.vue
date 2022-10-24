@@ -67,7 +67,6 @@ export default {
         const editor = window.editor;
         const { model, editing } = editor;
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
-        console.log(clickDom.classList);
         const isSelected = Array.from(clickDom.classList).includes(V_SELECT);
         // 点击可编辑区域时候执行
         if (isSelected) {
@@ -75,28 +74,19 @@ export default {
           const marker = getMarkerAtPosition(editor, modelSelection.anchor);
           if (!marker) return;
           const itemEnd = marker.getEnd();
-          console.log(itemEnd);
           // replace编辑器指定位置的DOM
+          let range;
           new Promise(res => {
             editing.view.change(writer => {
-              const newRange = editor.execute("insertSimpleBox", itemEnd);
               model.change(downcastWriter => {
-                const range = model.insertObject(createSimpleBox(downcastWriter), itemEnd);
-                console.log("9999:", range);
+                range = model.insertObject(createSimpleBox(downcastWriter), itemEnd);
               });
-              console.log(
-                "%c🍉Lee%cline:79%cNewRange",
-                "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-                "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-                "color:#fff;background:rgb(248, 214, 110);padding:3px;border-radius:2px",
-                "执行后"
-              );
               //缓存将要移除的marker 和 当前的range
               const [oldViewElement] = [...editor.editing.mapper.markerNameToElements(marker.name)];
               this.deposit = {
                 oldViewElement,
                 dom: clickDom,
-                newRange,
+                newRange: range,
                 oldMarker: marker,
               };
               writer.addClass(HIDDEN_CLASS, oldViewElement);
@@ -123,12 +113,12 @@ export default {
       const select = document.querySelector(V_SELECT_CLASS);
       const value = select.options[select.selectedIndex].value;
       const range = oldMarker.getRange();
-
       model.change(writer => {
         //移除vselect
         select.blur();
         const text = writer.createText(value, oldViewElement.getAttributes());
-        console.log(text);
+        console.log(text, range);
+        //这里的问题
         model.insertContent(text, range);
       });
     },
@@ -161,7 +151,6 @@ export default {
     htmlData: {
       immediate: true,
       handler(val) {
-        console.log(window.editor);
         if (window.editor) {
           window.editor.setData(val);
         }

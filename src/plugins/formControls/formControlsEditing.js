@@ -20,19 +20,6 @@ export default class FormControlEditing extends Plugin {
     this._defineConverters();
 
     this.editor.commands.add("insertSimpleBox", new InsertSimpleBoxCommand(this.editor));
-
-    // this.editor.editing.mapper.on(
-    //   "viewToModelPosition",
-    //   viewToModelPositionOutsideModelElement(this.editor.model, viewElement => viewElement.hasClass("restricted-editing-exception"))
-    // );
-
-    // editingView.change((writer) => {
-    //   const section = writer.createContainerElement("span", {
-    //     class: "simple-box",
-    //   });
-
-    //   writer.insert(docFrag);
-    // });
   }
 
   _defineSchema() {
@@ -111,17 +98,6 @@ export default class FormControlEditing extends Plugin {
     const conversion = this.editor.conversion;
     this._vSelectConversion(conversion);
 
-    // <simpleBox> converters
-
-    // conversion.for("downcast").elementToElement({
-    //   model: "simpleSpan",
-    //   view: {
-    //     name: "span",
-    //     classes: "restricted-editing-exception ",
-    //   },
-    // });
-    // <simpleBoxTitle> converters
-    console.log(666);
     let markerNumber = 0;
     conversion.for("upcast").add(
       upcastHighlightToMarker({
@@ -129,16 +105,7 @@ export default class FormControlEditing extends Plugin {
           name: "control-select",
         },
         model: () => {
-          console.log(7777);
-          console.log(
-            "%c🍉Lee%cline:132%cupMarker",
-            "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-            "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-            "color:#fff;background:rgb(17, 63, 61);padding:3px;border-radius:2px",
-            "upMarker"
-          );
           markerNumber++; // Starting from restrictedEditingException:1 marker.
-
           return `controlSelect:${markerNumber}`;
         },
         converterPriority: "high",
@@ -147,15 +114,7 @@ export default class FormControlEditing extends Plugin {
 
     conversion.for("downcast").markerToHighlight({
       model: "controlSelect",
-      // Use callback to return new object every time new marker instance is created - otherwise it will be seen as the same marker.
       view: () => {
-        console.log(
-          "%c🍉Lee%cline:143%cdowncast",
-          "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-          "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-          "color:#fff;background:rgb(20, 68, 106);padding:3px;border-radius:2px",
-          "downcast"
-        );
         return {
           name: "span",
           classes: "restricted-editing-exception v-select",
@@ -166,13 +125,6 @@ export default class FormControlEditing extends Plugin {
     conversion.for("editingDowncast").markerToElement({
       model: "control-select",
       view: (markerData, { writer }) => {
-        console.log(
-          "%c🍉Lee%cline:153%cediting",
-          "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-          "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-          "color:#fff;background:rgb(153, 80, 84);padding:3px;border-radius:2px",
-          "editing"
-        );
         return writer.createUIElement("span", {
           class: "restricted-editing-exception restricted-editing-exception_collapsed",
         });
@@ -202,7 +154,6 @@ export default class FormControlEditing extends Plugin {
     conversion.for("downcast").elementToElement({
       model: "simpleBoxTitle",
       view: (modelElement, { writer: viewWriter }) => {
-        // Note: You use a more specialized createEditableElement() method here.
         const select = viewWriter.createEditableElement(
           "select",
           {
@@ -234,7 +185,6 @@ export default class FormControlEditing extends Plugin {
     conversion.for("downcast").elementToElement({
       model: "simpleBoxDescriptions",
       view: (modelElement, { writer: viewWriter }) => {
-        // Note: You use a more specialized createEditableElement() method here.
         const option = viewWriter.createEditableElement("option", { class: "simple-box-descriptions", value: "李浩", label: "李浩" }, ["no"]);
 
         return toWidgetEditable(option, viewWriter);

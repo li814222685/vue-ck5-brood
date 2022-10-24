@@ -34,6 +34,7 @@ export const addClass = (itemClass, view) => {
 export const removeClass = (itemClass, view) => {
   const { editing } = window.editor;
   editing.view.change(writer => {
+    console.log(itemClass, view);
     writer.removeClass(itemClass, view);
   });
 };
@@ -45,6 +46,7 @@ export const removeClass = (itemClass, view) => {
 export const removeElement = range => {
   const { model } = window.editor;
   model.change(writer => {
+    console.log(range);
     writer.remove(range);
   });
 };
