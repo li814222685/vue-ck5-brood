@@ -22,7 +22,9 @@ enum EditorMode {
 }
 
 const nowMode = ref(EditorMode.Normal);
-const htmlData = ref("<p>你的姓名：Lee  nickName:<span class='restricted-editing-exception'>Lee</span></p>");
+const htmlData = ref(
+  '<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p><figure class="table"><table><tbody><tr><td>Red</td><td>Pink</td><td>Purple</td></tr><tr><td>Indigo</td><td>Blue</td><td>&nbsp;</td></tr></tbody></table></figure>'
+);
 const { value: editorMode } = nowMode;
 
 onUpdated(() => {
