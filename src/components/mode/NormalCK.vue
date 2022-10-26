@@ -13,12 +13,14 @@
     :insert-options-to-select="insertOptionsToSelect"
   />
 </template>
-<style>
+<style scoped>
 .hidden-item {
   display: none;
 }
 .extendBackground {
-  background-color: rgba(255, 169, 77, 0.2) !important;
+  background-color: inherit !important;
+  min-width: 60px;
+  outline: none !important;
 }
 </style>
 

@@ -55,6 +55,7 @@ const changeHtmlData = (val: string) => {
     .ck-editor__editable .restricted-editing-exception {
       background-color: inherit !important;
       border: none !important;
+      padding: 0px;
     }
   }
 }
