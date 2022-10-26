@@ -6,7 +6,7 @@
     "serve": "yarn && vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "formatAll": "prettier --config .prettierrc.js --write ./**/**/*.{js,css,vue}"
+    "formatAll": "prettier --config .prettierrc.js --write ./src"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-basic-styles": "^35.1.0",

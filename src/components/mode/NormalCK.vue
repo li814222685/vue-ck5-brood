@@ -6,7 +6,12 @@
 
     <div id="devEditor"></div>
   </div>
-  <SelectDialog :visible="dialogVisible" :change-visible="swtichModal" :table-data="selectedOptions" :insert-options-to-select="insertOptionsToSelect" />
+  <SelectDialog
+    :visible="dialogVisible"
+    :change-visible="swtichModal"
+    :table-data="selectedOptions"
+    :insert-options-to-select="insertOptionsToSelect"
+  />
 </template>
 <style>
 .hidden-item {
@@ -50,11 +55,6 @@ export default {
         //编辑器实例挂载到 Window
         (window as any).devEditor = editor;
         editor.setData(this.htmlData);
-        const dom =
-          '<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p><figure class="table"><table><tbody><tr><td><span class="restricted-editing-exception">Red</span></td><td>Pink</td><td>Purple</td></tr><tr><td>Indigo</td><td>Blue</td><td>&nbsp;</td></tr></tbody></table></figure>';
-        const jn = toAst(dom);
-        console.log(JSON.stringify(jn));
-        console.log(toHtmlString(jn));
       })
       .catch(error => {});
   },

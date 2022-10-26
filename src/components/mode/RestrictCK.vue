@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="restrictMode">
     <el-button type="primary" @click="exportData" plain>导出</el-button>
     <div id="editor"></div>
   </div>
@@ -44,7 +44,7 @@ export default {
   mounted() {
     // 注册点击事件监听
     console.log(this.htmlData);
-    window.addEventListener("mousedown", this.onGlobalClick);
+    // window.addEventListener("mousedown", this.onGlobalClick);
     ClassicEditor.create(document.querySelector("#editor"), RESTRICT_CONFIG)
       .then(editor => {
         CKEditorInspector.attach(editor);

@@ -15,12 +15,39 @@ import StandardEditingMode from "@ckeditor/ckeditor5-restricted-editing/src/stan
 import SelectToolbar from "../../plugins/controlsMenu/toolbar";
 import { WIDGET_TOOLBAR_NAME__MENU } from "../../plugins/controlsMenu/constant";
 export const RESTRICT_CONFIG = {
-  plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, RestrictedEditingMode, FormControls, Table, TableToolbar, TableProperties, TableCellProperties],
+  plugins: [
+    Heading,
+    Essentials,
+    Bold,
+    Italic,
+    Paragraph,
+    Link,
+    RestrictedEditingMode,
+    FormControls,
+    Table,
+    TableToolbar,
+    TableProperties,
+    TableCellProperties,
+  ],
   restrictedEditing: {
     allowedCommands: ["bold", "simpleBox", "heading", "insertSimpleBox"],
     allowedAttributes: ["bold", "simpleBox", "heading", "class", "control-select", "controlType"],
   },
-  toolbar: ["heading", "|", "bold", "italic", "link", "numberedList", "bulletedList", "|", "abbreviation", "abbreviations", "bubble", "simpleBox", "restrictedEditing"],
+  toolbar: [
+    "heading",
+    "|",
+    "bold",
+    "italic",
+    "link",
+    "numberedList",
+    "bulletedList",
+    "|",
+    "abbreviation",
+    "abbreviations",
+    "bubble",
+    "simpleBox",
+    "restrictedEditing",
+  ],
 };
 
 const customColorPalette = [
@@ -53,7 +80,22 @@ const customColorPalette = [
 ];
 
 export const NORMAL_CONFIG = {
-  plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, StandardEditingMode, ControlsMenu, SelectToolbar, Table, TableToolbar, TableProperties, TableCellProperties, Bold],
+  plugins: [
+    Heading,
+    Essentials,
+    Bold,
+    Italic,
+    Paragraph,
+    Link,
+    StandardEditingMode,
+    ControlsMenu,
+    SelectToolbar,
+    Table,
+    TableToolbar,
+    TableProperties,
+    TableCellProperties,
+    Bold,
+  ],
 
   toolbar: [
     "heading",
@@ -72,7 +114,13 @@ export const NORMAL_CONFIG = {
     "insertTable",
   ],
   table: {
-    contentToolbar: ["tableColumn", "tableRow", "mergeTableCells", "tableProperties", "tableCellProperties"],
+    contentToolbar: [
+      "tableColumn",
+      "tableRow",
+      "mergeTableCells",
+      "tableProperties",
+      "tableCellProperties",
+    ],
     tableProperties: {
       // ...
     },

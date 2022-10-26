@@ -6,8 +6,16 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { InsertControlsCommand, InsertOptionsCommand } from "./command";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { COMMAND_NAME__INSERT_SELECT, CONTROLS_CONTAINER, CUSTOM_PROPERTY__SELECT, V_OPTIONS, V_SELECT, COMMAND_NAME__INSERT_OPTIONS } from "./constant";
+import {
+  COMMAND_NAME__INSERT_SELECT,
+  CONTROLS_CONTAINER,
+  CUSTOM_PROPERTY__SELECT,
+  V_OPTIONS,
+  V_SELECT,
+  COMMAND_NAME__INSERT_OPTIONS,
+} from "./constant";
 import { V_OPTION } from "./constant";
+import { converDowncastCell } from "./util";
 export default class ControlsMenuEditing extends Plugin {
   static get requires() {
     return [Widget];
@@ -193,7 +201,11 @@ export default class ControlsMenuEditing extends Plugin {
       model: V_OPTIONS,
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
-        const option = viewWriter.createEditableElement("option", { class: "simple-box-descriptions", value: "李浩", label: "李浩" }, ["no"]);
+        const option = viewWriter.createEditableElement(
+          "option",
+          { class: "simple-box-descriptions", value: "李浩", label: "李浩" },
+          ["no"]
+        );
 
         return toWidget(option, viewWriter);
       },
@@ -247,6 +259,13 @@ export default class ControlsMenuEditing extends Plugin {
         return writer.createText("");
       },
       converterPriority: "high",
+    });
+
+    //Table 单元格outputData 的逻辑重写
+    conversion.for("dataDowncast").elementToElement({
+      model: "tableCell",
+      view: converDowncastCell(),
+      converterPriority: "highest",
     });
   }
 }

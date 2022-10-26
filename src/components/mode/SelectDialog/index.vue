@@ -3,21 +3,41 @@
     <el-table :data="tableData" style="width: 100%">
       <el-table-column prop="label" label="名称" width="180">
         <template #default="scope">
-          <el-input v-if="targetRow == scope.$index" v-model="scope.row.label" placeholder="Please input" />
+          <el-input
+            v-if="targetRow == scope.$index"
+            v-model="scope.row.label"
+            placeholder="Please input"
+          />
           <span v-else>{{ scope.row.label }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="value" label="值" width="180">
         <template #default="scope">
-          <el-input v-if="targetRow == scope.$index" v-model="scope.row.value" placeholder="Please input" />
+          <el-input
+            v-if="targetRow == scope.$index"
+            v-model="scope.row.value"
+            placeholder="Please input"
+          />
           <span v-else>{{ scope.row.value }}</span>
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作">
         <template #default="scope">
-          <el-button v-if="targetRow == scope.$index" link type="primary" size="small" @click.prevent="saveRow(scope.$index, scope.row)"> 保存 </el-button>
-          <el-button v-else link type="primary" size="small" @click.prevent="editRow(scope.$index)"> 修改 </el-button>
-          <el-button link type="primary" size="small" @click.prevent="deleteRow(scope.$index)"> 删除 </el-button>
+          <el-button
+            v-if="targetRow == scope.$index"
+            link
+            type="primary"
+            size="small"
+            @click.prevent="saveRow(scope.$index, scope.row)"
+          >
+            保存
+          </el-button>
+          <el-button v-else link type="primary" size="small" @click.prevent="editRow(scope.$index)">
+            修改
+          </el-button>
+          <el-button link type="primary" size="small" @click.prevent="deleteRow(scope.$index)">
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>

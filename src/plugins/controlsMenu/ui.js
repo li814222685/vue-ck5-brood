@@ -7,7 +7,12 @@ import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import { addListToDropdown, createDropdown } from "@ckeditor/ckeditor5-ui/src/dropdown/utils";
 import Collection from "@ckeditor/ckeditor5-utils/src/collection";
 import Model from "@ckeditor/ckeditor5-ui/src/model";
-import { COMMAND_NAME__INSERT_SELECT, CONTROLS_TOOLBAR, WIDGET_TOOLBAR_NAME__MENU, COMMAND_NAME__OPEN_CONTROL_MODAL } from "./constant";
+import {
+  COMMAND_NAME__INSERT_SELECT,
+  CONTROLS_TOOLBAR,
+  WIDGET_TOOLBAR_NAME__MENU,
+  COMMAND_NAME__OPEN_CONTROL_MODAL,
+} from "./constant";
 import { emitter, SWITCH_MODAL } from "../../components/mode/mitt";
 import { getMarkerAtPosition } from "@/plugins/formControls/utils.js";
 

@@ -42,7 +42,9 @@ export function isPositionInRangeBoundaries(range, position) {
   console.log(range.end.isEqual(position));
   console.log(range.start.isEqual(position));
 
-  return range.containsPosition(position) || range.end.isEqual(position) || range.start.isEqual(position);
+  return (
+    range.containsPosition(position) || range.end.isEqual(position) || range.start.isEqual(position)
+  );
 }
 
 /**

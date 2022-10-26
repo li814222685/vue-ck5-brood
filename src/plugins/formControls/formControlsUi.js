@@ -14,7 +14,7 @@ export default class FormControlsUI extends Plugin {
 
     // The "simpleBox" button must be registered among the UI components of the editor
     // to be displayed in the toolbar.
-    editor.ui.componentFactory.add("simpleBox", (locale) => {
+    editor.ui.componentFactory.add("simpleBox", locale => {
       // The state of the button will be bound to the widget command.
       const command = editor.commands.get("insertSimpleBox");
 
@@ -33,9 +33,7 @@ export default class FormControlsUI extends Plugin {
       buttonView.bind("isOn", "isEnabled").to(command, "value", "isEnabled");
 
       // Execute the command when the button is clicked (executed).
-      this.listenTo(buttonView, "execute", () =>
-        editor.execute("insertSimpleBox")
-      );
+      this.listenTo(buttonView, "execute", () => editor.execute("insertSimpleBox"));
 
       return buttonView;
     });

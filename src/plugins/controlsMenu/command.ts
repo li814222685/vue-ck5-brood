@@ -23,7 +23,10 @@ export class InsertControlsCommand extends Command {
   refresh() {
     const model = this.editor.model;
     const selection = model.document.selection;
-    const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), CONTROLS_CONTAINER);
+    const allowedIn = model.schema.findAllowedParent(
+      selection.getFirstPosition(),
+      CONTROLS_CONTAINER
+    );
 
     this.isEnabled = allowedIn !== null;
   }

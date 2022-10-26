@@ -25,3 +25,6 @@ export const COMMAND_NAME__INSERT_OPTIONS = "insertOptions";
 /* 功能类
 -------------------------- */
 export const IGNORE_EVENTS = "data-cke-ignore-events";
+export const RESTRICTED_EDITING = "restrictedEditingException";
+//限制编辑单元格背景色
+export const RESTRICTED_CELL_BGCOLOR = "restricted-cell-bgColor";

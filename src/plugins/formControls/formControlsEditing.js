@@ -4,7 +4,11 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { InsertSimpleBoxCommand, createSimpleBox } from "./insertsimpleboxcommand";
-import { toWidget, toWidgetEditable, viewToModelPositionOutsideModelElement } from "@ckeditor/ckeditor5-widget/src/utils";
+import {
+  toWidget,
+  toWidgetEditable,
+  viewToModelPositionOutsideModelElement,
+} from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
 import { getMarkerAtPosition } from "./utils";
 export default class FormControlEditing extends Plugin {
@@ -23,7 +27,9 @@ export default class FormControlEditing extends Plugin {
 
     this.editor.editing.mapper.on(
       "viewToModelPosition",
-      viewToModelPositionOutsideModelElement(this.editor.model, viewElement => viewElement.hasClass("restricted-editing-exception"))
+      viewToModelPositionOutsideModelElement(this.editor.model, viewElement =>
+        viewElement.hasClass("restricted-editing-exception")
+      )
     );
 
     // editingView.change((writer) => {
@@ -139,7 +145,9 @@ export default class FormControlEditing extends Plugin {
       view: "control-select",
       model: (ele, { writer }) => {
         console.log(ele.getClassNames());
-        return writer.createElement("control-select", { class: [...ele.getClassNames()].join(" ") });
+        return writer.createElement("control-select", {
+          class: [...ele.getClassNames()].join(" "),
+        });
       },
       converterPriority: "highest",
     });
@@ -244,7 +252,11 @@ export default class FormControlEditing extends Plugin {
       model: "simpleBoxDescriptions",
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
-        const option = viewWriter.createEditableElement("option", { class: "simple-box-descriptions", value: "李浩", label: "李浩" }, ["no"]);
+        const option = viewWriter.createEditableElement(
+          "option",
+          { class: "simple-box-descriptions", value: "李浩", label: "李浩" },
+          ["no"]
+        );
 
         return toWidgetEditable(option, viewWriter);
       },
