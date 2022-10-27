@@ -21,8 +21,14 @@ enum EditorMode {
   Restrict = "restrict",
 }
 
-const nowMode = ref(EditorMode.Normal);
-const htmlData = ref("<p>你的姓名：Lee  nickName:<span class='restricted-editing-exception'>Lee</span></p>");
+const nowMode = ref(EditorMode.Restrict);
+const htmlData = ref(
+  `<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p ><v-section modelName="模块名" type="switch" data-cases=${JSON.stringify([
+    "caseA",
+    "caseB",
+    "caseC",
+  ])}><p class="restricted-editing-exception">我只是一个段落</p ><span>只是一个Span</span></v-section>`
+);
 const { value: editorMode } = nowMode;
 
 onUpdated(() => {

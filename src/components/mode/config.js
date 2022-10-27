@@ -10,8 +10,10 @@ import RestrictedEditingMode from "@ckeditor/ckeditor5-restricted-editing/src/re
 import StandardEditingMode from "@ckeditor/ckeditor5-restricted-editing/src/standardeditingmode";
 import SelectToolbar from "../../plugins/controlsMenu/toolbar";
 import { WIDGET_TOOLBAR_NAME__MENU } from "../../plugins/controlsMenu/constant";
+import Section from "../../plugins/section";
+
 export const RESTRICT_CONFIG = {
-  plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, RestrictedEditingMode, FormControls],
+  plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, RestrictedEditingMode, FormControls, Section],
   restrictedEditing: {
     allowedCommands: ["bold", "simpleBox", "heading", "insertSimpleBox"],
     allowedAttributes: ["bold", "simpleBox", "heading", "class", "control-select", "controlType"],
