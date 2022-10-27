@@ -53,6 +53,10 @@ export default {
     const style = `style="background-color:hsl(30deg 100% 94%);"`;
     ClassicEditor.create(document.querySelector("#devEditor"), NORMAL_CONFIG)
       .then(editor => {
+        console.log(editor.ui);
+        editor.ui.focusTracker.on("change:focusedElement", (evt, name, focusedElement) => {
+          console.log(focusedElement);
+        });
         CKEditorInspector.attach(editor);
         //编辑器实例挂载到 Window
         (window as any).devEditor = editor;
