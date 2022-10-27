@@ -7,6 +7,6 @@
  * @module block-quote
  */
 
-export { default as BlockQuote } from './blockquote';
-export { default as BlockQuoteEditing } from './blockquoteediting';
-export { default as BlockQuoteUI } from './blockquoteui';
+export { default as BlockQuote } from "./blockquote";
+export { default as BlockQuoteEditing } from "./blockquoteediting";
+export { default as BlockQuoteUI } from "./blockquoteui";
