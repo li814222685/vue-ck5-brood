@@ -9,8 +9,8 @@
 
 import { Plugin } from "ckeditor5/src/core";
 
-import BlockQuoteEditing from "./blockquoteediting";
-import BlockQuoteUI from "./blockquoteui";
+import BlockQuoteEditing from "./blockQuoteEditing";
+import BlockQuoteUI from "./blockQuoteUi";
 
 /**
  * The block quote plugin.

@@ -11,7 +11,7 @@ import { Plugin, icons } from "ckeditor5/src/core";
 import { ButtonView } from "ckeditor5/src/ui";
 import { isWidget, findOptimalInsertionRange } from "ckeditor5/src/widget";
 import { ContextualBalloon, clickOutsideHandler, BalloonPanelView } from "@ckeditor/ckeditor5-ui";
-import FormView from "./blockquoteview";
+import FormView from "./blockQuoteView";
 
 import { getRangeText, isLinkElement } from "./utils.js";
 

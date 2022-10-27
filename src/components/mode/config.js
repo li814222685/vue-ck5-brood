@@ -9,7 +9,7 @@ import Link from "@ckeditor/ckeditor5-link/src/link";
 import RestrictedEditingMode from "@ckeditor/ckeditor5-restricted-editing/src/restrictededitingmode";
 import StandardEditingMode from "@ckeditor/ckeditor5-restricted-editing/src/standardeditingmode";
 import SelectToolbar from "../../plugins/controlsMenu/toolbar";
-import Section from "@/plugins/section/blockquote";
+import Section from "@/plugins/section/blockQuote";
 import { WIDGET_TOOLBAR_NAME__MENU } from "../../plugins/controlsMenu/constant";
 export const RESTRICT_CONFIG = {
   plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, RestrictedEditingMode, FormControls],
