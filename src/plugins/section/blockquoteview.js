@@ -27,19 +27,7 @@ export default class FormView extends View {
     // ui框样式内容
     this.focusTracker = new FocusTracker();
     this.keystrokes = new KeystrokeHandler();
-    // this.abbrInputView = this._createInput("Add abbreviation");
-    // this.titleInputView = this._createInput("Add title");
     this.saveButtonView = this._createButton("Save", icons.check, "ck-button-save");
-    // this.saveButtonView.bind("isOn", "isEnabled").to(command, "value", "isEnabled");
-
-    // Submit type of the button will trigger the submit event on entire form when clicked
-    // 按钮的提交类型将在单击时触发整个表单上的提交事件
-    //(see submitHandler() in render() below).
-    // this.saveButtonView.type = "submit";
-    // this.cancelButtonView = this._createButton("Cancel", icons.cancel, "ck-button-cancel");
-    // Delegate ButtonView#execute to FormView#cancel.
-    // 将ButtonView#execute委托给FormView#取消
-    // this.cancelButtonView.delegate("execute").to(this, "cancel");
     this.childViews = this.createCollection([this.saveButtonView]);
     this._focusCycler = new FocusCycler({
       focusables: this.childViews,
@@ -89,25 +77,6 @@ export default class FormView extends View {
     this.focusTracker.destroy();
     this.keystrokes.destroy();
   }
-
-  // focus() {
-    // If the abbreviation text field is enabled, focus it straight away to allow the user to type.
-    // 如果启用了缩写文本字段，请将其直接聚焦以允许用户键入。
-    // if (this.abbrInputView.isEnabled) {
-      // this.abbrInputView.focus();
-    // }
-    // Focus the abbreviation title field if the former is disabled.
-    // 如果禁用了缩写标题字段，请关注缩写标题字段。
-    // else {
-      // this.titleInputView.focus();
-    // }
-  // }
-
-  // _createInput(label) {
-  //   const labeledInput = new LabeledFieldView(this.locale, createLabeledInputText);
-  //   labeledInput.label = label;
-  //   return labeledInput;
-  // }
 
   _createButton(label, icon, className) {
     const button = new ButtonView();  

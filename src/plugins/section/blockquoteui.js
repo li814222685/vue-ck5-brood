@@ -45,15 +45,6 @@ export default class BlockQuoteUI extends Plugin {
     editor.ui.componentFactory.add("section", locale => {
       const command = editor.commands.get("section");
       const buttonView = new ButtonView(locale);
-      const panel = new BalloonPanelView(locale);
-      // const childView = new ChildView();
-      const positions = BalloonPanelView.defaultPositions;
-      // buttonView.set( {
-      // 	label: t( 'Block quote' ),
-      // 	// icon: icons.quote,
-      // 	tooltip: true,
-      // 	isToggleable: true
-      // } );
       buttonView.set({
         label: t("section Box"),
         withText: true,
@@ -82,12 +73,6 @@ export default class BlockQuoteUI extends Plugin {
       console.log(2222222222222222);
       // Grab values from the abbreviation and title input fields.
       // 从缩写和标题输入字段中获取值。
-      const value = {
-        // abbr: formView.abbrInputView.fieldView.element.value,
-        // title: formView.titleInputView.fieldView.element.value
-      };
-      const select = document.querySelector(".section");
-      // select.focus();
 
       editor.execute("section", "submit");
 
@@ -165,7 +150,6 @@ export default class BlockQuoteUI extends Plugin {
     const selection = this.editor.model.document.selection;
     // Check the value of the command.
     // 检查命令的值。
-    // const commandValue = this.editor.commands.get( 'addAbbreviation' ).value;
     const commandValue = {
       abbr: 123,
       title: 222,
@@ -175,25 +159,6 @@ export default class BlockQuoteUI extends Plugin {
       view: this.formView,
       position: this._getBalloonPositionData(),
     });
-
-    // 选择未折叠时禁用输入
-    // this.formView.abbrInputView.isEnabled = selection.getFirstRange().isCollapsed;
-
-    // 使用命令的状态（值）填写表单
-    // if (commandValue) {
-    //   this.formView.abbrInputView.fieldView.value = commandValue.abbr;
-    //   this.formView.titleInputView.fieldView.value = commandValue.title;
-    // }
-    // 如果命令没有值，则放入当前选定的文本（未折叠）
-    // 在第一个字段中，在这种情况下，清空第二个字段。
-    // else {
-    //   const selectedText = getRangeText(selection.getFirstRange());
-
-    //   this.formView.abbrInputView.fieldView.value = selectedText;
-    //   this.formView.titleInputView.fieldView.value = "";
-    // }
-
-    // this.formView.focus();
   }
   _hideUI() {
     // 清除输入字段值并重置表单
@@ -214,11 +179,6 @@ export default class BlockQuoteUI extends Plugin {
     const selection = model.document.selection;
     let target = null;
     const parent = findOptimalInsertionRange(selection, model).start.parent;
-    // console.log(parent.root.document)
-    // let pars = parent.root.document.selection.getFirstRange()
-    // let paa = viewDocument.selection.getFirstRange()
-    // console.log(pars.end.parent)
-    // console.log(paa.end.parent)
     // 通过将视图选择范围转换为DOM来设置目标位置
     target = () => view.domConverter.viewRangeToDom(viewDocument.selection.getFirstRange());
     console.log(viewDocument.selection.getFirstRange());
