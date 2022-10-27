@@ -9,7 +9,7 @@
 
 import { Plugin } from "ckeditor5/src/core";
 
-import BlockQuoteEditing from "./blockQuoteEditing";
+import BlockQuoteEditing from "./blocQuoteEditing";
 import BlockQuoteUI from "./blockQuoteUi";
 
 /**

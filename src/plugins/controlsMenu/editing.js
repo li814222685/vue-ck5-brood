@@ -6,7 +6,14 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { InsertControlsCommand, InsertOptionsCommand } from "./command";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { COMMAND_NAME__INSERT_SELECT, CONTROLS_CONTAINER, CUSTOM_PROPERTY__SELECT, V_OPTIONS, V_SELECT, COMMAND_NAME__INSERT_OPTIONS } from "./constant";
+import {
+  COMMAND_NAME__INSERT_SELECT,
+  CONTROLS_CONTAINER,
+  CUSTOM_PROPERTY__SELECT,
+  V_OPTIONS,
+  V_SELECT,
+  COMMAND_NAME__INSERT_OPTIONS,
+} from "./constant";
 import { V_OPTION } from "./constant";
 export default class ControlsMenuEditing extends Plugin {
   static get requires() {
@@ -53,6 +60,7 @@ export default class ControlsMenuEditing extends Plugin {
       allowWhere: "$text",
       // allowIn: CONTROLS_CONTAINER,
       allowContentOf: "$block",
+      allowAttributes: ["optionList"],
     });
 
     schema.register(V_OPTION, {
@@ -140,15 +148,22 @@ export default class ControlsMenuEditing extends Plugin {
       view: (modelElement, { writer: viewWriter }) => {
         modelElement.getAttribute("class")
         // Note: You use a more specialized createEditableElement() method here.
+        console.log(modelElement);
         const select = viewWriter.createEditableElement(
           "select",
           {
-            class: "virtual-select extendBackground ",
+            class: "virtual-select extendBackground",
             "data-cke-ignore-events": true,
             controlType: "select",
+            optionList: modelElement.getAttribute("optionList"),
           },
           {
-            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "controlType"],
+            renderUnsafeAttributes: [
+              "onchange",
+              "data-cke-ignore-events",
+              "controlType",
+              "optionList",
+            ],
           }
         );
 
@@ -195,7 +210,11 @@ export default class ControlsMenuEditing extends Plugin {
       model: V_OPTIONS,
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
-        const option = viewWriter.createEditableElement("option", { class: "simple-box-descriptions", value: "李浩", label: "李浩" }, ["no"]);
+        const option = viewWriter.createEditableElement(
+          "option",
+          { class: "simple-box-descriptions", value: "李浩", label: "李浩" },
+          ["no"]
+        );
 
         return toWidget(option, viewWriter);
       },
@@ -228,10 +247,10 @@ export default class ControlsMenuEditing extends Plugin {
           "control-select",
           {
             class: "restricted-editing-exception control-select",
-            controlType: "select",
+            optionList: modelElement.getAttribute("optionList"),
           },
           {
-            renderUnsafeAttributes: ["controlType"],
+            renderUnsafeAttributes: ["controlType", "optionList"],
           }
         );
       },

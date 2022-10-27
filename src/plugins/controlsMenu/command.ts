@@ -23,7 +23,10 @@ export class InsertControlsCommand extends Command {
   refresh() {
     const model = this.editor.model;
     const selection = model.document.selection;
-    const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), CONTROLS_CONTAINER);
+    const allowedIn = model.schema.findAllowedParent(
+      selection.getFirstPosition(),
+      CONTROLS_CONTAINER
+    );
 
     this.isEnabled = allowedIn !== null;
   }
@@ -57,10 +60,7 @@ export const insertSelect = (model, options: Option[]) => {
     model.change(writer => {
       console.log(writer);
       const selectElement = createSimpleBox(writer, options);
-      console.log(selectElement);
-      // 使用 findOptimalInsertionPosition 方法来获取最佳位置
-      // 如果某个选择位于段落的中间，则将返回该段落之前的位置，不拆分当前段落
-      // 如果选择位于段落的末尾，则将返回该段落之后的位置
+
       model.insertObject(selectElement, model.document.selection);
     });
   } catch (error) {
@@ -73,6 +73,7 @@ export function createSimpleBox(writer: Writer, attrs?: Option[]) {
   if (attrs?.length > 0) {
     const controls = writer.createElement(CONTROLS_CONTAINER); // => span
     const v_select = writer.createElement(V_SELECT); // => select
+    writer.setAttribute("optionList", JSON.stringify(attrs), v_select);
 
     (attrs || []).forEach(opt => {
       const v_option = writer.createElement(V_OPTION, opt as any); // => option
