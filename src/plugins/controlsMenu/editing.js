@@ -153,6 +153,7 @@ export default class ControlsMenuEditing extends Plugin {
             class: "virtual-select extendBackground",
             "data-cke-ignore-events": true,
             controlType: "select",
+            optionList: modelElement.getAttribute("optionList"),
           },
           {
             renderUnsafeAttributes: [
