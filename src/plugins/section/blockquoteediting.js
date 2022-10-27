@@ -39,11 +39,116 @@ export default class BlockQuoteEditing extends Plugin {
    * @inheritDoc
    */
   init() {
-    const editor = this.editor;
-    const schema = editor.model.schema;
+    this._defineSchema();
+    this._defineConverters();
+    // editor.conversion.elementToElement( { model: 'section', view: {
+    //   name: 'section',
+    //   classes: 'section'
+    // } } );
 
-    editor.commands.add("section", new BlockQuoteCommand(editor));
+    // 这是干啥的
+    // Postfixer which cleans incorrect model states connected with block quotes.
+    // editor.model.document.registerPostFixer(writer => {
+    //   const changes = editor.model.document.differ.getChanges();
+    //   for (const entry of changes) {
+    //     if (entry.type == "insert") {
+    //       const element = entry.position.nodeAfter;
 
+    //       if (!element) {
+    //         // We are inside a text node.
+    //         continue;
+    //       }
+
+    //       if (element.is("element", "section") && element.isEmpty) {
+    //         // Added an empty section - remove it.
+    //         writer.remove(element);
+
+    //         return true;
+    //       } else if (element.is("element", "section") && !schema.checkChild(entry.position, element)) {
+    //         // Added a section in incorrect place. Unwrap it so the content inside is not lost.
+    //         writer.unwrap(element);
+
+    //         return true;
+    //       } else if (element.is("element")) {
+    //         // Just added an element. Check that all children meet the scheme rules.
+    //         const range = writer.createRangeIn(element);
+
+    //         for (const child of range.getItems()) {
+    //           if (child.is("element", "section") && !schema.checkChild(writer.createPositionBefore(child), child)) {
+    //             writer.unwrap(child);
+
+    //             return true;
+    //           }
+    //         }
+    //       }
+    //     } else if (entry.type == "remove") {
+    //       const parent = entry.position.parent;
+
+    //       if (parent.is("element", "section") && parent.isEmpty) {
+    //         // Something got removed and now section is empty. Remove the section as well.
+    //         writer.remove(parent);
+
+    //         return true;
+    //       }
+    //     }
+    //   }
+
+    //   return false;
+    // });
+
+    // const viewDocument = this.editor.editing.view.document;
+    // const selection = editor.model.document.selection;
+    // const blockQuoteCommand = editor.commands.get("section");
+
+    // Overwrite default Enter key behavior.
+    // If Enter key is pressed with selection collapsed in empty block inside a quote, break the quote.
+    // this.listenTo(
+    //   viewDocument,
+    //   "enter",
+    //   (evt, data) => {
+    //     if (!selection.isCollapsed || !blockQuoteCommand.value) {
+    //       return;
+    //     }
+
+    //     const positionParent = selection.getLastPosition().parent;
+
+    //     if (positionParent.isEmpty) {
+    //       editor.execute("section");
+    //       editor.editing.view.scrollToTheSelection();
+
+    //       data.preventDefault();
+    //       evt.stop();
+    //     }
+    //   },
+    //   { context: "blockquote" }
+    // );
+
+    // // Overwrite default Backspace key behavior.
+    // // If Backspace key is pressed with selection collapsed in first empty block inside a quote, break the quote.
+    // this.listenTo(
+    //   viewDocument,
+    //   "delete",
+    //   (evt, data) => {
+    //     if (data.direction != "backward" || !selection.isCollapsed || !blockQuoteCommand.value) {
+    //       return;
+    //     }
+
+    //     const positionParent = selection.getLastPosition().parent;
+
+    //     if (positionParent.isEmpty && !positionParent.previousSibling) {
+    //       editor.execute("section");
+    //       editor.editing.view.scrollToTheSelection();
+
+    //       data.preventDefault();
+    //       evt.stop();
+    //     }
+    //   },
+    //   { context: "blockquote" }
+    // );
+  }
+
+  _defineSchema() {
+    const schema = this.editor.model.schema;
     schema.register("section", {
       // Allow wherever text is allowed:
       allowWhere: "$text",
@@ -61,7 +166,11 @@ export default class BlockQuoteEditing extends Plugin {
       allowAttributes: ["class", "controlType"],
       inheritAllFrom: "$container",
     });
+  }
 
+  _defineConverters() {
+    const editor = this.editor;
+    editor.commands.add("section", new BlockQuoteCommand(editor));
     // <simpleBox> converters
     editor.conversion.for("upcast").elementToElement({
       model: "section",
@@ -71,7 +180,7 @@ export default class BlockQuoteEditing extends Plugin {
       },
     });
     editor.conversion.for("dataDowncast").elementToElement({
-      model: "section",
+      model: "v-section",
       view: {
         name: "section",
         classes: "section",
@@ -82,118 +191,18 @@ export default class BlockQuoteEditing extends Plugin {
       view: (modelElement, { writer: viewWriter }) => {
         const section = viewWriter.createEditableElement(
           "section",
-          { class: "section" },
           {
-            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events"],
+            class: "section",
+            cases: "",
+            modelName: "",
+            type: "",
+          },
+          {
+            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "cases", "modelName", "type"],
           }
         );
-
         return toWidgetEditable(section, viewWriter, { label: "simple cc box widget" });
       },
     });
-
-    // editor.conversion.elementToElement( { model: 'section', view: {
-    //   name: 'section',
-    //   classes: 'section'
-    // } } );
-
-    // Postfixer which cleans incorrect model states connected with block quotes.
-    editor.model.document.registerPostFixer(writer => {
-      const changes = editor.model.document.differ.getChanges();
-      for (const entry of changes) {
-        if (entry.type == "insert") {
-          const element = entry.position.nodeAfter;
-
-          if (!element) {
-            // We are inside a text node.
-            continue;
-          }
-
-          if (element.is("element", "section") && element.isEmpty) {
-            // Added an empty section - remove it.
-            writer.remove(element);
-
-            return true;
-          } else if (element.is("element", "section") && !schema.checkChild(entry.position, element)) {
-            // Added a section in incorrect place. Unwrap it so the content inside is not lost.
-            writer.unwrap(element);
-
-            return true;
-          } else if (element.is("element")) {
-            // Just added an element. Check that all children meet the scheme rules.
-            const range = writer.createRangeIn(element);
-
-            for (const child of range.getItems()) {
-              if (child.is("element", "section") && !schema.checkChild(writer.createPositionBefore(child), child)) {
-                writer.unwrap(child);
-
-                return true;
-              }
-            }
-          }
-        } else if (entry.type == "remove") {
-          const parent = entry.position.parent;
-
-          if (parent.is("element", "section") && parent.isEmpty) {
-            // Something got removed and now section is empty. Remove the section as well.
-            writer.remove(parent);
-
-            return true;
-          }
-        }
-      }
-
-      return false;
-    });
-
-    const viewDocument = this.editor.editing.view.document;
-    const selection = editor.model.document.selection;
-    const blockQuoteCommand = editor.commands.get("section");
-
-    // Overwrite default Enter key behavior.
-    // If Enter key is pressed with selection collapsed in empty block inside a quote, break the quote.
-    this.listenTo(
-      viewDocument,
-      "enter",
-      (evt, data) => {
-        if (!selection.isCollapsed || !blockQuoteCommand.value) {
-          return;
-        }
-
-        const positionParent = selection.getLastPosition().parent;
-
-        if (positionParent.isEmpty) {
-          editor.execute("section");
-          editor.editing.view.scrollToTheSelection();
-
-          data.preventDefault();
-          evt.stop();
-        }
-      },
-      { context: "blockquote" }
-    );
-
-    // Overwrite default Backspace key behavior.
-    // If Backspace key is pressed with selection collapsed in first empty block inside a quote, break the quote.
-    this.listenTo(
-      viewDocument,
-      "delete",
-      (evt, data) => {
-        if (data.direction != "backward" || !selection.isCollapsed || !blockQuoteCommand.value) {
-          return;
-        }
-
-        const positionParent = selection.getLastPosition().parent;
-
-        if (positionParent.isEmpty && !positionParent.previousSibling) {
-          editor.execute("section");
-          editor.editing.view.scrollToTheSelection();
-
-          data.preventDefault();
-          evt.stop();
-        }
-      },
-      { context: "blockquote" }
-    );
   }
 }

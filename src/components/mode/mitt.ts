@@ -9,5 +9,6 @@ export const emitter = mitt();
  * ====================*/
 /** 切换Modal展示 */
 export const SWITCH_MODAL = "switchModal";
+export const SECTION_MODAL = "sectionModal";
 /**  获取OPTIONS list*/
 export const GET_OPTIONS = "getOptions";

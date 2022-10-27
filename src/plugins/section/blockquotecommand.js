@@ -46,22 +46,22 @@ export default class BlockQuoteCommand extends Command {
    * otherwise the command will remove the block quote. If not set, the command will act basing on its current value.
    */
   execute(options = {}) {
-    console.log(options);
-    console.log(this.editor);
+    // console.log(options);
+    // console.log(this.editor);
     const model = this.editor.model;
     const editing = this.editor.editing;
     const schema = model.schema;
     const selection = model.document.selection;
     const blocks = Array.from(selection.getSelectedBlocks());
-    console.log(selection.getSelectedBlocks());
+    // console.log(selection.getSelectedBlocks());
     const firstRange = selection.getFirstPosition();
     const LastRange = selection.getLastPosition();
-    console.log(this.value);
-    console.log(options.forceValue === undefined);
+    // console.log(this.value);
+    // console.log(options.forceValue === undefined);
     const value = options.forceValue === undefined ? !this.value : options.forceValue;
     model.change(writer => {
       if (!value) {
-        console.log(1);
+        // console.log(1);
         if (options == "submit") {
           writer.setAttribute("aaa", "cs", window.elem);
         } else if (options == "cancel") {

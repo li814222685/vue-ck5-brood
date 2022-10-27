@@ -1,9 +1,10 @@
+
 /**
  * @license Copyright (c) 2003-2022, CKSource Holding sp. z o.o. All rights reserved.
  * For licensing, see LICENSE.md.
  */
 
-import {
+ import {
   View,
   LabeledFieldView,
   createLabeledInputText,
@@ -15,27 +16,31 @@ import {
 } from "@ckeditor/ckeditor5-ui";
 import { FocusTracker, KeystrokeHandler } from "@ckeditor/ckeditor5-utils";
 import { icons } from "@ckeditor/ckeditor5-core";
+import { emitter, SECTION_MODAL } from "../../components/mode/mitt";
 
 export default class FormView extends View {
   // 构造器
   constructor(locale) {
     super(locale);
+    const editor = this.editor;
     // console.log(locale)
     // ui框样式内容
     this.focusTracker = new FocusTracker();
     this.keystrokes = new KeystrokeHandler();
-    this.abbrInputView = this._createInput("Add abbreviation");
-    this.titleInputView = this._createInput("Add title");
+    // this.abbrInputView = this._createInput("Add abbreviation");
+    // this.titleInputView = this._createInput("Add title");
     this.saveButtonView = this._createButton("Save", icons.check, "ck-button-save");
+    // this.saveButtonView.bind("isOn", "isEnabled").to(command, "value", "isEnabled");
+
     // Submit type of the button will trigger the submit event on entire form when clicked
     // 按钮的提交类型将在单击时触发整个表单上的提交事件
     //(see submitHandler() in render() below).
-    this.saveButtonView.type = "submit";
-    this.cancelButtonView = this._createButton("Cancel", icons.cancel, "ck-button-cancel");
+    // this.saveButtonView.type = "submit";
+    // this.cancelButtonView = this._createButton("Cancel", icons.cancel, "ck-button-cancel");
     // Delegate ButtonView#execute to FormView#cancel.
     // 将ButtonView#execute委托给FormView#取消
-    this.cancelButtonView.delegate("execute").to(this, "cancel");
-    this.childViews = this.createCollection([this.saveButtonView, this.cancelButtonView]);
+    // this.cancelButtonView.delegate("execute").to(this, "cancel");
+    this.childViews = this.createCollection([this.saveButtonView]);
     this._focusCycler = new FocusCycler({
       focusables: this.childViews,
       focusTracker: this.focusTracker,
@@ -50,6 +55,7 @@ export default class FormView extends View {
         focusNext: "tab",
       },
     });
+    // 这是啥
     this.setTemplate({
       tag: "form",
       attributes: {
@@ -84,38 +90,34 @@ export default class FormView extends View {
     this.keystrokes.destroy();
   }
 
-  focus() {
+  // focus() {
     // If the abbreviation text field is enabled, focus it straight away to allow the user to type.
     // 如果启用了缩写文本字段，请将其直接聚焦以允许用户键入。
-    if (this.abbrInputView.isEnabled) {
+    // if (this.abbrInputView.isEnabled) {
       // this.abbrInputView.focus();
-    }
+    // }
     // Focus the abbreviation title field if the former is disabled.
     // 如果禁用了缩写标题字段，请关注缩写标题字段。
-    else {
+    // else {
       // this.titleInputView.focus();
-    }
-  }
+    // }
+  // }
 
-  _createInput(label) {
-    const labeledInput = new LabeledFieldView(this.locale, createLabeledInputText);
-
-    labeledInput.label = label;
-
-    return labeledInput;
-  }
+  // _createInput(label) {
+  //   const labeledInput = new LabeledFieldView(this.locale, createLabeledInputText);
+  //   labeledInput.label = label;
+  //   return labeledInput;
+  // }
 
   _createButton(label, icon, className) {
-    const button = new ButtonView();
-
+    const button = new ButtonView();  
     button.set({
-      label,
-      // withText: true,
-      icon,
-      tooltip: true,
-      class: className,
+      withText: true,
+      label: "配置",
     });
-
+    this.listenTo(button, "execute", () => {
+      emitter.emit(SECTION_MODAL)
+    });
     return button;
   }
 }

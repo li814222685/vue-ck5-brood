@@ -7,6 +7,7 @@
     <div id="devEditor"></div>
   </div>
   <SelectDialog :visible="dialogVisible" :change-visible="swtichModal" :table-data="selectedOptions" :insert-options-to-select="insertOptionsToSelect" />
+  <SectionDialog :visible="sectionVisible" :type-radio="typeRadio" :change-visible="sectionModal" :form-data="sectionOption" @getFormValue="getFormValue" />
 </template>
 <style>
 .hidden-item {
@@ -21,8 +22,9 @@
 import _ from "lodash";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 import { NORMAL_CONFIG } from "./config.js";
-import { emitter, SWITCH_MODAL, Option, GET_OPTIONS } from "./mitt";
+import { emitter, SWITCH_MODAL, SECTION_MODAL, Option, GET_OPTIONS } from "./mitt";
 import SelectDialog from "./SelectDialog/index.vue";
+import SectionDialog from "./SectionDialog/index.vue";
 import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 
@@ -35,9 +37,21 @@ export default {
       deposit: {},
       dialogVisible: false,
       selectedOptions: [], //当前选中select 有哪些options，用来将options传递到弹窗表格内
+      sectionVisible: false,
+      sectionOption: {
+        modelName: "",
+        type: "switch",
+        cases: [],
+      },
+      typeRadio: [
+        { label: "可删除", value: "delete" },
+        { label: "可切换", value: "switch" },
+        { label: "适用/不适用", value: "applicable" },
+      ],
+      sectionInfo: "",
     };
   },
-  components: { SelectDialog },
+  components: { SelectDialog, SectionDialog },
   mounted() {
     //挂载Emitter
     this.hangUpAllEmitFunctions();
@@ -48,21 +62,39 @@ export default {
         (window as any).devEditor = editor;
         editor.setData(this.htmlData);
       })
-      .catch(error => {});
+      .catch(error => {
+        console.error(error);
+      });
   },
   methods: {
     exportData() {
       this.onchange((window as any).devEditor.getData());
     },
+
     swtichModal() {
       this.dialogVisible = !this.dialogVisible;
       //每次关闭MODAL后都清空 Table 数据
       emitter.emit(GET_OPTIONS, []);
     },
 
+    sectionModal() {
+      this.sectionVisible = !this.sectionVisible;
+      this.sectionOption = {
+        modelName: "",
+        type: "switch",
+        cases: [],
+      };
+      //每次关闭MODAL后都清空 Table 数据
+      // emitter.emit(GET_OPTIONS, []);
+    },
+    getFormValue(val) {
+      this.sectionInfo = JSON.stringify(val);
+    },
+
     /** emitter函数挂起 */
     hangUpAllEmitFunctions() {
       emitter.on(SWITCH_MODAL, this.swtichModal);
+      emitter.on(SECTION_MODAL, this.sectionModal);
       emitter.on(GET_OPTIONS, this.setOptionListFromSelect);
     },
 

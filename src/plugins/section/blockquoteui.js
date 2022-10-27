@@ -177,28 +177,28 @@ export default class BlockQuoteUI extends Plugin {
     });
 
     // 选择未折叠时禁用输入
-    this.formView.abbrInputView.isEnabled = selection.getFirstRange().isCollapsed;
+    // this.formView.abbrInputView.isEnabled = selection.getFirstRange().isCollapsed;
 
     // 使用命令的状态（值）填写表单
-    if (commandValue) {
-      this.formView.abbrInputView.fieldView.value = commandValue.abbr;
-      this.formView.titleInputView.fieldView.value = commandValue.title;
-    }
+    // if (commandValue) {
+    //   this.formView.abbrInputView.fieldView.value = commandValue.abbr;
+    //   this.formView.titleInputView.fieldView.value = commandValue.title;
+    // }
     // 如果命令没有值，则放入当前选定的文本（未折叠）
     // 在第一个字段中，在这种情况下，清空第二个字段。
-    else {
-      const selectedText = getRangeText(selection.getFirstRange());
+    // else {
+    //   const selectedText = getRangeText(selection.getFirstRange());
 
-      this.formView.abbrInputView.fieldView.value = selectedText;
-      this.formView.titleInputView.fieldView.value = "";
-    }
+    //   this.formView.abbrInputView.fieldView.value = selectedText;
+    //   this.formView.titleInputView.fieldView.value = "";
+    // }
 
-    this.formView.focus();
+    // this.formView.focus();
   }
   _hideUI() {
     // 清除输入字段值并重置表单
-    this.formView.abbrInputView.fieldView.value = "";
-    this.formView.titleInputView.fieldView.value = "";
+    // this.formView.abbrInputView.fieldView.value = "";
+    // this.formView.titleInputView.fieldView.value = "";
     this.formView.element.reset();
 
     this._balloon.remove(this.formView);

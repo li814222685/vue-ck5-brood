@@ -50,7 +50,8 @@ export default class ControlsMenuEditing extends Plugin {
       isLimit: true,
       isSelectable: true,
       isInline: true,
-      allowIn: CONTROLS_CONTAINER,
+      allowWhere: "$text",
+      // allowIn: CONTROLS_CONTAINER,
       allowContentOf: "$block",
     });
 
@@ -137,6 +138,7 @@ export default class ControlsMenuEditing extends Plugin {
     conversion.for("downcast").elementToElement({
       model: V_SELECT,
       view: (modelElement, { writer: viewWriter }) => {
+        modelElement.getAttribute("class")
         // Note: You use a more specialized createEditableElement() method here.
         const select = viewWriter.createEditableElement(
           "select",
@@ -210,17 +212,18 @@ export default class ControlsMenuEditing extends Plugin {
       },
     });
     /** dataDowncast */
-    conversion.for("dataDowncast").elementToElement({
-      model: CONTROLS_CONTAINER,
-      view: "span",
-      converterPriority: "high",
-    });
+    // conversion.for("dataDowncast").elementToElement({
+    //   model: CONTROLS_CONTAINER,
+    //   view: "span",
+    //   converterPriority: "high",
+    // });
     conversion.for("dataDowncast").elementToElement({
       model: {
         name: V_SELECT,
         attributes: ["controlType"],
       },
       view: (modelElement, { writer }) => {
+        console.log(modelElement.getAttribute("controltype"));
         return writer.createEditableElement(
           "control-select",
           {
