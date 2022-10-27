@@ -9,6 +9,7 @@ import Link from "@ckeditor/ckeditor5-link/src/link";
 import RestrictedEditingMode from "@ckeditor/ckeditor5-restricted-editing/src/restrictededitingmode";
 import StandardEditingMode from "@ckeditor/ckeditor5-restricted-editing/src/standardeditingmode";
 import SelectToolbar from "../../plugins/controlsMenu/toolbar";
+import Section from "@/plugins/section/blockquote";
 import { WIDGET_TOOLBAR_NAME__MENU } from "../../plugins/controlsMenu/constant";
 export const RESTRICT_CONFIG = {
   plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, RestrictedEditingMode, FormControls],
@@ -20,7 +21,7 @@ export const RESTRICT_CONFIG = {
 };
 
 export const NORMAL_CONFIG = {
-  plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, StandardEditingMode, ControlsMenu, SelectToolbar],
+  plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, StandardEditingMode, ControlsMenu, SelectToolbar, Section],
 
-  toolbar: ["heading", "|", "bold", "italic", "link", "numberedList", "bulletedList", "|", "abbreviation", "abbreviations", "bubble", "restrictedEditingException", WIDGET_TOOLBAR_NAME__MENU],
+  toolbar: ["heading", "|", "bold", "italic", "link", "numberedList", "bulletedList", "|", "abbreviation", "abbreviations", "bubble", "restrictedEditingException", WIDGET_TOOLBAR_NAME__MENU, "section"],
 };
