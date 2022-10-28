@@ -27,6 +27,7 @@ import SelectDialog from "./SelectDialog/index.vue";
 import SectionDialog from "./SectionDialog/index.vue";
 import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
+import "../../plugins/section/theme/style-setion.css"
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
@@ -49,10 +50,12 @@ export default {
         { label: "适用/不适用", value: "applicable" },
       ],
       sectionInfo: "",
+      attr_id:1,
     };
   },
   components: { SelectDialog, SectionDialog },
   mounted() {
+    window.addEventListener("mousedown", this.onParagraph);
     //挂载Emitter
     this.hangUpAllEmitFunctions();
     ClassicEditor.create(document.querySelector("#devEditor"), NORMAL_CONFIG)
@@ -107,6 +110,52 @@ export default {
     setOptionListFromSelect(options: Option[]) {
       console.log(options);
       this.selectedOptions = _.cloneDeep(options);
+    },
+    onParagraph(e) {
+      if(document.getElementsByClassName('ck-editor')[0].contains(e.srcElement)){
+        let check = document.getElementsByClassName("Check")
+        for(let i = 0;i<check.length;i++){
+          check[i].classList.remove('Check')
+        }
+      }
+      setTimeout(() => {
+        const clickDom = <HTMLElement>document.elementFromPoint(e.clientX, e.clientY);
+        const isSetion = Array.from(clickDom.classList).includes('section');
+        // 点击可编辑区域时候执行
+        // 是否为段落标签
+        if (isSetion) {
+          let check = document.getElementsByClassName("Check")
+          for(let i = 0;i<check.length;i++){
+            check[i].classList.remove('Check')
+          }
+          clickDom.classList.add('Check')
+          clickDom.setAttribute('attr_id',"" + this.attr_id ++)
+          clickDom.focus();
+          var descDiv = document.querySelector(".icon-but");
+          document.body.appendChild(descDiv);
+        }else{
+          // parent 当前选中元素的父元素
+          let parent = <HTMLElement>clickDom.parentNode
+          // 选中效果
+          if(parent.className.search('section') !== -1){
+            let check = document.getElementsByClassName("Check")
+            for(let i = 0;i<check.length;i++){
+              check[i].classList.remove('Check')
+            }
+            parent.classList.add('Check')
+          }else{
+          // const editor = window.editor;
+          // console.log(window.editor)
+        //  editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
+        //       console.log( `View document is focused: ${ isFocused }.` );
+        //   } );
+            // let check = document.getElementsByClassName("Check")
+            // for(let i = 0;i<check.length;i++){
+            //   check[i].classList.remove('Check')
+            // }
+          }
+        }
+      }, 1);
     },
   },
   computed: {

@@ -192,32 +192,13 @@ export default class BlockQuoteCommand extends Command {
       .forEach((groupRange, index, arr) => {
         console.log(groupRange);
         window.groupRange = groupRange;
-
-        console.log(arr);
         let quote = findQuote(groupRange.start);
-        console.log(quote);
         if (!quote) {
-          console.log(11);
           quote = writer.createElement("section");
           console.log(quote);
-          // console.log(window.Section)
-          // console.log(Section.SECTION1)
-          writer.addMarker("window.Section", { range, usingOperation: true });
           writer.setAttributes({ class: "cs" }, range);
           writer.wrap(groupRange, quote);
         }
-        let marker = this.editor.model.markers.get("window.Section");
-        console.log(marker);
-        const markerprant = marker.getRange();
-        window.markerprant = markerprant;
-        console.log(markerprant);
-        const prantelement = markerprant.getCommonAncestor();
-        console.log(prantelement);
-        const cloneElement = writer.cloneElement(prantelement, [true]);
-        console.log(cloneElement);
-        window.elem = prantelement;
-        window.elss = cloneElement;
-        // const elem = writer.cloneElement(blocks,[true])
         quotesToMerge.push(quote);
         // writer.wrap( groupRange, cloneElement );
       });
