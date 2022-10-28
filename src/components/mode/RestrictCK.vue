@@ -65,37 +65,10 @@ export default {
         const editor = window.editor;
         const { model, editing } = editor;
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
-        const isSelected = Array.from(clickDom.classList).includes(EDITABLE_CLASS);
-        // 点击可编辑区域时候执行
-        if (isSelected) {
-          const modelSelection = model.document.selection;
-          const marker = getMarkerAtPosition(editor, modelSelection.anchor);
-          if (!marker) return;
-          const itemEnd = marker.getEnd();
-          // replace编辑器指定位置的DOM
-          new Promise(res => {
-            editing.view.change(writer => {
-              const newRange = editor.execute("insertSimpleBox", itemEnd);
-              //缓存将要移除的marker 和 当前的range
-              const [oldViewElement] = [...editor.editing.mapper.markerNameToElements(marker.name)];
-              this.deposit = {
-                oldViewElement,
-                dom: clickDom,
-                newRange,
-                oldMarker: marker,
-              };
-              writer.addClass(HIDDEN_CLASS, oldViewElement);
-              res();
-            });
-          }).then(res => {
-            const select = document.querySelector(V_SELECT);
-            const textNode = document.querySelector(".hidden-item");
-            select.focus();
-            select.value = textNode.innerText;
-            select.onblur = this.onSelectBlur;
-            select.onchange = this.onSelectChange;
-          });
-        }
+
+        console.log(clickDom);
+        this.toShowSectionMenu(clickDom, editor);
+        this.toShowSelect(clickDom, editor);
       }, 1);
     },
     /**
@@ -131,6 +104,70 @@ export default {
     },
     exportData() {
       this.onchange(window.devEditor.getData());
+    },
+    getDomPath(ele) {
+      let path = ele.nodeName;
+      let parent = ele.parentNode;
+      while (parent) {
+        path = parent.nodeName + "/" + path;
+        parent = parent.parentNode;
+      }
+      return path;
+    },
+    //Section Menu展示逻辑
+    toShowSectionMenu(clickDom, editor) {
+      const domAncestorsPath = this.getDomPath(clickDom);
+      console.log(domAncestorsPath);
+      const hasSection = domAncestorsPath.split("/").includes("SECTION");
+      console.log(hasSection);
+      const sectionDom = document.querySelector(".ck-editor__nested-editable_focused");
+      //todo ：如果是dom祖先里面有SECTION那就展示菜单
+
+      if (sectionDom) {
+        const sectionPostion = sectionDom.getBoundingClientRect();
+        const [sectionMenuPostionX, sectionMenuPostionY] = [Math.floor(sectionPostion.x), Math.floor(sectionPostion.y)];
+        //todo： 根据这个去显示菜单
+        console.log(sectionMenuPostionX, sectionMenuPostionY);
+      }
+    },
+    //v-select 相关的展示逻辑
+    toShowSelect(clickDom, editor) {
+      const { model, editing } = editor;
+      const modelSelection = model.document.selection;
+      const isSelected = Array.from(clickDom.classList).includes("visual-select");
+
+      // 点击可编辑区域时候执行
+      if (isSelected) {
+        const modelSelection = model.document.selection;
+
+        const marker = getMarkerAtPosition(editor, modelSelection.anchor);
+        return;
+        if (!marker) return;
+        const itemEnd = marker.getEnd();
+        // replace编辑器指定位置的DOM
+        new Promise(res => {
+          editing.view.change(writer => {
+            const newRange = editor.execute("insertSimpleBox", itemEnd);
+            //缓存将要移除的marker 和 当前的range
+            const [oldViewElement] = [...editor.editing.mapper.markerNameToElements(marker.name)];
+            this.deposit = {
+              oldViewElement,
+              dom: clickDom,
+              newRange,
+              oldMarker: marker,
+            };
+            writer.addClass(HIDDEN_CLASS, oldViewElement);
+            res();
+          });
+        }).then(res => {
+          const select = document.querySelector(V_SELECT);
+          const textNode = document.querySelector(".hidden-item");
+          select.focus();
+          select.value = textNode.innerText;
+          select.onblur = this.onSelectBlur;
+          select.onchange = this.onSelectChange;
+        });
+      }
     },
   },
   computed: {

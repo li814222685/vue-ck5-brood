@@ -7,10 +7,7 @@ import { SectionCommand } from "./command";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
 import { V_SECTION } from "./constant";
-import View from "@ckeditor/ckeditor5-engine/src/view/view";
-import { Element, ViewDocument } from "@ckeditor/ckeditor5-engine";
-import { Item } from "@ckeditor/ckeditor5-engine/src/view/item";
-import RootElement from "@ckeditor/ckeditor5-engine/src/model/rootelement";
+import FocusTracker from "@ckeditor/ckeditor5-utils/src/focustracker";
 
 interface SectionAttrs {
   modelname: string;
@@ -26,7 +23,6 @@ export default class SectionEditing extends Plugin {
   init() {
     this._defineSchema();
     this._defineConverters();
-
     // this.editor.commands.add(COMMAND_NAME__INSERT_SELECT, new SectionCommand(this.editor));
   }
 
@@ -41,6 +37,10 @@ export default class SectionEditing extends Plugin {
 
       // The inline widget is self-contained so it cannot be split by the caret and it can be selected:
       isObject: true,
+
+      isBlock: true,
+
+      allowChildren: ["$block", "$text"],
 
       // The inline widget can have the same attributes as text (for example linkHref, bold).
       allowAttributesOf: "$text",
@@ -61,29 +61,16 @@ export default class SectionEditing extends Plugin {
 
     conversion.for("upcast").elementToElement({
       view: V_SECTION,
-      model: (viewEle, { writer }) => {
-        const v_section = writer.createElement(V_SECTION, viewEle.getAttributes() as any);
-        console.log("children:::", [...viewEle.getChildren()]);
-        [...viewEle.getChildren()].forEach(childNode => {
-          try {
-            console.log(childNode);
-            writer.insert(childNode as any, v_section, "end");
-          } catch (error) {
-            console.error(error);
-          }
-        });
-
-        return v_section;
-      },
+      model: (viewEle, { writer }) => writer.createElement(V_SECTION, viewEle.getAttributes() as any),
     });
 
     conversion.for("downcast").elementToElement({
       model: V_SECTION,
       view: (modelEle, { writer }) => {
         const sectionAttrs = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
-        const section = writer.createContainerElement("section", sectionAttrs);
+        const section = writer.createEditableElement("section", sectionAttrs);
         console.log("section", section);
-        return toWidget(section, writer);
+        return toWidgetEditable(section, writer);
       },
     });
   }

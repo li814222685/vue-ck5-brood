@@ -4,7 +4,12 @@
       <el-radio :label="EditorMode.Normal" size="large">编辑模式</el-radio>
       <el-radio :label="EditorMode.Restrict" size="large">模版模式</el-radio>
     </el-radio-group>
-    <NormalCK v-if="nowMode === EditorMode.Normal" :htmlData="htmlData" :onchange="changeHtmlData" :nowMode="nowMode" />
+    <NormalCK
+      v-if="nowMode === EditorMode.Normal"
+      :htmlData="htmlData"
+      :onchange="changeHtmlData"
+      :nowMode="nowMode"
+    />
     <RestrictCK v-else :htmlData="htmlData" :onchange="changeHtmlData" :nowMode="nowMode" />
   </div>
 </template>
@@ -23,11 +28,9 @@ enum EditorMode {
 
 const nowMode = ref(EditorMode.Restrict);
 const htmlData = ref(
-  `<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p ><v-section modelName="模块名" type="switch" data-cases=${JSON.stringify([
-    "caseA",
-    "caseB",
-    "caseC",
-  ])}><p class="restricted-editing-exception">我只是一个段落</p ><span>只是一个Span</span></v-section>`
+  `<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p ><v-section modelName="模块名" type="switch" data-cases=${JSON.stringify(
+    ["caseA", "caseB", "caseC"]
+  )}><p>我只是一个段落</p ><span class="restricted-editing-exception">只是一个可编辑的地方</span></v-section>`
 );
 const { value: editorMode } = nowMode;
 
