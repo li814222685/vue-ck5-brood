@@ -10,7 +10,7 @@ export const CUSTOM_PROPERTY__SELECT = "isSelect";
 -------------------------- */
 export const WIDGET_TOOLBAR_NAME__MENU = "controlsMenu";
 
-export const CONTROLS_TOOLBAR = "controlsToolBar";
+export const SECTION_TOOLBAR = "sectionsToolBar";
 
 /* 工具栏 - 指令
 -------------------------- */
