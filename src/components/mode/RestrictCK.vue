@@ -1,7 +1,7 @@
 <template>
   <div>
-    <el-button type="primary" @click="exportData" plain>导出</el-button>
     <div id="editor"></div>
+    <SectionMenu :position-range="positionRange" :attributs-list="attributsList" :menu-visible="menuVisible" @changeCase="changeCase" />
   </div>
 </template>
 <style>
@@ -22,12 +22,13 @@ import { RESTRICT_CONFIG } from "./config.js";
 import { regExpReplacer, removeClass, removeElement } from "../utils";
 import { EditorClasses } from "./define";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
+import SectionMenu from "./SectionMenu/index";
 
 const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
-
+  components: { SectionMenu },
   data() {
     return {
       editor: {},
@@ -39,6 +40,9 @@ export default {
         oldMarker: null,
         dom: null,
       },
+      menuVisible: false,
+      positionRange: [],
+      attributsList: [],
     };
   },
   mounted() {
@@ -65,8 +69,6 @@ export default {
         const editor = window.editor;
         const { model, editing } = editor;
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
-
-        console.log(clickDom);
         this.toShowSectionMenu(clickDom, editor);
         this.toShowSelect(clickDom, editor);
       }, 1);
@@ -103,7 +105,7 @@ export default {
       };
     },
     exportData() {
-      this.onchange(window.devEditor.getData());
+      this.onchange(window.editor.getData());
     },
     getDomPath(ele) {
       let path = ele.nodeName;
@@ -117,18 +119,57 @@ export default {
     //Section Menu展示逻辑
     toShowSectionMenu(clickDom, editor) {
       const domAncestorsPath = this.getDomPath(clickDom);
-      console.log(domAncestorsPath);
+      const tagName = clickDom.tagName;
+      const classList = clickDom.classList;
+      const isSelected = Array.from(clickDom.classList).includes("visual-select");
+      // tagname 是svg/path classname 有section-btn / section-menu
+      const isSectionBtn = tagName == "svg" || tagName == "path" || Array.from(classList).includes("section-btn") || Array.from(classList).includes("section-menu");
       const hasSection = domAncestorsPath.split("/").includes("SECTION");
-      console.log(hasSection);
       const sectionDom = document.querySelector(".ck-editor__nested-editable_focused");
       //todo ：如果是dom祖先里面有SECTION那就展示菜单
-
+      if (hasSection || isSectionBtn) {
+        this.menuVisible = true;
+        this.attributsList = [
+          { key: "type", value: sectionDom.getAttribute("type") },
+          { key: "data-cases", value: sectionDom.getAttribute("data-cases") },
+          { key: "modelname", value: sectionDom.getAttribute("modelname") },
+        ];
+      } else {
+        this.positionRange = [];
+        this.menuVisible = false;
+      }
       if (sectionDom) {
         const sectionPostion = sectionDom.getBoundingClientRect();
         const [sectionMenuPostionX, sectionMenuPostionY] = [Math.floor(sectionPostion.x), Math.floor(sectionPostion.y)];
         //todo： 根据这个去显示菜单
-        console.log(sectionMenuPostionX, sectionMenuPostionY);
+        this.positionRange = [sectionMenuPostionX, sectionMenuPostionY];
       }
+    },
+    changeCase(val) {
+      const editor = window.editor;
+      const { model, editing } = editor;
+      const casesList = {
+        caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名"type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception">只是一个可编辑的地方</span></section>`,
+        caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名"type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>CASE B</p></section>`,
+        caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名"
+        type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true">
+        <span class="restricted-editing-exception">只是一个可编辑的地方</span></section>`,
+      };
+      const sectionVal = casesList[val];
+
+      model.change(writer => {
+        const editorData = editor.getData();
+        console.log(editorData)
+        // let editorGroup = editorData.split("section");
+        // let caseGroup = sectionVal.split("section");
+        // let newGroup = [editorGroup[0], caseGroup[1], editorGroup[2]];
+        // let newEditorData = newGroup.join("section");
+        console.log(casesList.caseA,sectionVal)
+        const newVal = _.replace(editorData,'模块名','leehaohaohao')
+        console.log(newVal)
+        editor.setData(newVal);
+      });
+      console.log(val, sectionVal, "changeCase");
     },
     //v-select 相关的展示逻辑
     toShowSelect(clickDom, editor) {
