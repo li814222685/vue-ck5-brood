@@ -5,6 +5,7 @@
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import { emitter, SWITCH_MODAL } from "../../components/mode/mitt";
+import { SECTION_TOOLBAR, COMMAND_NAME__INSERT_SECTION } from "./constant";
 
 export default class SectionUI extends Plugin {
   init() {
@@ -12,6 +13,18 @@ export default class SectionUI extends Plugin {
 
     const editor = this.editor;
     const t = editor.t;
+    editor.ui.componentFactory.add(SECTION_TOOLBAR, locale => {
+      const command = editor.commands.get(COMMAND_NAME__INSERT_SECTION);
+
+      const buttonView = new ButtonView(locale);
+      buttonView.bind("isEnabled").to(command, "isEnabled");
+      this.listenTo(buttonView, "execute", val => editor.execute(COMMAND_NAME__INSERT_SECTION));
+      buttonView.set({
+        withText: true,
+        label: "插入Section",
+      });
+      return buttonView;
+    });
 
     // The "simpleBox" button must be registered among the UI components of the editor
     // to be displayed in the toolbar.

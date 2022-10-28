@@ -6,7 +6,7 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { SectionCommand } from "./command";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { V_SECTION } from "./constant";
+import { COMMAND_NAME__INSERT_SECTION, V_SECTION } from "./constant";
 import FocusTracker from "@ckeditor/ckeditor5-utils/src/focustracker";
 
 interface SectionAttrs {
@@ -21,9 +21,10 @@ export default class SectionEditing extends Plugin {
   }
 
   init() {
+    this.editor.commands.add(COMMAND_NAME__INSERT_SECTION, new SectionCommand(this.editor));
+
     this._defineSchema();
     this._defineConverters();
-    // this.editor.commands.add(COMMAND_NAME__INSERT_SELECT, new SectionCommand(this.editor));
   }
 
   _defineSchema() {
