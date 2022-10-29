@@ -46,7 +46,6 @@ export default {
   },
   mounted() {
     // 注册点击事件监听
-    console.log(this.htmlData);
     // window.addEventListener("mousedown", this.onGlobalClick);
     ClassicEditor.create(document.querySelector("#editor"), RESTRICT_CONFIG)
       .then(editor => {
@@ -139,7 +138,6 @@ export default {
   computed: {
     nowMode() {
       if (this.nowMode) {
-        console.log(this.nowMode);
         return this.nowMode;
       }
     },
@@ -148,7 +146,6 @@ export default {
     htmlData: {
       immediate: true,
       handler(val) {
-        console.log(window.editor);
         if (window.editor) {
           window.editor.setData(val);
         }
