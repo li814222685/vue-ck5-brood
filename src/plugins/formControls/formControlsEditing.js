@@ -164,7 +164,7 @@ export default class FormControlEditing extends Plugin {
       model: "restrictedEditingException",
       // Use callback to return new object every time new marker instance is created - otherwise it will be seen as the same marker.
       view: (data, { writer }) => {
-        console.log(data);
+        console.log(data, writer, this.editor.model.markers);
         return {
           name: "span",
           classes: "restricted-editing-exception",

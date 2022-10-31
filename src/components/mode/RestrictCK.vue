@@ -46,6 +46,7 @@ export default {
       positionRange: [],
       attributsList: [],
       range: null,
+      clickDom: null,
     };
   },
   mounted() {
@@ -133,18 +134,6 @@ export default {
       this.menuVisible = false;
       //todo ：如果是dom祖先里面有SECTION or tagname 是 svg/path classname 有 section-btn/section-menu 那就展示菜单
       if (hasSection || isSectionBtn) {
-        const editor = window.editor;
-        const { model, editing } = editor;
-        const selection = model.document.selection;
-        const firstRange = selection.getFirstPosition();
-        const LastRange = selection.getLastPosition();
-        model.change(writer => {
-          this.range = writer.createRange(firstRange, LastRange);
-          let range = toRaw(this.range)
-          if(hasSection && !isSectionBtn) {
-            writer.addMarker("sectionMarker", { range, usingOperation: true });
-          }
-        });
         this.menuVisible = true;
         this.attributsList = [
           { key: "type", value: sectionDom.getAttribute("type") },
@@ -180,22 +169,18 @@ export default {
       const parserSection = parse(sectionVal);
       let range = null;
       model.change(writer => {
-        // 获取范围
+        // 获取section范围
         const firstRange = modelSelection.getFirstPosition();
         const LastRange = modelSelection.getLastPosition();
-        range = writer.createRange(firstRange, LastRange);
-
-        const child = model.document.getRoot().getChild(1).getChild(0);
-        range = writer.createRangeOn(child);
-
-        let marker = model.markers.get("sectionMarker");
-        const markerRange = marker.getRange();
-        writer.remove(markerRange)
-        console.log(marker, model.markers, "marker");
-        // 创建element，插入
-        const element = this.createSectionInner(writer, parserSection, null);
-        writer.append(element, docFrag);
-        model.insertObject(element, range);
+        let elementRange = writer.createRange(firstRange, LastRange);
+        // 通过section 范围获取到范围内的 element
+        const element = model.schema.getLimitElement(elementRange);
+        range = writer.createRangeOn(element);
+        // 移除范围和范围内元素，再去插入
+        writer.remove(range);
+        // 创建新的element，插入
+        const newElement = this.createSectionInner(writer, parserSection, null);
+        model.insertContent(newElement, range, "on");
       });
     },
     /**
