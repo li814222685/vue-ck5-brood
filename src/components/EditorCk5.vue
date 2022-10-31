@@ -51,6 +51,9 @@ const changeHtmlData = (val: string) => {
 figure {
   width: 100%;
   max-width: 100%;
+  table {
+    table-layout: fixed;
+  }
 }
 .restricted-cell-bgColor {
   background-color: rgba(255, 169, 77, 0.2) !important;
