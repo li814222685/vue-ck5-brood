@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="normalMode">
     <JqxDropDownList
       :width="200"
       :height="25"

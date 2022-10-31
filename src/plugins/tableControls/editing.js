@@ -3,20 +3,11 @@
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import { InsertControlsCommand, InsertOptionsCommand } from "./command";
-import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import {
-  COMMAND_NAME__INSERT_SELECT,
-  CONTROLS_CONTAINER,
-  CUSTOM_PROPERTY__SELECT,
-  V_OPTIONS,
-  V_SELECT,
-  COMMAND_NAME__INSERT_OPTIONS,
-} from "./constant";
-import { V_OPTION } from "./constant";
-import { converDowncastCell } from "./util";
+import { converDowncastCell, isRestrictedElement } from "./util";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
+import { COMMAND_NAME__INSERT_TABLE_SELECT } from "./constant";
+import { TableControlsCommand } from "./command";
 export default class TableControlsEditing extends Plugin {
   static get requires() {
     return [Widget];
@@ -26,6 +17,10 @@ export default class TableControlsEditing extends Plugin {
     this._defineSchema();
     this._defineConverters();
     this._listenToClick();
+    this.editor.commands.add(
+      COMMAND_NAME__INSERT_TABLE_SELECT,
+      new TableControlsCommand(this.editor)
+    );
   }
 
   _defineSchema() {
@@ -51,8 +46,10 @@ export default class TableControlsEditing extends Plugin {
     editingView.addObserver(ClickObserver);
     this.listenTo(viewDocument, "click", (event, data) => {
       const target = data.target;
-      const modelEle = editor.editing.mapper.toModelElement(target);
-      console.log(modelEle);
+      console.log(target);
+      const isRestrict = isRestrictedElement(target);
+      console.log(isRestrict);
+      // const modelEle = editor.editing.mapper.toModelElement(target);
     });
   }
 }

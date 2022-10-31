@@ -52,16 +52,14 @@ figure {
   width: 100%;
   max-width: 100%;
 }
-#restrictMode {
-  .restricted-cell-bgColor {
-    background-color: rgba(255, 169, 77, 0.2) !important;
-  }
-  tr {
-    .ck-editor__editable .restricted-editing-exception {
-      background-color: inherit !important;
-      border: none !important;
-      padding: 0px;
-    }
+.restricted-cell-bgColor {
+  background-color: rgba(255, 169, 77, 0.2) !important;
+}
+tr {
+  .ck-editor__editable .restricted-editing-exception {
+    background-color: inherit !important;
+    border: none !important;
+    padding: 0px;
   }
 }
 </style>
