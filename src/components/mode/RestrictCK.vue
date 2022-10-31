@@ -23,6 +23,8 @@ import { regExpReplacer, removeClass, removeElement } from "../utils";
 import { EditorClasses } from "./define";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import SectionMenu from "./SectionMenu/index";
+import { parse, stringify } from "himalaya";
+import { V_SECTION, V_SPAN } from "../../plugins/section/constant.ts";
 
 const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
 
@@ -43,6 +45,7 @@ export default {
       menuVisible: false,
       positionRange: [],
       attributsList: [],
+      range: null,
     };
   },
   mounted() {
@@ -91,7 +94,6 @@ export default {
         model.insertContent(text, range);
       });
     },
-
     onSelectBlur() {
       const { oldViewElement, newRange } = toRaw(this.deposit);
       removeClass(HIDDEN_CLASS, oldViewElement);
@@ -126,8 +128,23 @@ export default {
       const isSectionBtn = tagName == "svg" || tagName == "path" || Array.from(classList).includes("section-btn") || Array.from(classList).includes("section-menu");
       const hasSection = domAncestorsPath.split("/").includes("SECTION");
       const sectionDom = document.querySelector(".ck-editor__nested-editable_focused");
-      //todo ：如果是dom祖先里面有SECTION那就展示菜单
+      // 清空位置
+      this.positionRange = [];
+      this.menuVisible = false;
+      //todo ：如果是dom祖先里面有SECTION or tagname 是 svg/path classname 有 section-btn/section-menu 那就展示菜单
       if (hasSection || isSectionBtn) {
+        const editor = window.editor;
+        const { model, editing } = editor;
+        const selection = model.document.selection;
+        const firstRange = selection.getFirstPosition();
+        const LastRange = selection.getLastPosition();
+        model.change(writer => {
+          this.range = writer.createRange(firstRange, LastRange);
+          let range = toRaw(this.range)
+          if(hasSection && !isSectionBtn) {
+            writer.addMarker("sectionMarker", { range, usingOperation: true });
+          }
+        });
         this.menuVisible = true;
         this.attributsList = [
           { key: "type", value: sectionDom.getAttribute("type") },
@@ -145,31 +162,82 @@ export default {
         this.positionRange = [sectionMenuPostionX, sectionMenuPostionY];
       }
     },
-    changeCase(val) {
+    /**
+     * @description 获取caseName,找到case结构进行section替换
+     * @param val caseName
+     */
+    changeCase(caseName) {
       const editor = window.editor;
       const { model, editing } = editor;
+      const modelSelection = model.document.selection;
       const casesList = {
-        caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名"type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception">只是一个可编辑的地方</span></section>`,
-        caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名"type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>CASE B</p></section>`,
-        caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名"
-        type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true">
-        <span class="restricted-editing-exception">只是一个可编辑的地方</span></section>`,
+        caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception">只是一个可编辑的地方</span></section>`,
+        caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>CASE B</p></section>`,
+        caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><span class="restricted-editing-exception">只是一个可编辑的地方</span></section>`,
       };
-      const sectionVal = casesList[val];
-
+      const sectionVal = casesList[caseName];
+      // 获取html标签字符串转换的对象
+      const parserSection = parse(sectionVal);
+      let range = null;
       model.change(writer => {
-        const editorData = editor.getData();
-        console.log(editorData)
-        // let editorGroup = editorData.split("section");
-        // let caseGroup = sectionVal.split("section");
-        // let newGroup = [editorGroup[0], caseGroup[1], editorGroup[2]];
-        // let newEditorData = newGroup.join("section");
-        console.log(casesList.caseA,sectionVal)
-        const newVal = _.replace(editorData,'模块名','leehaohaohao')
-        console.log(newVal)
-        editor.setData(newVal);
+        // 获取范围
+        const firstRange = modelSelection.getFirstPosition();
+        const LastRange = modelSelection.getLastPosition();
+        range = writer.createRange(firstRange, LastRange);
+
+        const child = model.document.getRoot().getChild(1).getChild(0);
+        range = writer.createRangeOn(child);
+
+        let marker = model.markers.get("sectionMarker");
+        const markerRange = marker.getRange();
+        writer.remove(markerRange)
+        console.log(marker, model.markers, "marker");
+        // 创建element，插入
+        const element = this.createSectionInner(writer, parserSection, null);
+        writer.append(element, docFrag);
+        model.insertObject(element, range);
       });
-      console.log(val, sectionVal, "changeCase");
+    },
+    /**
+     * @description 创建section内的元素
+     * @param writer model 编写器
+     * @param parserDom 元素结构转化的对象
+     * @param parentElement 父级元素
+     */
+    createSectionInner(writer, parserDom, parentElement) {
+      let elementList = [],
+        text = null,
+        dom = null;
+      for (let item of parserDom) {
+        if (item.type === "element") {
+          // 返回元素属性对象
+          let atttibutesList = item.attributes.map(item => [item.key, item.value]);
+          atttibutesList = Object.fromEntries([...atttibutesList]);
+          // 创建元素
+          if (item.tagName === "section") {
+            dom = writer.createElement(V_SECTION, atttibutesList);
+          } else if (item.tagName === "p") {
+            dom = writer.createElement("paragraph", atttibutesList);
+          } else if (item.tagName === "span") {
+            dom = writer.createElement(V_SPAN, atttibutesList);
+          } else {
+            atttibutesList["data-cke-ignore-events"] = true;
+            dom = writer.createElement(item.tagName, atttibutesList);
+          }
+          // 插入到父级元素
+          if (parentElement) {
+            writer.append(dom, parentElement);
+          }
+        } else {
+          // 不是元素的创建文字插入到dom中
+          text = writer.insertText(item.content, parentElement);
+        }
+        // 递归
+        if (item.children) {
+          this.createSectionInner(writer, item.children, dom);
+        }
+      }
+      return dom;
     },
     //v-select 相关的展示逻辑
     toShowSelect(clickDom, editor) {

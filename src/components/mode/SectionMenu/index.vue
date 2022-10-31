@@ -33,7 +33,7 @@ let cases = reactive({
 });
 watch(
   positionRange,
-  (value) => {
+  (value: string[]) => {
     nextTick(() => {
       const menuBtn = document.querySelector("#menuBtn");
       if (!menuBtn) return;
@@ -45,7 +45,7 @@ watch(
 );
 watch(
   menuVisible,
-  (value, oldValue) => {
+  (value: boolean) => {
     if(!value) {
       listVisible.value = false;
     }

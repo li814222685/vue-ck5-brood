@@ -6,7 +6,7 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { SectionCommand } from "./command";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { COMMAND_NAME__INSERT_SECTION, V_SECTION } from "./constant";
+import { COMMAND_NAME__INSERT_SECTION, V_SECTION, V_SPAN } from "./constant";
 import FocusTracker from "@ckeditor/ckeditor5-utils/src/focustracker";
 
 interface SectionAttrs {
@@ -49,7 +49,13 @@ export default class SectionEditing extends Plugin {
       // The placeholder can have many types, like date, name, surname, etc:
       allowAttributes: ["modelName", "type", "cases", "data-cases"],
     });
-
+    schema.register("v-span", {
+      allowWhere: "$block",
+      isInline: true,
+      isObject: true,
+      allowAttributesOf: "$text",
+      allowAttributes: ["class", "data-cke-ignore-events"],
+    });
     // schema.addChildCheck((context, childDefinition) => {
     //   if (context.endsWith(V_OPTIONS) && childDefinition.name == CONTROLS_CONTAINER) {
     //     return false;
@@ -70,8 +76,17 @@ export default class SectionEditing extends Plugin {
       view: (modelEle, { writer }) => {
         const sectionAttrs = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
         const section = writer.createEditableElement("section", sectionAttrs);
-        console.log("section", section);
         return toWidgetEditable(section, writer);
+      },
+    });
+    conversion.for("downcast").elementToElement({
+      model: V_SPAN,
+      view: (modelEle, { writer }) => {
+        const attributesList = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
+        const span = writer.createEditableElement("span", attributesList, {
+          renderUnsafeAttributes: ["data-cke-ignore-events"],
+        });
+        return toWidgetEditable(span, writer);
       },
     });
   }

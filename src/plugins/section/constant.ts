@@ -2,6 +2,7 @@
 -------------------------- */
 
 export const V_SECTION = "v-section";
+export const V_SPAN = "v-span";
 
 export const SCHEMA_NAME__IMAGE = "image";
 export const CUSTOM_PROPERTY__SELECT = "isSelect";
