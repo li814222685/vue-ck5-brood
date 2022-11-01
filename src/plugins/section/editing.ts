@@ -6,7 +6,7 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { SectionCommand,InsertSectionCommand } from "./command";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { COMMAND_NAME__INSERT_SECTION, V_SECTION,COMMAND__INSERT_SECTION } from "./constant";
+import { COMMAND_NAME__INSERT_SECTION, V_SECTION,COMMAND__INSERT_SECTION,V_SPAN } from "./constant";
 import FocusTracker from "@ckeditor/ckeditor5-utils/src/focustracker";
 
 interface SectionAttrs {
@@ -61,7 +61,13 @@ export default class SectionEditing extends Plugin {
       allowContentOf: "$root",
       allowAttributes: ["label", "value"],
     });
-
+    schema.register("v-span", {
+      allowWhere: "$block",
+      isInline: true,
+      isObject: true,
+      allowAttributesOf: "$text",
+      allowAttributes: ["class", "data-cke-ignore-events"],
+    });
     // schema.addChildCheck((context, childDefinition) => {
     //   if (context.endsWith(V_OPTIONS) && childDefinition.name == CONTROLS_CONTAINER) {
     //     return false;
@@ -123,6 +129,16 @@ export default class SectionEditing extends Plugin {
         return toWidgetEditable(option, writer);
       },
       
+    });
+    conversion.for("downcast").elementToElement({
+      model: V_SPAN,
+      view: (modelEle, { writer }) => {
+        const attributesList = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
+        const span = writer.createEditableElement("span", attributesList, {
+          renderUnsafeAttributes: ["data-cke-ignore-events"],
+        });
+        return toWidgetEditable(span, writer);
+      },
     });
   }
 }

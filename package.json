@@ -25,6 +25,7 @@
     "@vue/cli-plugin-typescript": "^5.0.8",
     "core-js": "^3.8.3",
     "element-plus": "^2.2.18",
+    "himalaya": "^1.1.0",
     "lodash": "^4.17.21",
     "mitt": "^3.0.0",
     "postcss-loader": "^4.3.0",
