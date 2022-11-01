@@ -3,10 +3,10 @@
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import { SectionCommand } from "./command";
+import { SectionCommand,InsertSectionCommand } from "./command";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { COMMAND_NAME__INSERT_SECTION, V_SECTION } from "./constant";
+import { COMMAND_NAME__INSERT_SECTION, V_SECTION,COMMAND__INSERT_SECTION } from "./constant";
 import FocusTracker from "@ckeditor/ckeditor5-utils/src/focustracker";
 
 interface SectionAttrs {
@@ -22,6 +22,7 @@ export default class SectionEditing extends Plugin {
 
   init() {
     this.editor.commands.add(COMMAND_NAME__INSERT_SECTION, new SectionCommand(this.editor));
+    this.editor.commands.add(COMMAND__INSERT_SECTION, new InsertSectionCommand(this.editor));
 
     this._defineSchema();
     this._defineConverters();
@@ -47,7 +48,18 @@ export default class SectionEditing extends Plugin {
       allowAttributesOf: "$text",
 
       // The placeholder can have many types, like date, name, surname, etc:
-      allowAttributes: ["modelName", "type", "cases", "data-cases"],
+      allowAttributes: ["modelName", "type", "cases", "data-cases","class"],
+      inheritAllFrom: "$container",
+
+    });
+    schema.register("p", {
+      // Cannot be split or left by the caret.
+      isLimit: true,
+      isSelectable: true,
+      isInline: true,
+      allowIn: V_SECTION,
+      allowContentOf: "$root",
+      allowAttributes: ["label", "value"],
     });
 
     // schema.addChildCheck((context, childDefinition) => {
@@ -69,10 +81,48 @@ export default class SectionEditing extends Plugin {
       model: V_SECTION,
       view: (modelEle, { writer }) => {
         const sectionAttrs = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
-        const section = writer.createEditableElement("section", sectionAttrs);
-        console.log("section", section);
+        const section = writer.createEditableElement(
+          "section",
+          {
+            class: "section",
+            cases: sectionAttrs.cases,
+            modelName: sectionAttrs.modelName,
+            type: sectionAttrs.type,
+          },
+          {
+            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "cases", "modelName", "type"],
+          }
+        );
         return toWidgetEditable(section, writer);
       },
+    });
+    // conversion.for("upcast").elementToElement({
+    //   view: "section",
+    //   model: (viewEle, { writer }) => writer.createElement("section", viewEle.getAttributes() as any),
+    // });
+    conversion.for("upcast").elementToElement({
+      model: "p",
+      view: {
+        name: "p",
+        classes: "p",
+      },
+    });
+    conversion.for("downcast").elementToElement({
+      model: "p",
+      view: (modelElement, { writer }) => {
+        console.log(modelElement);
+        console.log(modelElement.getAttribute("label"), modelElement.getAttribute("value"));
+        const option = writer.createEditableElement("p", {
+          class: "p",
+          label: modelElement.getAttribute("label"),
+          value: modelElement.getAttribute("value"),
+        },{
+          renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "cases", "modelName", "type","label", "value"]
+        }
+        );
+        return toWidgetEditable(option, writer);
+      },
+      
     });
   }
 }

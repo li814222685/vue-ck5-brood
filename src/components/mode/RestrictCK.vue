@@ -43,7 +43,6 @@ export default {
   },
   mounted() {
     // 注册点击事件监听
-    console.log(this.htmlData);
     window.addEventListener("mousedown", this.onGlobalClick);
     ClassicEditor.create(document.querySelector("#editor"), RESTRICT_CONFIG)
       .then(editor => {
@@ -117,9 +116,7 @@ export default {
     //Section Menu展示逻辑
     toShowSectionMenu(clickDom, editor) {
       const domAncestorsPath = this.getDomPath(clickDom);
-      console.log(domAncestorsPath);
       const hasSection = domAncestorsPath.split("/").includes("SECTION");
-      console.log(hasSection);
       const sectionDom = document.querySelector(".ck-editor__nested-editable_focused");
       //todo ：如果是dom祖先里面有SECTION那就展示菜单
 
@@ -127,7 +124,6 @@ export default {
         const sectionPostion = sectionDom.getBoundingClientRect();
         const [sectionMenuPostionX, sectionMenuPostionY] = [Math.floor(sectionPostion.x), Math.floor(sectionPostion.y)];
         //todo： 根据这个去显示菜单
-        console.log(sectionMenuPostionX, sectionMenuPostionY);
       }
     },
     //v-select 相关的展示逻辑
@@ -173,7 +169,6 @@ export default {
   computed: {
     nowMode() {
       if (this.nowMode) {
-        console.log(this.nowMode);
         return this.nowMode;
       }
     },
@@ -182,7 +177,6 @@ export default {
     htmlData: {
       immediate: true,
       handler(val) {
-        console.log(window.editor);
         if (window.editor) {
           window.editor.setData(val);
         }
