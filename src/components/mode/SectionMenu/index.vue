@@ -11,7 +11,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, toRaw, toRefs, watch, nextTick, defineEmits } from "vue";
+import { reactive, ref, toRaw, toRefs, watch, nextTick } from "vue";
 interface AttributeOption {
   key: string;
   value: string;
@@ -84,7 +84,7 @@ const chengeCase = (item: string) => {
 .box-card {
   width: 100px;
   position: absolute;
-  /deep/ .el-card__body {
+  :deep(.el-card__body) {
     padding: 0;
     .item {
       padding: 10px 10px 10px 10px;
