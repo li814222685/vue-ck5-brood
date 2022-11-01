@@ -4,6 +4,7 @@ import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils
 import AttributeElement from "@ckeditor/ckeditor5-engine/src/view/attributeelement";
 import { RESTRICTED_EDITING } from "./constant";
 import { EditorClasses } from "../../components/mode/define";
+import ContainerElement from "@ckeditor/ckeditor5-engine/src/view/containerelement";
 
 /** Table Cell dataDowncast逻辑重写 */
 /**
@@ -52,7 +53,17 @@ const isCellChildHasRestricted = (ele: Element): any => {
 };
 
 /** 当前点击的元素是否是限制编辑元素 */
-export const isRestrictedElement = (ele: AttributeElement): boolean => {
-  //Todo：这里暂时只考虑了Cell内的元素deep 为2，后续可能需要结合需求或者具体场景，使用遍历递归实现
-  return [...ele.getClassNames()].includes(EditorClasses.EDITABLE_CLASS);
+export const isRestrictedElement = (ele: AttributeElement | ContainerElement): boolean => {
+  return (
+    //当前元素拥有class | 或其子元素含有class
+    [...ele.getClassNames()].includes(EditorClasses.EDITABLE_CLASS) ||
+    [...ele.getChildren()].some((child: AttributeElement) => {
+      if (!child?.getClassNames) {
+        return false;
+      }
+      return [...(child as AttributeElement)?.getClassNames()].includes(
+        EditorClasses.EDITABLE_CLASS
+      );
+    })
+  );
 };

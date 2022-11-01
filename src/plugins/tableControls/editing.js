@@ -8,6 +8,8 @@ import { converDowncastCell, isRestrictedElement } from "./util";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
 import { COMMAND_NAME__INSERT_TABLE_SELECT } from "./constant";
 import { TableControlsCommand } from "./command";
+import { emitter, SET_TABLE_SELECT_POSITION } from "@/components/mode/mitt";
+
 export default class TableControlsEditing extends Plugin {
   static get requires() {
     return [Widget];
@@ -21,6 +23,7 @@ export default class TableControlsEditing extends Plugin {
       COMMAND_NAME__INSERT_TABLE_SELECT,
       new TableControlsCommand(this.editor)
     );
+    window.addEventListener("mousedown", this.clickDom);
   }
 
   _defineSchema() {
@@ -51,5 +54,15 @@ export default class TableControlsEditing extends Plugin {
       console.log(isRestrict);
       // const modelEle = editor.editing.mapper.toModelElement(target);
     });
+  }
+
+  clickDom(e) {
+    const editor = window.editor;
+    const clickDom = document.elementFromPoint(e.clientX, e.clientY);
+    const ancestorTd = clickDom.closest("td");
+    if (!ancestorTd) return;
+
+    const { width, height, top, left } = ancestorTd.getBoundingClientRect();
+    emitter.emit(SET_TABLE_SELECT_POSITION, { width, height, top, left });
   }
 }

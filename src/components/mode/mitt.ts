@@ -11,3 +11,7 @@ export const emitter = mitt();
 export const SWITCH_MODAL = "switchModal";
 /**  获取OPTIONS list*/
 export const GET_OPTIONS = "getOptions";
+
+/* ====================*/
+
+export const SET_TABLE_SELECT_POSITION = "setTableSelectPosition";

@@ -7,6 +7,7 @@
       :selectedIndex="1"
     >
     </JqxDropDownList>
+    <TableSelect />
     <el-button type="primary" @click="exportData" plain>导出</el-button>
     <br />
     <br />
@@ -41,6 +42,7 @@ import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constan
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import { parse as toAst, stringify as toHtmlString } from "himalaya";
 import JqxDropDownList from "jqwidgets-scripts/jqwidgets-vue/vue_jqxdropdownlist.vue";
+import TableSelect from "./TableSelect/index.vue";
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
@@ -64,7 +66,7 @@ export default {
       ],
     };
   },
-  components: { SelectDialog, JqxDropDownList },
+  components: { SelectDialog, JqxDropDownList, TableSelect },
   mounted() {
     //挂载Emitter
     this.hangUpAllEmitFunctions();
@@ -115,4 +117,8 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+#normalMode {
+  position: relative;
+}
+</style>
