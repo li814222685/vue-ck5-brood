@@ -1,6 +1,6 @@
 import { Element } from "@ckeditor/ckeditor5-engine";
 import Selection from "@ckeditor/ckeditor5-engine/src/model/selection";
-import { CUSTOM_PROPERTY__SELECT } from "./constant";
+// import { CUSTOM_PROPERTY__SELECT } from "./constant";
 import { emitter, GET_OPTIONS, Option } from "../../components/mode/mitt";
 import EditableElement from "@ckeditor/ckeditor5-engine/src/view/editableelement";
 /** 获取选中的控件 */

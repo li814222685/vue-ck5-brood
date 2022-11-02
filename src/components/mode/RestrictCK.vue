@@ -51,7 +51,6 @@ export default {
   },
   mounted() {
     // 注册点击事件监听
-    console.log(this.htmlData);
     window.addEventListener("mousedown", this.onGlobalClick);
     ClassicEditor.create(document.querySelector("#editor"), RESTRICT_CONFIG)
       .then(editor => {
@@ -59,6 +58,7 @@ export default {
 
         //编辑器实例挂载到 Window
         window.editor = editor;
+        console.log(this.htmlData);
         editor.setData(this.htmlData);
       })
       .catch(error => {
@@ -170,6 +170,7 @@ export default {
       // editor.setData(sectionVal);
       // 获取html标签字符串转换的对象
       const parserSection = parse(sectionVal);
+      console.log(parserSection);
       let range = null;
       model.change(writer => {
         // 获取section范围
@@ -271,7 +272,6 @@ export default {
   computed: {
     nowMode() {
       if (this.nowMode) {
-        console.log(this.nowMode);
         return this.nowMode;
       }
     },
@@ -280,7 +280,6 @@ export default {
     htmlData: {
       immediate: true,
       handler(val) {
-        console.log(window.editor);
         if (window.editor) {
           console.log(val, "data");
           window.editor.setData(val);

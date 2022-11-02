@@ -26,7 +26,7 @@ enum EditorMode {
   Restrict = "restrict",
 }
 
-const nowMode = ref(EditorMode.Restrict);
+const nowMode = ref(EditorMode.Normal);
 const htmlData = ref(
   `<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p ><v-section modelName="模块名" type="switch" data-cases=${JSON.stringify(
     ["caseA", "caseB", "caseC"]

@@ -4,22 +4,16 @@
 export const V_SECTION = "v-section";
 export const V_SPAN = "v-span";
 
-export const SCHEMA_NAME__IMAGE = "image";
-export const CUSTOM_PROPERTY__SELECT = "isSelect";
-
 /* 工具栏
 -------------------------- */
-export const WIDGET_TOOLBAR_NAME__MENU = "controlsMenu";
-
 export const SECTION_TOOLBAR = "sectionsToolBar";
+export const WIDGET_TOOLBAR_NAME__MENU = "sectionToolBar";
 
 /* 工具栏 - 指令
 -------------------------- */
 export const COMMAND_NAME__INSERT_SECTION = "insertSection";
-export const COMMAND_NAME__OPEN_CONTROL_MODAL = "openControlModal";
-
-export const COMMAND_NAME__INSERT_OPTIONS = "insertOptions";
+export const COMMAND__INSERT_SECTION = "insertSectionCommand";
 
 /* 功能类
 -------------------------- */
-export const IGNORE_EVENTS = "data-cke-ignore-events";
+
