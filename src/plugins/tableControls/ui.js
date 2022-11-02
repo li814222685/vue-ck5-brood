@@ -7,7 +7,11 @@ import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import { addListToDropdown, createDropdown } from "@ckeditor/ckeditor5-ui/src/dropdown/utils";
 import Collection from "@ckeditor/ckeditor5-utils/src/collection";
 import Model from "@ckeditor/ckeditor5-ui/src/model";
-import { COMMAND_NAME__INSERT_TABLE_SELECT, TABLE_CC_TOOLBAR } from "./constant";
+import {
+  COMMAND_NAME__INSERT_TABLE_NORMAL,
+  COMMAND_NAME__INSERT_TABLE_SELECT,
+  TABLE_CC_TOOLBAR,
+} from "./constant";
 
 export default class TableControlsUI extends Plugin {
   init() {
@@ -17,7 +21,7 @@ export default class TableControlsUI extends Plugin {
     const t = editor.t;
 
     editor.ui.componentFactory.add(TABLE_CC_TOOLBAR, locale => {
-      const command = editor.commands.get(COMMAND_NAME__INSERT_TABLE_SELECT);
+      const command = editor.commands.get(COMMAND_NAME__INSERT_TABLE_NORMAL);
 
       const dropdownView = createDropdown(locale);
       const dropButton = new ButtonView(locale);
@@ -30,12 +34,24 @@ export default class TableControlsUI extends Plugin {
         model: new Model({
           withText: true,
           label: "插入普通CC ( ⌘ / CTRL + J )",
+          cmd: COMMAND_NAME__INSERT_TABLE_NORMAL,
+        }),
+      });
+
+      const insertSelectBtn = new ButtonView(locale);
+
+      insertSelectBtn.set({
+        type: "button",
+        model: new Model({
+          withText: true,
+          label: "插入Select",
           cmd: COMMAND_NAME__INSERT_TABLE_SELECT,
         }),
       });
 
       const items = new Collection();
       items.add(dropButton);
+      items.add(insertSelectBtn);
 
       dropdownView.buttonView.set({
         withText: true,

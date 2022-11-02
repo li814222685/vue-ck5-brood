@@ -115,4 +115,10 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style>
+.rawSelect {
+  width: 200px;
+  height: 30px;
+  border: 2px solid red;
+}
+</style>

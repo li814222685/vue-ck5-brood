@@ -3,8 +3,10 @@
  */
 
 import Command from "@ckeditor/ckeditor5-core/src/command";
+import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import _ from "lodash";
 import { RESTRICTED_EDITING } from "./constant";
+import { createSelect } from "./util";
 
 interface Option {
   label: string | number;
@@ -49,6 +51,34 @@ export class TableControlsCommand extends Command {
   }
 }
 
+export class TableSelectCommand extends Command {
+  execute() {
+    //插入Table Select
+
+    console.log(
+      '%c🍉Lee%cline:57%c"插入TableSelect！！！"',
+      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      "color:#fff;background:rgb(3, 101, 100);padding:3px;border-radius:2px",
+      "插入TableSelect！！！"
+    );
+    // return this.editor.model.change((writer: Writer) => {
+    //   return (this.editor.model as any).insertObject(createSelect(writer));
+    // });
+    return this.editor.model.change(writer => {
+      return (this.editor.model as any).insertObject(createSelect(writer));
+    });
+  }
+
+  refresh() {
+    const model = this.editor.model;
+    const selection = model.document.selection;
+    const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
+    this.isEnabled = allowedIn.name === "tableCell";
+  }
+}
+
 export default {
   TableControlsCommand,
+  TableSelectCommand,
 };

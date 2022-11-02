@@ -17,6 +17,8 @@ export const TABLE_CC_TOOLBAR = "tableCcToolbar";
 /* 工具栏 - 指令
 -------------------------- */
 export const COMMAND_NAME__INSERT_TABLE_SELECT = "insertTableSelect";
+export const COMMAND_NAME__INSERT_TABLE_NORMAL = "insertTableNormal";
+
 export const COMMAND_NAME__OPEN_CONTROL_MODAL = "openControlModal";
 
 export const COMMAND_NAME__INSERT_OPTIONS = "insertOptions";

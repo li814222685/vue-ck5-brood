@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select</title>
+    <style>
+        /* Select 最外层容器 */
+        .v_select {
+            /* 事实上Select 的宽高应该是自适应的，支持外部参数来改变 Select 对应的宽高 */
+            width: 500px;
+            height: 30px;
+            margin: 0 auto;
+            margin-top: 20vh;
+        }
+
+        /* Select 的选择框 */
+        .v_select_dropDown {
+            position: relative;
+
+        }
+
+        /* 可输入 选择框文字部分  */
+        .v_select_dropDown_text {
+            display: block;
+            padding: 0 10px;
+            line-height: 38px;
+            border-bottom: 1px solid #d8d7d9;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #333;
+            background: #fff;
+        }
+
+        /* 打开Option列表 选择框选中后的样式 */
+        .v_select_dropDown_text_sele {
+
+            display: block;
+            padding: 0 10px;
+            line-height: 38px;
+            /* border: 1px solid #1769fe; */
+            border: 1px solid rgba(218, 130, 36, 0.437);
+
+            border-radius: 4px;
+            font-size: 16px;
+            /* color: #1968ff; */
+            /* background: #dce9ff; */
+            background: rgba(255, 169, 77, 0.2);
+
+        }
+
+        /* 修改ContentEditable 的默认Style */
+        [contenteditable] {
+            outline: 1px solid transparent;
+        }
+
+        [contenteditable]:focus {
+            border-bottom: 3px solid rgba(191, 111, 26, 0.437);
+            border-radius: 3px;
+        }
+
+
+
+        /*Select 箭头的样式  */
+        .triangle_up {
+            width: 0;
+            height: 0;
+            right: 20px;
+            top: 17px;
+            position: absolute;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #323232;
+
+        }
+
+        .triangle_down {
+            width: 0;
+            height: 0;
+            right: 20px;
+            top: 17px;
+            position: absolute;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgba(235, 142, 42, 0.437);
+            transform: rotate(180deg);
+            transition: transform 0.2s linear;
+        }
+
+        /* Option 列表   */
+
+        .v_select_optionList {
+            border: 1px solid rgba(218, 130, 36, 0.437);
+            border-top: none;
+            display: none;
+            border-radius: 4px;
+
+        }
+
+        .v_select_optionList_item {
+            padding: 5px;
+        }
+
+        .v_select_optionList_item:hover {
+            background-color: rgba(255, 169, 77, 0.2);
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="v_select" onclick="onClickSelect()">
+        <div class="v_select_dropDown">
+            <div id="v_select_dropDown_text" class="v_select_dropDown_text" contenteditable="true">自定义自定义
+            </div>
+            <span id="theme_icon" class="triangle_up" contenteditable="false"></span>
+
+
+        </div>
+        <div class="v_select_optionList">
+            <div class="v_select_optionList_item" data-value="是" onclick="clickOption();">是</div>
+            <div class="v_select_optionList_item" data-value="否" onclick="clickOption();">否</div>
+        </div>
+        <script>
+            const onClickSelect = () => {
+
+                console.log('%c🍉Lee%cline:74%c999', 'color:#fff;background:#ee6f57;padding:3px;border-radius:2px', 'color:#fff;background:#1f3c88;padding:3px;border-radius:2px', 'color:#fff;background:rgb(254, 67, 101);padding:3px;border-radius:2px', 999)
+                document.querySelector('.v_select_optionList').style.display = "block"
+                document.querySelector(".v_select_dropDown_text").className = "v_select_dropDown_text_sele";
+                document.getElementById("theme_icon").className = "triangle_down";
+
+            }
+            const clickOption = () => {
+                var t_obj = event.target;
+                console.log(t_obj.getAttribute("data-value")); //可获取自定义属性值
+                document.getElementById("v_select_dropDown_text").innerHTML = t_obj.getAttribute("data-value");
+            }
+            document.onclick = function () {
+                var cur_obj = event.target;
+                console.log(cur_obj.className)
+                if ("v_select_dropDown_text" != cur_obj.className && "v_select" != cur_obj.className && "v_select_dropDown_text_sele" != cur_obj.className) {
+                    document.querySelector(".v_select_optionList").style.display = "none";
+                    document.getElementById("v_select_dropDown_text").className = "v_select_dropDown_text";
+                    document.getElementById("theme_icon").className = "triangle_up";
+                }
+            };
+        </script>
+
+</body>
+
+</html>

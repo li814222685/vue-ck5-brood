@@ -6,8 +6,8 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
 import { converDowncastCell, isRestrictedElement } from "./util";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
-import { COMMAND_NAME__INSERT_TABLE_SELECT } from "./constant";
-import { TableControlsCommand } from "./command";
+import { COMMAND_NAME__INSERT_TABLE_SELECT, COMMAND_NAME__INSERT_TABLE_NORMAL } from "./constant";
+import { TableControlsCommand, TableSelectCommand } from "./command";
 export default class TableControlsEditing extends Plugin {
   static get requires() {
     return [Widget];
@@ -18,13 +18,33 @@ export default class TableControlsEditing extends Plugin {
     this._defineConverters();
     this._listenToClick();
     this.editor.commands.add(
-      COMMAND_NAME__INSERT_TABLE_SELECT,
+      COMMAND_NAME__INSERT_TABLE_NORMAL,
       new TableControlsCommand(this.editor)
+    );
+    this.editor.commands.add(
+      COMMAND_NAME__INSERT_TABLE_SELECT,
+      new TableSelectCommand(this.editor)
     );
   }
 
   _defineSchema() {
     const schema = this.editor.model.schema;
+    schema.register("v-div", {
+      // Allow wherever text is allowed:
+      allowWhere: "$block",
+
+      // The placeholder will act as an inline node:
+      isBlock: true,
+
+      // The inline widget is self-contained so it cannot be split by the caret and it can be selected:
+      isObject: true,
+
+      // The inline widget can have the same attributes as text (for example linkHref, bold).
+      allowAttributesOf: "$text",
+
+      // The placeholder can have many types, like date, name, surname, etc:
+      allowAttributes: ["class"],
+    });
   }
 
   _defineConverters() {
@@ -35,6 +55,12 @@ export default class TableControlsEditing extends Plugin {
       model: "tableCell",
       view: converDowncastCell(),
       converterPriority: "highest",
+    });
+    conversion.for("editingDowncast").elementToElement({
+      model: "v-div",
+      view: (modelEle, { writer }) => {
+        return writer.createContainerElement("div", { class: modelEle.getAttribute("class") });
+      },
     });
   }
   _listenToClick() {

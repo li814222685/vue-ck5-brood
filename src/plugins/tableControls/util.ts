@@ -1,9 +1,10 @@
-import { Element } from "@ckeditor/ckeditor5-engine";
+import { DowncastWriter, Element } from "@ckeditor/ckeditor5-engine";
 import TableWalker from "@ckeditor/ckeditor5-table/src/tablewalker";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import AttributeElement from "@ckeditor/ckeditor5-engine/src/view/attributeelement";
 import { RESTRICTED_EDITING } from "./constant";
 import { EditorClasses } from "../../components/mode/define";
+import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 
 /** Table Cell dataDowncast逻辑重写 */
 /**
@@ -45,7 +46,6 @@ export function converDowncastCell(options = {}) {
 
 /** Cell中是否含有限制🚫编辑元素 */
 const isCellChildHasRestricted = (ele: Element): any => {
-  console.log(ele);
   //Todo：这里暂时只考虑了Cell内的元素deep 为2，后续可能需要结合需求或者具体场景，使用遍历递归实现
   const content = (ele.getChild(0) as Element).getChild(0);
   return (content as any)?._attrs.has(RESTRICTED_EDITING);
@@ -55,4 +55,10 @@ const isCellChildHasRestricted = (ele: Element): any => {
 export const isRestrictedElement = (ele: AttributeElement): boolean => {
   //Todo：这里暂时只考虑了Cell内的元素deep 为2，后续可能需要结合需求或者具体场景，使用遍历递归实现
   return [...ele.getClassNames()].includes(EditorClasses.EDITABLE_CLASS);
+};
+
+export const createSelect = (writer: Writer) => {
+  const v_div = writer.createElement("v-div", { class: "rawSelect" });
+  writer.appendText("插入了一个DIV", v_div);
+  return v_div;
 };

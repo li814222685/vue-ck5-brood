@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>下拉框</title>
+  </head>
+  <style type="text/css">
+    #theme_box {
+      display: inline-block;
+      width: 195px;
+      height: 40px;
+      background-color: #fff;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+    }
+    #content_box {
+      position: absolute;
+      top: 0;
+      left: 220px;
+    }
+    .theme_title {
+      position: relative;
+    }
+    .theme_text {
+      display: block;
+      width: 173px;
+      height: 38px;
+      padding: 0 10px;
+      line-height: 38px;
+      border: 1px solid #d8d7d9;
+      border-radius: 4px;
+      font-size: 16px;
+      color: #333;
+      background: #fff;
+    }
+    .theme_text_sele {
+      display: block;
+      width: 173px;
+      height: 38px;
+      padding: 0 10px;
+      line-height: 38px;
+      border: 1px solid #1769fe;
+      border-radius: 4px;
+      font-size: 16px;
+      color: #1968ff;
+      background: #dce9ff;
+    }
+    /* 箭头 */
+    .triangle_up {
+      width: 0;
+      height: 0;
+      right: 20px;
+      top: 17px;
+      position: absolute;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid #323232;
+    }
+    .triangle_bom {
+      width: 0;
+      height: 0;
+      right: 20px;
+      top: 17px;
+      position: absolute;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid #1968ff;
+    }
+    #theme_box ul {
+      list-style: none;
+      padding: 0px;
+      margin-top: 4px;
+      border: 1px solid #333333;
+      background-color: #fff;
+      position: relative;
+      border: 1px solid #d8d7d9;
+      border-radius: 4px;
+      z-index: 2;
+    }
+
+    #theme_box ul li {
+      height: 40px;
+      line-height: 40px;
+      font-size: 16px;
+      color: #333;
+      padding-left: 10px;
+    }
+
+    #theme_box ul li:hover,
+    #content_box ul li:hover {
+      color: #156cff;
+    }
+  </style>
+
+  <body>
+    <div id="theme_box" onclick="click_ul();">
+      <div class="theme_title">
+        <span id="theme_text" class="theme_text">自定义自定义</span>
+        <span id="theme_icon" class="triangle_up"></span>
+      </div>
+      <ul id="theme_select">
+        <li sele="select1" onclick="theme_li_click();">全部</li>
+        <li sele="select2" onclick="theme_li_click();">A</li>
+        <li sele="select3" onclick="theme_li_click();">B</li>
+        <li sele="select4" onclick="theme_li_click();">C</li>
+      </ul>
+    </div>
+  </body>
+
+  <script type="text/javascript">
+    document.getElementById("theme_select").style.display = "none";
+    //  点击展开
+    function click_ul() {
+      document.getElementById("theme_select").style.display = "block";
+      document.getElementById("theme_text").className = "theme_text_sele";
+      document.getElementById("theme_icon").className = "triangle_bom";
+    }
+    // 点击下拉选项
+    function theme_li_click() {
+      var t_obj = event.target;
+      console.log(t_obj.getAttribute("sele")); //可获取自定义属性值
+      document.getElementById("theme_text").innerHTML = t_obj.innerHTML;
+      setTimeout(function () {
+        document.getElementById("theme_select").style.display = "none";
+        document.getElementById("theme_text").className = "theme_text";
+        document.getElementById("theme_icon").className = "triangle_up";
+      }, 1);
+    }
+    // 点其他地方下拉框收回
+    document.onclick = function () {
+      var cur_obj = event.target;
+      if ("theme_text" != cur_obj.id && "theme_box" != cur_obj.id) {
+        document.getElementById("theme_select").style.display = "none";
+        document.getElementById("theme_text").className = "theme_text";
+        document.getElementById("theme_icon").className = "triangle_up";
+      }
+    };
+  </script>
+</html>
