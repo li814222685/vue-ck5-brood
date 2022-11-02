@@ -189,6 +189,9 @@ export default {
         console.log(section, section.focus);
         section.focus();
       });
+      editing.view.change(writer => {
+        console.log(editing.view.domConverter, "view");
+      })
     },
     /**
      * @description 创建section内的元素

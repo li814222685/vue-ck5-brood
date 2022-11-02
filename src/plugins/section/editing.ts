@@ -13,7 +13,7 @@ interface SectionAttrs {
   modelname: string;
   type: string;
   "data-cases": string;
-  id:string;
+  id: string;
 }
 
 export default class SectionEditing extends Plugin {
@@ -49,7 +49,7 @@ export default class SectionEditing extends Plugin {
       allowAttributesOf: "$text",
 
       // The placeholder can have many types, like date, name, surname, etc:
-      allowAttributes: ["modelname", "type", "cases", "data-cases", "data-cke-ignore-events", "class","id"],
+      allowAttributes: ["modelname", "type", "cases", "data-cases", "data-cke-ignore-events", "class", "id"],
       inheritAllFrom: "$container",
     });
     schema.register("p", {
@@ -84,11 +84,9 @@ export default class SectionEditing extends Plugin {
         const sectionAttrs = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
         sectionAttrs.class = "section";
         console.log(sectionAttrs);
-        const section = writer.createEditableElement("section", sectionAttrs, 
-          {
-            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events","data-cases", "cases", "modelname", "type","id"],
-          }
-        );
+        const section = writer.createEditableElement("section", sectionAttrs, {
+          renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "data-cases", "cases", "modelname", "type", "id"],
+        });
         return toWidgetEditable(section, writer);
       },
     });
