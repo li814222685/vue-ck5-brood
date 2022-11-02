@@ -208,7 +208,6 @@ export default {
           } else if (item.tagName === "p") {
             dom = writer.createElement("paragraph", atttibutesList);
           } else if (item.tagName === "span") {
-            console.log(item, "span");
             dom = writer.createElement(V_SPAN, atttibutesList);
           } else {
             dom = writer.createElement(item.tagName, atttibutesList);
