@@ -58,9 +58,12 @@ export default {
 
         //编辑器实例挂载到 Window
         window.editor = editor;
+        console.log(this.htmlData);
         editor.setData(this.htmlData);
       })
-      .catch(error => {});
+      .catch(error => {
+        console.error(error);
+      });
   },
   methods: {
     /**
@@ -134,16 +137,16 @@ export default {
       //todo ：如果是dom祖先里面有SECTION or tagname 是 svg/path classname 有 section-btn/section-menu 那就展示菜单
       if (hasSection || isSectionBtn) {
         this.menuVisible = true;
-        this.attributsList = [
-          { key: "type", value: sectionDom.getAttribute("type") },
-          { key: "data-cases", value: sectionDom.getAttribute("data-cases") },
-          { key: "modelname", value: sectionDom.getAttribute("modelname") },
-        ];
       } else {
         this.positionRange = [];
         this.menuVisible = false;
       }
       if (sectionDom) {
+        this.attributsList = [
+          { key: "type", value: sectionDom.getAttribute("type") },
+          { key: "data-cases", value: sectionDom.getAttribute("data-cases") },
+          { key: "modelname", value: sectionDom.getAttribute("modelname") },
+        ];
         const sectionPostion = sectionDom.getBoundingClientRect();
         const [sectionMenuPostionX, sectionMenuPostionY] = [Math.floor(sectionPostion.x), Math.floor(sectionPostion.y)];
         //todo： 根据这个去显示菜单
@@ -159,13 +162,15 @@ export default {
       const { model, editing } = editor;
       const modelSelection = model.document.selection;
       const casesList = {
-        caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception">只是一个可编辑的地方</span></section>`,
-        caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>CASE B</p></section>`,
-        caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><span class="restricted-editing-exception">只是一个可编辑的地方</span></section>`,
+        caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方</span></section>`,
+        caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>CASE B</p></section></p>`,
+        caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><span class="restricted-editing-exception restricted-editing-exception_collapsed">怎么才能可编辑</span></section>`,
       };
       const sectionVal = casesList[caseName];
+      // editor.setData(sectionVal);
       // 获取html标签字符串转换的对象
       const parserSection = parse(sectionVal);
+      console.log(parserSection);
       let range = null;
       model.change(writer => {
         // 获取section范围
@@ -203,9 +208,9 @@ export default {
           } else if (item.tagName === "p") {
             dom = writer.createElement("paragraph", atttibutesList);
           } else if (item.tagName === "span") {
+            console.log(item, "span");
             dom = writer.createElement(V_SPAN, atttibutesList);
           } else {
-            atttibutesList["data-cke-ignore-events"] = true;
             dom = writer.createElement(item.tagName, atttibutesList);
           }
           // 插入到父级元素
@@ -214,6 +219,7 @@ export default {
           }
         } else {
           // 不是元素的创建文字插入到dom中
+          console.log(parentElement, item, "text");
           text = writer.insertText(item.content, parentElement);
         }
         // 递归
@@ -275,6 +281,7 @@ export default {
       immediate: true,
       handler(val) {
         if (window.editor) {
+          console.log(val, "data");
           window.editor.setData(val);
         }
       },

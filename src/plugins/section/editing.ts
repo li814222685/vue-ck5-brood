@@ -49,7 +49,7 @@ export default class SectionEditing extends Plugin {
       allowAttributesOf: "$text",
 
       // The placeholder can have many types, like date, name, surname, etc:
-      allowAttributes: ["modelname", "type", "data-cases", "data-cases","class","id"],
+      allowAttributes: ["modelname", "type", "cases", "data-cases", "data-cke-ignore-events", "class","id"],
       inheritAllFrom: "$container",
 
     });
@@ -69,11 +69,6 @@ export default class SectionEditing extends Plugin {
       allowAttributesOf: "$text",
       allowAttributes: ["class", "data-cke-ignore-events"],
     });
-    // schema.addChildCheck((context, childDefinition) => {
-    //   if (context.endsWith(V_OPTIONS) && childDefinition.name == CONTROLS_CONTAINER) {
-    //     return false;
-    //   }
-    // });
   }
 
   _defineConverters() {
@@ -100,7 +95,7 @@ export default class SectionEditing extends Plugin {
             id:sectionAttrs.id,
           },
           {
-            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "cases", "modelname", "type","id"],
+            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events","data-cases", "cases", "modelname", "type","id"],
           }
         );
         return toWidgetEditable(section, writer);
@@ -127,7 +122,7 @@ export default class SectionEditing extends Plugin {
           label: modelElement.getAttribute("label"),
           value: modelElement.getAttribute("value"),
         },{
-          renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "cases", "modelName", "type","label", "value"]
+          renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "data-cases", "modelname", "type","label", "value"]
         }
         );
         return toWidgetEditable(option, writer);
