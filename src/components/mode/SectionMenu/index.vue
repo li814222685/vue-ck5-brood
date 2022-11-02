@@ -70,7 +70,6 @@ const showList = () => {
 };
 
 const chengeCase = (item: string) => {
-  // listVisible.value = false;
   emit("changeCase", item);
 };
 </script>

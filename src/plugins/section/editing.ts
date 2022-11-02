@@ -47,7 +47,7 @@ export default class SectionEditing extends Plugin {
       allowAttributesOf: "$text",
 
       // The placeholder can have many types, like date, name, surname, etc:
-      allowAttributes: ["modelName", "type", "cases", "data-cases"],
+      allowAttributes: ["modelName", "type", "cases", "data-cases", "data-cke-ignore-events"],
     });
     schema.register("v-span", {
       allowWhere: "$block",
@@ -56,11 +56,6 @@ export default class SectionEditing extends Plugin {
       allowAttributesOf: "$text",
       allowAttributes: ["class", "data-cke-ignore-events"],
     });
-    // schema.addChildCheck((context, childDefinition) => {
-    //   if (context.endsWith(V_OPTIONS) && childDefinition.name == CONTROLS_CONTAINER) {
-    //     return false;
-    //   }
-    // });
   }
 
   _defineConverters() {
@@ -79,6 +74,7 @@ export default class SectionEditing extends Plugin {
         return toWidgetEditable(section, writer);
       },
     });
+    // conversion.for("editingDowncast").elementToElement({
     conversion.for("downcast").elementToElement({
       model: V_SPAN,
       view: (modelEle, { writer }) => {
