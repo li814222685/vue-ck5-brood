@@ -6,7 +6,10 @@
   </span>
   <div>
     <el-card class="box-card" v-if="listVisible">
-      <div v-for="(item, index) in cases.data" :key="index" class="text item section-menu" @click="chengeCase(item)">{{ item }}</div>
+      <div v-for="(item, index) in cases.data" :key="index" class="text item section-menu" @click="chengeCase(item)">
+        {{ item }}
+        <el-icon v-if="currentCase === item" class="select-case"><Select /></el-icon>
+      </div>
     </el-card>
   </div>
 </template>
@@ -26,8 +29,9 @@ interface SectionMenuProps {
 const props = defineProps<SectionMenuProps>();
 const state = reactive<SectionMenuProps>(props);
 const { positionRange, attributsList, menuVisible } = toRefs(state);
-const emit = defineEmits(['changeCase']);
+const emit = defineEmits(["changeCase"]);
 let listVisible = ref(false);
+let currentCase = ref("");
 let cases = reactive({
   data: [],
 });
@@ -43,14 +47,11 @@ watch(
   },
   { immediate: true, deep: true }
 );
-watch(
-  menuVisible,
-  (value: boolean) => {
-    if(!value) {
-      listVisible.value = false;
-    }
+watch(menuVisible, (value: boolean) => {
+  if (!value) {
+    listVisible.value = false;
   }
-);
+});
 
 const showList = () => {
   const attributes = toRaw(attributsList.value);
@@ -59,6 +60,7 @@ const showList = () => {
       cases.data = JSON.parse(i.value);
     }
   }
+  currentCase.value = cases.data[0];
   listVisible.value = true;
 
   nextTick(() => {
@@ -70,6 +72,7 @@ const showList = () => {
 };
 
 const chengeCase = (item: string) => {
+  currentCase.value = item;
   emit("changeCase", item);
 };
 </script>
@@ -90,6 +93,10 @@ const chengeCase = (item: string) => {
       text-align: center;
       &:hover {
         background-color: #f5f7fa;
+      }
+      .select-case {
+        position: absolute;
+        right: 10px;
       }
     }
   }

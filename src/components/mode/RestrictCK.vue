@@ -185,6 +185,9 @@ export default {
         // 创建新的element，插入
         const newElement = this.createSectionInner(writer, parserSection, null);
         model.insertContent(newElement, range, "on");
+        const section = document.querySelector(".section");
+        console.log(section, section.focus);
+        section.focus();
       });
     },
     /**
