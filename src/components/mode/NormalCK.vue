@@ -44,10 +44,10 @@
       </el-radio-group>
     </el-form-item>
     <el-form-item
-      v-for="(domain, index) in dynamicValidateForm.domains"
+      v-for="(domain, index) in dynamicValidateForm.cases"
       :key="domain.key"
       :label="'cases' + index"
-      :prop="'domains.' + index + '.value'"
+      :prop="'cases.' + index + '.value'"
       :rules="{
         required: true,
         message: 'cases can not be null',
@@ -55,13 +55,17 @@
       }"
     >
       <el-input v-model="domain.value" />
+      <el-button class="mt-2" type="primary" @click.prevent="submitForm(domain,dynamicValidateForm)"
+        >submit</el-button>
       <el-button class="mt-2" @click.prevent="removeDomain(domain)"
         >Delete</el-button>
       <el-button class="mt-2" @click.prevent="CheckDomain(domain)"
         >CheckSection</el-button>
+      <el-button class="mt-2" @click.prevent="CheckTopping(domain)"
+        >Topping</el-button>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="submitForm(dynamicValidateForm)">Submit</el-button>
+      <!-- <el-button type="primary" @click="submitForm(dynamicValidateForm)">Submit</el-button> -->
       <el-button @click="addDomain">New cases</el-button>
       <el-button @click="resetForm()">Reset</el-button>
     </el-form-item>
@@ -94,9 +98,11 @@ import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constan
 import { COMMAND__INSERT_SECTION } from "../../plugins/section/constant";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import "../../plugins/theme/style-setion.css"
-import { V_SECTION } from "../../plugins/section/constant";
+import { V_SECTION,V_SPAN } from "../../plugins/section/constant";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import selection from "@ckeditor/ckeditor5-engine/src/model/selection";
+import { parse, stringify } from "himalaya";
+
 export default {
   props: ["htmlData", "nowMode", "onchange"],
   data() {
@@ -119,9 +125,8 @@ export default {
         cases: [],
       },
       dynamicValidateForm:{
-        domains: [
+        cases: [
           {
-            key: 1,
             value: '',
           },
         ],
@@ -129,6 +134,7 @@ export default {
         radio:1,
       },
       SectionData:[],
+      SectionDataHTML:[],
     };
   },
   components: { SelectDialog,SectionDialog },
@@ -234,18 +240,21 @@ export default {
     },
     /** 删除选中section及cases */
     removeDomain (item) {
-      const index = this.dynamicValidateForm.domains.indexOf(item)
+      const index = this.dynamicValidateForm.cases.indexOf(item)
       if (index !== -1) {
-        this.dynamicValidateForm.domains.splice(index, 1)
+        this.dynamicValidateForm.cases.splice(index, 1)
         this.SectionData.splice(index,1)
+        this.SectionDataHTML.splice(index,1)
       }
     },
     /** 切换选中的section */
     CheckDomain(item){
-      const index = this.dynamicValidateForm.domains.indexOf(item)
-      let data = JSON.parse(JSON.stringify(this.SectionData[index]))
+      const index = this.dynamicValidateForm.cases.indexOf(item)
+      let SectionData = JSON.parse(JSON.stringify(this.SectionData[index]))
+      let SectionDataHTML = JSON.parse(JSON.stringify(this.SectionDataHTML[index]))
+      const parserSection = parse(SectionDataHTML);
       const model = (window as any).devEditor.model;
-      const selection:selection = model.document.selection;
+      const selection = model.document.selection;
       const firstRange = selection.getFirstPosition();
       const LastRange = selection.getLastPosition();
       model.change(writer=>{
@@ -255,68 +264,90 @@ export default {
         const range = writer.createRangeOn(element);
         // 删除section
         writer.remove(range);
-        // 创建新的element，插入
-        const sectionElement =  this.createSectionElement(writer,data);
-        model.insertContent(sectionElement, model.document.selection,'on')
+        // 创建新的element，插入   newElement ：dom创建   sectionElement ：element元素创建
+        const newElement = this.createSectionInner(writer, parserSection, null);
+        // const sectionElement =  this.createSectionElement(writer,SectionData);
+        model.insertContent(newElement, model.document.selection,'on')
       })
+    },
+    /** 置顶当前选中的section */
+    CheckTopping(item){
+      const index = this.dynamicValidateForm.cases.indexOf(item)
+      let data = this.SectionData
+      let datas = this.dynamicValidateForm.cases
+      let datass = this.SectionDataHTML
+      console.log(data)
+      data.map((items,indexs) => {
+        if(index == indexs){
+          data.unshift(data.splice(indexs , 1)[0]);
+          datas.unshift(datas.splice(indexs , 1)[0]);
+          datass.unshift(datass.splice(indexs , 1)[0]);
+        }
+      })
+      // console.log(JSON.parse(JSON.stringify(data)) )
     },
     /** 增加section的cases */
     addDomain (){
-      if(this.dynamicValidateForm.domains.length<4){
-        this.dynamicValidateForm.domains.push({
-          key: Date.now(),
+      if(this.dynamicValidateForm.cases.length<4){
+        this.dynamicValidateForm.cases.push({
+          // key: Date.now(),
           value: '',
         });
-        // let num = this.dynamicValidateForm.domains.length-1
+        // let num = this.dynamicValidateForm.cases.length-1
         // let check = document.getElementsByClassName("Check")[0];
         // console.log(JSON.parse(JSON.stringify(this.SectionData)))
         // console.log(check.outerHTML)
       }
     },
     /** 提交保存section数据 */
-    submitForm (formEl) {
-      let userFormData = JSON.parse(JSON.stringify(formEl))
-      console.log(userFormData)
+    submitForm (item,formEl) {
+      const index = this.dynamicValidateForm.cases.indexOf(item)
+      const userFormData = JSON.parse(JSON.stringify(formEl))
       if(!userFormData.modelName || userFormData.modelName == "") return;
-      if(userFormData.domains.some(item=>!item.value || item.value == "" )) return;
-
+      if(userFormData.cases.some(item=>!item.value || item.value == "" )) return;
       if (!userFormData) return;
-      // formEl.validate((valid) => {
-      //   if (valid) {
-      //     console.log('submit!')
-      //   } else {
-      //     console.log('error submit!')
-      //     return false
-      //   }
-      // })
+      let cases = []
+      userFormData.cases.map(item=>{
+        cases.push(item.value)
+      })
       let modelData = {
         type:userFormData.radio,
-        modelName:userFormData.modelName,
-        cases:userFormData.domains[userFormData.domains.length - 1].value
-      }
+        modelname:userFormData.modelName,
+        "data-cases":cases,
+        id: "section" + userFormData.cases.length,
+      } 
       const model = (window as any).devEditor.model;
       const selection:selection = model.document.selection;
       const parent = Array.from( selection.getSelectedBlocks() )[0].parent;
       const blocks = Array.from(Array.from(selection.getSelectedBlocks())[0].parent.getChildren());
-      const firstRange = selection.getFirstPosition();
-      const LastRange = selection.getLastPosition();
+
       const DocumentData = []
       blocks.map(item=>{
         DocumentData.push(item.toJSON())
       })
       model.change(writer => {
+        // 通过section 范围获取到范围内的 element
+        const firstRange = selection.getFirstPosition();
+        const LastRange = selection.getLastPosition();
         let elementRange = writer.createRange(firstRange, LastRange);
-      // 通过section 范围获取到范围内的 element
         const element = model.schema.getLimitElement(elementRange);
         const range = writer.createRangeOn(element);
-        let markerName = userFormData.domains[userFormData.domains.length - 1].value
-        // writer.addMarker(markerName, { range, usingOperation: true } );
         // 删除section
         writer.remove(range)
         // 执行创建section元素并添加子元素
         const sectionElement =   this.createSectionElement(writer,DocumentData,modelData)
-        this.SectionData.push(JSON.parse(JSON.stringify(sectionElement)))
+        console.log(JSON.parse(JSON.stringify(this.SectionData)))
+        console.log(this.SectionData)
+        // if(this.SectionData)
+        this.SectionData[index] = (JSON.parse(JSON.stringify(sectionElement)))
         model.insertContent(sectionElement, model.document.selection,'on')
+        let idname = "section" + userFormData.cases.length
+        setTimeout(() => {
+          // 存储section的html
+          let set = document.getElementById(idname) 
+          this.SectionDataHTML[index] = (set.outerHTML)
+          console.log(this.SectionDataHTML)
+        },1000)
     });
     },
     resetForm(formEl) {
@@ -333,12 +364,14 @@ export default {
       let modeData ={}
       if(data){
          modeData = {
-          modelName:data.modelName,
+          modelname:data.modelname,
           type:data.type,
-          cases:data.cases,
+          "data-cases":data["data-cases"],
+          id:data.id
         }
       }
       if(DocumentData.name && DocumentData.name =='v-section'){
+        console.log(123)
         const create = writer.createElement(V_SECTION,DocumentData.attributes);
         DocumentData.children.map(item=>{
           const p = writer.createElement(item.name); 
@@ -352,6 +385,7 @@ export default {
         })
         return create;
       }
+      console.log(modeData)
       const create = writer.createElement(V_SECTION,modeData);
       DocumentData.map(item=>{
         console.log(item)
@@ -366,7 +400,7 @@ export default {
       })
       console.log(create)
       // 创建section 及子元素
-      // ,{type:data.radio,cases:data.domains[0].value,modelName:data.modelName}
+      // ,{type:data.radio,cases:data.cases[0].value,modelName:data.modelName}
       // (data || []).forEach(opt => {
       // })
       // const p = writer.createElement("p"); 
@@ -386,6 +420,41 @@ export default {
 
       return create
       
+    },
+    createSectionInner(writer, parserDom, parentElement) {
+      let elementList = [],
+        text = null,
+        dom = null;
+      for (let item of parserDom) {
+        if (item.type === "element") {
+          // 返回元素属性对象
+          let atttibutesList = item.attributes.map(item => [item.key, item.value]);
+          atttibutesList = Object.fromEntries([...atttibutesList]);
+          // 创建元素
+          if (item.tagName === "section") {
+            dom = writer.createElement(V_SECTION, atttibutesList);
+          } else if (item.tagName === "p") {
+            dom = writer.createElement("paragraph", atttibutesList);
+          } else if (item.tagName === "span") {
+            dom = writer.createElement(V_SPAN, atttibutesList);
+          } else {
+            atttibutesList["data-cke-ignore-events"] = true;
+            dom = writer.createElement(item.tagName, atttibutesList);
+          }
+          // 插入到父级元素
+          if (parentElement) {
+            writer.append(dom, parentElement);
+          }
+        } else {
+          // 不是元素的创建文字插入到dom中
+          text = writer.insertText(item.content, parentElement);
+        }
+        // 递归
+        if (item.children) {
+          this.createSectionInner(writer, item.children, dom);
+        }
+      }
+      return dom;
     },
     changeRadio(val){
       

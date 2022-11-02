@@ -13,6 +13,7 @@ interface SectionAttrs {
   modelname: string;
   type: string;
   "data-cases": string;
+  id:string;
 }
 
 export default class SectionEditing extends Plugin {
@@ -48,7 +49,7 @@ export default class SectionEditing extends Plugin {
       allowAttributesOf: "$text",
 
       // The placeholder can have many types, like date, name, surname, etc:
-      allowAttributes: ["modelName", "type", "cases", "data-cases","class"],
+      allowAttributes: ["modelname", "type", "data-cases", "data-cases","class","id"],
       inheritAllFrom: "$container",
 
     });
@@ -86,17 +87,20 @@ export default class SectionEditing extends Plugin {
     conversion.for("downcast").elementToElement({
       model: V_SECTION,
       view: (modelEle, { writer }) => {
-        const sectionAttrs = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
+        console.log(modelEle)
+        const sectionAttrs = Object.fromEntries([...(modelEle.getAttributes() )]);
+        console.log(sectionAttrs)
         const section = writer.createEditableElement(
           "section",
           {
             class: "section",
-            cases: sectionAttrs.cases,
-            modelName: sectionAttrs.modelName,
+            "data-cases": JSON.stringify(sectionAttrs["data-cases"]),
+            modelname: sectionAttrs.modelname,
             type: sectionAttrs.type,
+            id:sectionAttrs.id,
           },
           {
-            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "cases", "modelName", "type"],
+            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "cases", "modelname", "type","id"],
           }
         );
         return toWidgetEditable(section, writer);
