@@ -4,13 +4,12 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { InsertSimpleBoxCommand, createSimpleBox } from "./insertsimpleboxcommand";
-import {
-  toWidget,
-  toWidgetEditable,
-  viewToModelPositionOutsideModelElement,
-} from "@ckeditor/ckeditor5-widget/src/utils";
+import { toWidget, toWidgetEditable, viewToModelPositionOutsideModelElement } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
 import { getMarkerAtPosition } from "./utils";
+import { Matcher } from "ckeditor5/src/engine";
+
+import { upcastHighlightToMarker } from "@ckeditor/ckeditor5-restricted-editing/src/restrictededitingmode/converters";
 export default class FormControlEditing extends Plugin {
   static get requires() {
     return [Widget];
@@ -23,13 +22,13 @@ export default class FormControlEditing extends Plugin {
     this._defineSchema();
     this._defineConverters();
 
+    this.editor.model.schema.extend("$text", { allowAttributes: ["restrictedEditingException"] });
+
     this.editor.commands.add("insertSimpleBox", new InsertSimpleBoxCommand(this.editor));
 
     this.editor.editing.mapper.on(
       "viewToModelPosition",
-      viewToModelPositionOutsideModelElement(this.editor.model, viewElement =>
-        viewElement.hasClass("restricted-editing-exception")
-      )
+      viewToModelPositionOutsideModelElement(this.editor.model, viewElement => viewElement.hasClass("restricted-editing-exception"))
     );
 
     // editingView.change((writer) => {
@@ -113,6 +112,43 @@ export default class FormControlEditing extends Plugin {
     });
   }
 
+  upcastHighlightToMarker(config) {
+    try {
+      return dispatcher =>
+        dispatcher.on("element:span", (evt, data, conversionApi) => {
+          const { writer } = conversionApi;
+
+          const matcher = new Matcher(config.view);
+          const matcherResult = matcher.match(data.viewItem);
+          console.log("333", matcherResult);
+          // If there is no match, this callback should not do anything.
+          if (!matcherResult) {
+            return;
+          }
+
+          const match = matcherResult.match;
+
+          // Force consuming element's name (taken from upcast helpers elementToElement converter).
+          match.name = true;
+
+          const { modelRange: convertedChildrenRange } = conversionApi.convertChildren(data.viewItem, data.modelCursor);
+          conversionApi.consumable.consume(data.viewItem, match);
+
+          const markerName = config.model(data.viewItem);
+          const fakeMarkerStart = writer.createElement("$marker", { "data-name": markerName });
+          const fakeMarkerEnd = writer.createElement("$marker", { "data-name": markerName });
+
+          // Insert in reverse order to use converter content positions directly (without recalculating).
+          writer.insert(fakeMarkerEnd, convertedChildrenRange.end);
+          writer.insert(fakeMarkerStart, convertedChildrenRange.start);
+
+          data.modelRange = writer.createRange(writer.createPositionBefore(fakeMarkerStart), writer.createPositionAfter(fakeMarkerEnd));
+          data.modelCursor = data.modelRange.end;
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
   _defineConverters() {
     const conversion = this.editor.conversion;
 
@@ -141,31 +177,58 @@ export default class FormControlEditing extends Plugin {
     //   },
     // });
     // <simpleBoxTitle> converters
-    conversion.for("upcast").elementToElement({
+    conversion.for("upcast").elementToAttribute({
       view: "control-select",
-      model: (ele, { writer }) => {
-        console.log(ele.getClassNames());
-        return writer.createElement("control-select", {
-          class: [...ele.getClassNames()].join(" "),
-        });
-      },
-      converterPriority: "highest",
+      model: "restrictedEditingException",
     });
+    let markerNumber = 0;
+    conversion.for("upcast").add(
+      this.upcastHighlightToMarker({
+        view: "control-select",
+        model: (viewEle, { writer }) => {
+          console.log(31231231);
+          markerNumber++; // Starting from restrictedEditingException:1 marker.
 
-    conversion.for("downcast").elementToElement({
-      model: "control-select",
-      view: (ele, { writer }) => {
-        const span = writer.createContainerElement(
-          "span",
-          {
-            class: ele.getAttribute("class"),
-          },
-          [writer.createText("我就是控件点我试试？")]
-        );
-        console.log(span);
-        return span;
+          return {
+            name: `restrictedEditingException:${markerNumber}`,
+          };
+        },
+      })
+    );
+    // conversion.for("upcast").elementToElement({
+    //   view: "control-select",
+    //   model: (ele, { writer }) => {
+    //     console.log(ele.getClassNames());
+    //     return writer.createElement("control-select", {
+    //       class: [...ele.getClassNames()].join(" "),
+    //     });
+    //   },
+    //   converterPriority: "highest",
+    // });
+
+    // conversion.for("downcast").elementToElement({
+    //   model: "control-select",
+    //   view: (ele, { writer }) => {
+    //     const span = writer.createContainerElement(
+    //       "span",
+    //       {
+    //         class: ele.getAttribute("class"),
+    //       },
+    //       [writer.createText("我就是控件点我试试？")]
+    //     );
+    //     console.log(span);
+    //     return span;s
+    //   },
+    //   converterPriority: "highest",
+    // });
+    conversion.for("downcast").attributeToElement({
+      model: "restrictedEditingException",
+      view: (modelAttributeValue, { writer }) => {
+        if (modelAttributeValue) {
+          // Make the restricted editing <span> outer-most in the view.
+          return writer.createAttributeElement("span", { class: "restricted-editing-exception" });
+        }
       },
-      converterPriority: "highest",
     });
 
     conversion.for("downcast").markerToHighlight({
@@ -252,11 +315,7 @@ export default class FormControlEditing extends Plugin {
       model: "simpleBoxDescriptions",
       view: (modelElement, { writer: viewWriter }) => {
         // Note: You use a more specialized createEditableElement() method here.
-        const option = viewWriter.createEditableElement(
-          "option",
-          { class: "simple-box-descriptions", value: "李浩", label: "李浩" },
-          ["no"]
-        );
+        const option = viewWriter.createEditableElement("option", { class: "simple-box-descriptions", value: "李浩", label: "李浩" }, ["no"]);
 
         return toWidgetEditable(option, viewWriter);
       },

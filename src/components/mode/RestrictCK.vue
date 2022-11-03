@@ -9,7 +9,7 @@
   display: none;
 }
 .extendBackground {
-  background-color: inherit !important;
+  background-color: rgba(255, 169, 77, 0.5) !important;
   min-width: 60px;
   outline: none !important;
   border: none;
@@ -46,7 +46,7 @@ export default {
   },
   mounted() {
     // 注册点击事件监听
-    // window.addEventListener("mousedown", this.onGlobalClick);
+    window.addEventListener("mousedown", this.onGlobalClick);
     ClassicEditor.create(document.querySelector("#editor"), RESTRICT_CONFIG)
       .then(editor => {
         CKEditorInspector.attach(editor);

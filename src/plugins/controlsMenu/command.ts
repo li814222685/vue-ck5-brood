@@ -23,10 +23,7 @@ export class InsertControlsCommand extends Command {
   refresh() {
     const model = this.editor.model;
     const selection = model.document.selection;
-    const allowedIn = model.schema.findAllowedParent(
-      selection.getFirstPosition(),
-      CONTROLS_CONTAINER
-    );
+    const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), CONTROLS_CONTAINER);
 
     this.isEnabled = allowedIn !== null;
   }
@@ -75,7 +72,7 @@ export function createSimpleBox(writer: Writer, attrs?: Option[]) {
   //指令传入第二个参数时，动态创建 select - option
   if (attrs?.length > 0) {
     const controls = writer.createElement(CONTROLS_CONTAINER); // => span
-    const v_select = writer.createElement(V_SELECT); // => select
+    const v_select = writer.createElement(V_SELECT, { options: JSON.stringify(attrs) }); // => select
 
     (attrs || []).forEach(opt => {
       const v_option = writer.createElement(V_OPTION, opt as any); // => option

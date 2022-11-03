@@ -53,6 +53,7 @@ export default class ControlsMenuEditing extends Plugin {
       isInline: true,
       allowIn: CONTROLS_CONTAINER,
       allowContentOf: "$block",
+      allowAttributes: ["class", "options"],
     });
 
     schema.register(V_OPTION, {
@@ -206,6 +207,7 @@ export default class ControlsMenuEditing extends Plugin {
         // Note: You use a more specialized createEditableElement() method here.
         const select = viewWriter.createEditableElement("select", {
           class: "virtual-select",
+          options: modelElement.getAttribute("options"),
         });
         return toWidget(select, viewWriter);
       },
@@ -223,10 +225,12 @@ export default class ControlsMenuEditing extends Plugin {
       },
       view: (modelElement, { writer }) => {
         return writer.createEditableElement(
-          "control-select",
+          // "control-select",
+          "span",
           {
             class: "restricted-editing-exception control-select",
             controlType: "select",
+            options: modelElement.getAttribute("options"),
           },
           {
             renderUnsafeAttributes: ["controlType"],
@@ -238,7 +242,8 @@ export default class ControlsMenuEditing extends Plugin {
     conversion.for("dataDowncast").elementToElement({
       model: V_OPTION,
       view: (modelElement, { writer }) => {
-        return writer.createText("Lee");
+        console.log(modelElement);
+        return writer.createText(modelElement.getAttribute("value"));
       },
       converterPriority: "high",
     });
