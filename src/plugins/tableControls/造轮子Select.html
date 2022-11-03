@@ -107,6 +107,10 @@
             background-color: rgba(255, 169, 77, 0.2);
 
         }
+
+        .hidden_item {
+            display: none;
+        }
     </style>
 </head>
 
@@ -120,32 +124,70 @@
 
         </div>
         <div class="v_select_optionList">
-            <div class="v_select_optionList_item" data-value="是" onclick="clickOption();">是</div>
-            <div class="v_select_optionList_item" data-value="否" onclick="clickOption();">否</div>
+            <div class="v_select_optionList_item" data-value="朝阳区" onclick="clickOption();">朝阳区</div>
+            <div class="v_select_optionList_item" data-value="海淀区" onclick="clickOption();">海淀区</div>
+            <div class="v_select_optionList_item" data-value="西城区" onclick="clickOption();">西城区</div>
+            <div class="v_select_optionList_item" data-value="通州区" onclick="clickOption();">通州区</div>
+
         </div>
         <script>
+            const V_SELECT = "v_select"
+            const V_SELECT_DROPDOWN_TEXT="v_select_dropDown_text"
+            const V_SELECT_DROPDOWN_TEXT_SELE ="v_select_dropDown_text_sele"
+
+            const TRIANGlE_DOWN = "triangle_down"
+            const TRIANGlE_UP = "triangle_up"
+
+            const DATA_VALUE = "data-value"
+            const HIDDEN_ITEM = "hidden_item"
+
+            /** Select的点击事件*/
             const onClickSelect = () => {
-
-                console.log('%c🍉Lee%cline:74%c999', 'color:#fff;background:#ee6f57;padding:3px;border-radius:2px', 'color:#fff;background:#1f3c88;padding:3px;border-radius:2px', 'color:#fff;background:rgb(254, 67, 101);padding:3px;border-radius:2px', 999)
+                if (document.querySelector(".v_select_dropDown_text_sele")) return
                 document.querySelector('.v_select_optionList').style.display = "block"
-                document.querySelector(".v_select_dropDown_text").className = "v_select_dropDown_text_sele";
-                document.getElementById("theme_icon").className = "triangle_down";
-
+                document.querySelector(".v_select_dropDown_text").className = V_SELECT_DROPDOWN_TEXT_SELE;
+                document.getElementById("theme_icon").className = TRIANGlE_DOWN;
             }
+
+            /** Option的点击事件*/
             const clickOption = () => {
                 var t_obj = event.target;
-                console.log(t_obj.getAttribute("data-value")); //可获取自定义属性值
-                document.getElementById("v_select_dropDown_text").innerHTML = t_obj.getAttribute("data-value");
+                console.log(t_obj.getAttribute(DATA_VALUE)); //可获取自定义属性值
+                document.getElementById(V_SELECT_DROPDOWN_TEXT).innerHTML = t_obj.getAttribute(DATA_VALUE);
             }
+
+            /** Select 失焦的逻辑，失焦后去隐藏OptionList*/
             document.onclick = function () {
                 var cur_obj = event.target;
                 console.log(cur_obj.className)
-                if ("v_select_dropDown_text" != cur_obj.className && "v_select" != cur_obj.className && "v_select_dropDown_text_sele" != cur_obj.className) {
+                if ( V_SELECT_DROPDOWN_TEXT!= cur_obj.className && V_SELECT != cur_obj.className && V_SELECT_DROPDOWN_TEXT_SELE != cur_obj.className) {
                     document.querySelector(".v_select_optionList").style.display = "none";
-                    document.getElementById("v_select_dropDown_text").className = "v_select_dropDown_text";
-                    document.getElementById("theme_icon").className = "triangle_up";
+                    document.getElementById(V_SELECT_DROPDOWN_TEXT).className = V_SELECT_DROPDOWN_TEXT;
+                    document.getElementById("theme_icon").className = TRIANGlE_UP;
                 }
             };
+
+            /** Select ContentEditable 的onChange 和 Select 的搜索功能*/
+            document.getElementById(V_SELECT_DROPDOWN_TEXT).addEventListener("input", (e) => {
+                console.log("输入了东西！", e.target.innerHTML)
+                //select value的onchange 以及 value 对 option列表的搜索匹配功能
+                const value = e.target.innerHTML
+                // 1.过滤掉Option 列表内所有未命中 keyWord 的option
+                const optionContainer = document.querySelector('.v_select_optionList')
+                const originOptions = document.querySelectorAll(".v_select_optionList_item")
+                const _options = [...originOptions].forEach(opt => {
+                    //option是否包含关键字
+                    const isIncludes = opt.innerHTML.includes(value)
+                    //option 是否隐藏
+                    const isHidden = opt.className.includes(HIDDEN_ITEM)
+                    if (!isIncludes && !opt.className.includes(HIDDEN_ITEM)) {
+                        opt.className += " hidden_item"
+                    } else if (isIncludes) {
+                        opt.className = opt.className.replace(HIDDEN_ITEM, "")
+                    } 
+
+                })
+            })
         </script>
 
 </body>
