@@ -57,7 +57,7 @@ export default class TableControlsUI extends Plugin {
         withText: true,
         label: "插入TABLE-CC",
       });
-      editor.keystrokes.set("CTRL+J", COMMAND_NAME__INSERT_TABLE_SELECT);
+      editor.keystrokes.set("CTRL+J", COMMAND_NAME__INSERT_TABLE_NORMAL);
 
       addListToDropdown(dropdownView, items);
 

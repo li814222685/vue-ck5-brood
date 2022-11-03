@@ -121,4 +121,99 @@ export default {
   height: 30px;
   border: 2px solid red;
 }
+
+/* Select 最外层容器 */
+.v_select {
+  /* 事实上Select 的宽高应该是自适应的，支持外部参数来改变 Select 对应的宽高 */
+  width: inherit;
+  height: 20px;
+}
+
+/* Select 的选择框 */
+.v_select_dropDown {
+  position: relative;
+}
+
+/* 可输入 选择框文字部分  */
+.v_select_dropDown_text {
+  display: block;
+  /* padding: 0 10px; */
+  line-height: 38px;
+  /* border-top: 1px solid #d8d7d9 !important; */
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;
+  background: #fff;
+}
+
+/* 打开Option列表 选择框选中后的样式 */
+.v_select_dropDown_text_sele {
+  display: block;
+  padding: 0 10px;
+  line-height: 38px;
+  /* border: 1px solid #1769fe; */
+  border: 1px solid rgba(218, 130, 36, 0.437);
+
+  border-radius: 4px;
+  font-size: 16px;
+  /* color: #1968ff; */
+  /* background: #dce9ff; */
+  background: rgba(255, 169, 77, 0.2);
+}
+
+/* 修改ContentEditable 的默认Style */
+[contenteditable] {
+  outline: 1px solid transparent;
+}
+
+[contenteditable]:focus {
+  border-bottom: 3px solid rgba(191, 111, 26, 0.437);
+  border-radius: 3px;
+}
+
+/*Select 箭头的样式  */
+.triangle_up {
+  width: 0;
+  height: 0;
+  right: 20px;
+  top: 17px;
+  position: absolute;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #323232;
+}
+
+.triangle_down {
+  width: 0;
+  height: 0;
+  right: 20px;
+  top: 17px;
+  position: absolute;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid rgba(235, 142, 42, 0.437);
+  transform: rotate(180deg);
+  transition: transform 0.2s linear;
+}
+
+/* Option 列表   */
+
+.v_select_optionList {
+  border: 1px solid rgba(218, 130, 36, 0.437);
+  border-top: none;
+  display: none;
+  border-radius: 4px;
+}
+
+.v_select_optionList_item {
+  padding: 5px;
+}
+
+.v_select_optionList_item:hover {
+  background-color: rgba(255, 169, 77, 0.2);
+}
+
+.hidden_item {
+  display: none;
+}
 </style>

@@ -1,6 +1,6 @@
 import mitt from "mitt";
 export interface Option {
-  label: string | number;
+  label: string;
   value: string | number | boolean;
 }
 export const emitter = mitt();

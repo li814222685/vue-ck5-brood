@@ -47,7 +47,7 @@ export class TableControlsCommand extends Command {
     const model = this.editor.model;
     const selection = model.document.selection;
     const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
-    this.isEnabled = allowedIn.name === "tableCell";
+    this.isEnabled = true;
   }
 }
 
@@ -55,16 +55,24 @@ export class TableSelectCommand extends Command {
   execute() {
     //插入Table Select
 
-    console.log(
-      '%c🍉Lee%cline:57%c"插入TableSelect！！！"',
-      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-      "color:#fff;background:rgb(3, 101, 100);padding:3px;border-radius:2px",
-      "插入TableSelect！！！"
-    );
-    // return this.editor.model.change((writer: Writer) => {
-    //   return (this.editor.model as any).insertObject(createSelect(writer));
-    // });
+    const selection = this.editor.model.document.selection;
+    const mapper = this.editor.editing.mapper;
+    const tableCell = [...selection.getSelectedBlocks()][0] as any;
+
+    const td = mapper.toViewElement(tableCell.parent);
+    this.editor.editing.view.change(writer => {
+      writer.setStyle(
+        {
+          "background-color": "rgba(255, 169, 77, 0.2)",
+        },
+        td
+      );
+    });
+    if (!_.isEqual(selection.anchor.path.slice(-2), [0, 0])) {
+      console.log("我又全选了！");
+      this.editor.execute("selectAll");
+      this.editor.editing.view.focus();
+    }
     return this.editor.model.change(writer => {
       return (this.editor.model as any).insertObject(createSelect(writer));
     });
@@ -74,7 +82,7 @@ export class TableSelectCommand extends Command {
     const model = this.editor.model;
     const selection = model.document.selection;
     const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
-    this.isEnabled = allowedIn.name === "tableCell";
+    this.isEnabled = true;
   }
 }
 

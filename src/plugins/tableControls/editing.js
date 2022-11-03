@@ -8,6 +8,8 @@ import { converDowncastCell, isRestrictedElement } from "./util";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
 import { COMMAND_NAME__INSERT_TABLE_SELECT, COMMAND_NAME__INSERT_TABLE_NORMAL } from "./constant";
 import { TableControlsCommand, TableSelectCommand } from "./command";
+import { V_SELECT } from "./constant";
+import { toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 export default class TableControlsEditing extends Plugin {
   static get requires() {
     return [Widget];
@@ -31,11 +33,32 @@ export default class TableControlsEditing extends Plugin {
     const schema = this.editor.model.schema;
     schema.register("v-div", {
       // Allow wherever text is allowed:
-      allowWhere: "$block",
+      allowWhere: ["$block", "$text"],
 
       // The placeholder will act as an inline node:
       isBlock: true,
+      // The inline widget is self-contained so it cannot be split by the caret and it can be selected:
+      isObject: true,
 
+      // The inline widget can have the same attributes as text (for example linkHref, bold).
+      allowAttributesOf: ["$text", "$block"],
+
+      // The placeholder can have many types, like date, name, surname, etc:
+      allowAttributes: [
+        "class",
+        "id",
+        "contenteditable",
+        "data-value",
+        "label",
+        "data-cke-ignore-events",
+      ],
+    });
+    schema.register("v-span", {
+      // Allow wherever text is allowed:
+      allowWhere: "$block",
+
+      // The placeholder will act as an inline node:
+      isInline: true,
       // The inline widget is self-contained so it cannot be split by the caret and it can be selected:
       isObject: true,
 
@@ -43,7 +66,7 @@ export default class TableControlsEditing extends Plugin {
       allowAttributesOf: "$text",
 
       // The placeholder can have many types, like date, name, surname, etc:
-      allowAttributes: ["class"],
+      allowAttributes: ["class", "id", "contenteditable"],
     });
   }
 
@@ -57,9 +80,27 @@ export default class TableControlsEditing extends Plugin {
       converterPriority: "highest",
     });
     conversion.for("editingDowncast").elementToElement({
+      model: {
+        name: "v-div",
+        classes: V_SELECT,
+      },
+      view: (modelEle, { writer }) => {
+        const container = writer.createContainerElement("div", modelEle.getAttributes());
+        return toWidgetEditable(container, writer);
+      },
+      renderUnsafeAttributes: ["data-cke-ignore-events"],
+    });
+    conversion.for("editingDowncast").elementToElement({
       model: "v-div",
       view: (modelEle, { writer }) => {
-        return writer.createContainerElement("div", { class: modelEle.getAttribute("class") });
+        return writer.createDocumentFragment("div", modelEle.getAttributes());
+      },
+      renderUnsafeAttributes: ["data-cke-ignore-events"],
+    });
+    conversion.for("editingDowncast").elementToElement({
+      model: "v-span",
+      view: (modelEle, { writer }) => {
+        return writer.createAttributeElement("span", modelEle.getAttributes());
       },
     });
   }
