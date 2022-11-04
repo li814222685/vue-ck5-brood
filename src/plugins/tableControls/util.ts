@@ -9,6 +9,7 @@ import {
   V_SELECT,
   V_SELECT_DROPDOWN,
   V_SELECT_DROPDOWN_TEXT,
+  V_SELECT_DROPDOWN_TEXT_SELE,
   V_SELECT_OPTION_LIST,
   V_SELECT_OPTION_LIST_ITEM,
 } from "./constant";
@@ -36,9 +37,7 @@ export function converDowncastCell(options = { asWidget: true }) {
       if (tableSlot.cell == tableCell) {
         const isHeading = tableSlot.row < headingRows || tableSlot.column < headingColumns;
         const cellElementName = isHeading ? "th" : "td";
-        const element = (options as any).asWidget
-          ? toWidgetEditable(writer.createEditableElement(cellElementName), writer)
-          : writer.createContainerElement(cellElementName);
+        const element = (options as any).asWidget ? toWidgetEditable(writer.createEditableElement(cellElementName), writer) : writer.createContainerElement(cellElementName);
         //给output的th or td添加背景样式
         if (isCellChildHasRestricted(tableCell)) {
           writer.setStyle(
@@ -69,7 +68,7 @@ export const isRestrictedElement = (ele: AttributeElement): boolean => {
 
 export const createSelect = (writer: Writer, options?: Option[]) => {
   /**最外层容器 */
-  const selectContainer = writer.createElement("v-div", {
+  const selectContainer = writer.createElement("v-div-c", {
     class: V_SELECT,
     "data-cke-ignore-events": true,
   });
@@ -84,11 +83,10 @@ export const createSelect = (writer: Writer, options?: Option[]) => {
     "data-cke-ignore-events": true,
   });
   /**下拉框文字 */
-  const dropDown_text = writer.createElement("v-span", {
+  const dropDown_text = writer.createElement("v-div", {
     class: V_SELECT_DROPDOWN_TEXT,
     id: V_SELECT_DROPDOWN_TEXT,
     contenteditable: true,
-    "data-cke-ignore-events": true,
   });
   /**图标 */
   const dorpDown_icon = writer.createElement("v-span", {
@@ -106,7 +104,18 @@ export const createSelect = (writer: Writer, options?: Option[]) => {
 
   /**列表 */
   const optionList = writer.createElement("v-div", { class: V_SELECT_OPTION_LIST });
-  (options || []).forEach(({ label, value }) => {
+  (
+    options || [
+      {
+        label: "朝阳区",
+        value: "朝阳区",
+      },
+      {
+        label: "海淀区",
+        value: "海淀区",
+      },
+    ]
+  ).forEach(({ label, value }) => {
     const optionItem = writer.createElement("v-div", {
       class: V_SELECT_OPTION_LIST_ITEM,
       "data-value": value,
@@ -120,4 +129,23 @@ export const createSelect = (writer: Writer, options?: Option[]) => {
     writer.append(item, selectContainer);
   });
   return selectContainer;
+};
+
+/** DOM元素是否为TableSelect */
+export const isTableSelect = (dom: globalThis.Element): boolean => [V_SELECT_DROPDOWN_TEXT, V_SELECT_DROPDOWN_TEXT_SELE].some(className => [...dom.classList].includes(className));
+
+/** 为Table Select bind 它的事件 */
+export const bindClickToSelect = (dom: globalThis.Element) => {
+  const findContainer = dom.closest(".v_select");
+
+  //todo：绑定Table Select 里面的事件
+};
+
+/** TableSelect Handler */
+export const onTableSelect = e => {
+  const clickDom = document.elementFromPoint(e.clientX, e.clientY);
+  const flag = isTableSelect(clickDom);
+  if (flag) {
+    bindClickToSelect(clickDom);
+  }
 };
