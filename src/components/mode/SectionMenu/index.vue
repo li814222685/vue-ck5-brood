@@ -58,11 +58,12 @@ const showList = () => {
   for (let i of attributes) {
     if (i.key == "data-cases") {
       cases.data = JSON.parse(i.value);
+      if(!currentCase.value) {
+        currentCase.value = cases.data[0]
+      }
     }
   }
-  currentCase.value = cases.data[0];
   listVisible.value = true;
-
   nextTick(() => {
     const menuBtn = document.querySelector(".box-card");
     const range = toRaw(positionRange.value);
@@ -72,8 +73,10 @@ const showList = () => {
 };
 
 const chengeCase = (item: string) => {
+  if(currentCase.value != item) {
+    emit("changeCase", item);
+  }
   currentCase.value = item;
-  emit("changeCase", item);
 };
 </script>
 <style lang="less" scoped>

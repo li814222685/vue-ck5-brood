@@ -2,7 +2,7 @@
 -------------------------- */
 
 export const V_SECTION = "v-section";
-export const V_SPAN = "v-span";
+export const V_SPAN = "span";
 
 /* 工具栏
 -------------------------- */

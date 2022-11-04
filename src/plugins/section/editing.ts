@@ -61,13 +61,13 @@ export default class SectionEditing extends Plugin {
       allowContentOf: "$root",
       allowAttributes: ["label", "value"],
     });
-    schema.register(V_SPAN, {
-      allowWhere: "$block",
-      isInline: true,
-      isObject: true,
-      allowAttributesOf: "$text",
-      allowAttributes: ["class", "data-cke-ignore-events"],
-    });
+    // schema.register(V_SPAN, {
+    //   allowWhere: "$block",
+    //   isInline: true,
+    //   isObject: true,
+    //   allowAttributesOf: "$text",
+    //   allowAttributes: ["class", "data-cke-ignore-events"],
+    // });
   }
 
   _defineConverters() {
@@ -83,7 +83,6 @@ export default class SectionEditing extends Plugin {
       view: (modelEle, { writer }) => {
         const sectionAttrs = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
         sectionAttrs.class = "section";
-        console.log(sectionAttrs);
         const section = writer.createEditableElement("section", sectionAttrs, {
           renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "data-cases", "cases", "modelname", "type", "id"],
         });
@@ -104,8 +103,6 @@ export default class SectionEditing extends Plugin {
     conversion.for("downcast").elementToElement({
       model: "p",
       view: (modelElement, { writer }) => {
-        console.log(modelElement);
-        console.log(modelElement.getAttribute("label"), modelElement.getAttribute("value"));
         const option = writer.createEditableElement(
           "p",
           {
@@ -120,6 +117,8 @@ export default class SectionEditing extends Plugin {
         return toWidgetEditable(option, writer);
       },
     });
+
+    // 原
     conversion.for("downcast").elementToElement({
       model: V_SPAN,
       view: (modelEle, { writer }) => {

@@ -47,6 +47,7 @@ export default {
       attributsList: [],
       range: null,
       clickDom: null,
+      spanRanges: [],
     };
   },
   mounted() {
@@ -160,7 +161,9 @@ export default {
     changeCase(caseName) {
       const editor = window.editor;
       const { model, editing } = editor;
+      const view = editing.view;
       const modelSelection = model.document.selection;
+      const viewSelection = view.document.selection;
       const casesList = {
         caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方</span></section>`,
         caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>CASE B</p></section></p>`,
@@ -170,7 +173,6 @@ export default {
       // editor.setData(sectionVal);
       // 获取html标签字符串转换的对象
       const parserSection = parse(sectionVal);
-      console.log(parserSection);
       let range = null;
       model.change(writer => {
         // 获取section范围
@@ -185,13 +187,15 @@ export default {
         // 创建新的element，插入
         const newElement = this.createSectionInner(writer, parserSection, null);
         model.insertContent(newElement, range, "on");
-        const section = document.querySelector(".section");
-        console.log(section, section.focus);
-        section.focus();
       });
-      editing.view.change(writer => {
-        console.log(editing.view.domConverter, "view");
-      })
+      model.change(writer => {
+        const ranges = toRaw(this.spanRanges);
+        ranges.forEach((item, index) => {
+          console.log(item);
+          writer.addMarker(`sectionMarker:${index + 1}`, { item, usingOperation: true });
+        });
+        console.log(ranges, modle.markers);
+      });
     },
     /**
      * @description 创建section内的元素
@@ -204,7 +208,9 @@ export default {
         text = null,
         dom = null;
       for (let item of parserDom) {
-        if (item.type === "element") {
+        text = "";
+        dom = "";
+        if (item.type === "element" && item.tagName !== "span") {
           // 返回元素属性对象
           let atttibutesList = item.attributes.map(item => [item.key, item.value]);
           atttibutesList = Object.fromEntries([...atttibutesList]);
@@ -213,8 +219,6 @@ export default {
             dom = writer.createElement(V_SECTION, atttibutesList);
           } else if (item.tagName === "p") {
             dom = writer.createElement("paragraph", atttibutesList);
-          } else if (item.tagName === "span") {
-            dom = writer.createElement(V_SPAN, atttibutesList);
           } else {
             dom = writer.createElement(item.tagName, atttibutesList);
           }
@@ -224,8 +228,24 @@ export default {
           }
         } else {
           // 不是元素的创建文字插入到dom中
-          console.log(parentElement, item, "text");
-          text = writer.insertText(item.content, parentElement);
+          if (item.tagName && item.tagName === "span") {
+            for (let i of item.children) {
+              text += i.content;
+            }
+            const word = writer.createText(text);
+            writer.append(word, parentElement);
+            const before = writer.createPositionBefore(word);
+            const after = writer.createPositionAfter(word);
+            const range = writer.createRangeOn(word);
+            console.log(word, before, after, range);
+            this.spanRanges.push(range);
+            // this.$nextTick(() => {
+            //   writer.addMarker("restrictedEditingException:3", { range, usingOperation: true });
+            // });
+          } else if (parentElement) {
+            const word = writer.createText(item.content);
+            writer.append(word, parentElement);
+          }
         }
         // 递归
         if (item.children) {
