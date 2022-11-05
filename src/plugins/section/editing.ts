@@ -12,6 +12,7 @@ import FocusTracker from "@ckeditor/ckeditor5-utils/src/focustracker";
 interface SectionAttrs {
   modelname: string;
   type: string;
+  case: string;
   "data-cases": string;
   id: string;
 }
@@ -87,34 +88,6 @@ export default class SectionEditing extends Plugin {
           renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "data-cases", "cases", "modelname", "type", "id"],
         });
         return toWidgetEditable(section, writer);
-      },
-    });
-    // conversion.for("upcast").elementToElement({
-    //   view: "section",
-    //   model: (viewEle, { writer }) => writer.createElement("section", viewEle.getAttributes() as any),
-    // });
-    conversion.for("upcast").elementToElement({
-      model: "p",
-      view: {
-        name: "p",
-        classes: "p",
-      },
-    });
-    conversion.for("downcast").elementToElement({
-      model: "p",
-      view: (modelElement, { writer }) => {
-        const option = writer.createEditableElement(
-          "p",
-          {
-            class: "p",
-            label: modelElement.getAttribute("label"),
-            value: modelElement.getAttribute("value"),
-          },
-          {
-            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "data-cases", "modelname", "type", "label", "value"],
-          }
-        );
-        return toWidgetEditable(option, writer);
       },
     });
 

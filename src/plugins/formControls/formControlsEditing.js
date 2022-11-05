@@ -160,19 +160,19 @@ export default class FormControlEditing extends Plugin {
       converterPriority: "highest",
     });
 
-    conversion.for("downcast").markerToHighlight({
-      model: "restrictedEditingException",
-      // Use callback to return new object every time new marker instance is created - otherwise it will be seen as the same marker.
-      view: (data, { writer }) => {
-        console.log(data, writer, this.editor.model.markers);
-        return {
-          name: "span",
-          classes: "restricted-editing-exception",
-        };
-      },
-      renderUnsafeAttributes: ["classes", "controlType"],
-      converterPriority: "high",
-    });
+    // conversion.for("downcast").markerToHighlight({
+    //   model: "restrictedEditingException",
+    //   // Use callback to return new object every time new marker instance is created - otherwise it will be seen as the same marker.
+    //   view: (data, { writer }) => {
+    //     console.log(data, writer, this.editor.model.markers);
+    //     return {
+    //       name: "span",
+    //       classes: "restricted-editing-exception",
+    //     };
+    //   },
+    //   renderUnsafeAttributes: ["classes", "controlType"],
+    //   converterPriority: "high",
+    // });
 
     conversion.for("upcast").elementToElement({
       // model: 'simpleBoxTitle',

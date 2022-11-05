@@ -39,10 +39,10 @@ watch(
   positionRange,
   (value: string[]) => {
     nextTick(() => {
-      const menuBtn = document.querySelector("#menuBtn");
+      const menuBtn = <HTMLImageElement>document.querySelector("#menuBtn");
       if (!menuBtn) return;
-      menuBtn.style.left = value[0] - 35 + "px";
-      menuBtn.style.top = value[1] - 3 + "px";
+      menuBtn.style.left = <any>value[0] - 35 + "px";
+      menuBtn.style.top = <any>value[1] - 3 + "px";
     });
   },
   { immediate: true, deep: true }
@@ -65,10 +65,10 @@ const showList = () => {
   }
   listVisible.value = true;
   nextTick(() => {
-    const menuBtn = document.querySelector(".box-card");
+    const menuBtn = <HTMLImageElement>document.querySelector(".box-card");
     const range = toRaw(positionRange.value);
-    menuBtn.style.left = range[0] - 45 - 100 + "px";
-    menuBtn.style.top = range[1] - 3 + "px";
+    menuBtn.style.left = <any>range[0] - 45 - 100 + "px";
+    menuBtn.style.top = <any>range[1] - 3 + "px";
   });
 };
 
