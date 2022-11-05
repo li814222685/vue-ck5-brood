@@ -3,17 +3,17 @@
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import { SectionCommand,InsertSectionCommand } from "./command";
+import { SectionCommand, InsertSectionCommand } from "./command";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { COMMAND_NAME__INSERT_SECTION, V_SECTION,COMMAND__INSERT_SECTION,V_SPAN } from "./constant";
+import { COMMAND_NAME__INSERT_SECTION, V_SECTION, COMMAND__INSERT_SECTION, V_SPAN } from "./constant";
 import FocusTracker from "@ckeditor/ckeditor5-utils/src/focustracker";
 
 interface SectionAttrs {
   modelname: string;
   type: string;
   "data-cases": string;
-  id:string;
+  id: string;
 }
 
 export default class SectionEditing extends Plugin {
@@ -49,9 +49,8 @@ export default class SectionEditing extends Plugin {
       allowAttributesOf: "$text",
 
       // The placeholder can have many types, like date, name, surname, etc:
-      allowAttributes: ["modelname", "type", "cases", "data-cases", "data-cke-ignore-events", "class","id"],
+      allowAttributes: ["modelname", "type", "cases", "data-cases", "data-cke-ignore-events", "class", "id"],
       inheritAllFrom: "$container",
-
     });
     schema.register("p", {
       // Cannot be split or left by the caret.
@@ -62,13 +61,13 @@ export default class SectionEditing extends Plugin {
       allowContentOf: "$root",
       allowAttributes: ["label", "value"],
     });
-    schema.register("v-span", {
-      allowWhere: "$block",
-      isInline: true,
-      isObject: true,
-      allowAttributesOf: "$text",
-      allowAttributes: ["class", "data-cke-ignore-events"],
-    });
+    // schema.register(V_SPAN, {
+    //   allowWhere: "$block",
+    //   isInline: true,
+    //   isObject: true,
+    //   allowAttributesOf: "$text",
+    //   allowAttributes: ["class", "data-cke-ignore-events"],
+    // });
   }
 
   _defineConverters() {
@@ -82,22 +81,11 @@ export default class SectionEditing extends Plugin {
     conversion.for("downcast").elementToElement({
       model: V_SECTION,
       view: (modelEle, { writer }) => {
-        console.log(modelEle)
-        const sectionAttrs = Object.fromEntries([...(modelEle.getAttributes() )]);
-        console.log(sectionAttrs)
-        const section = writer.createEditableElement(
-          "section",
-          {
-            class: "section",
-            "data-cases": sectionAttrs["data-cases"],
-            modelname: sectionAttrs.modelname,
-            type: sectionAttrs.type,
-            id:sectionAttrs.id,
-          },
-          {
-            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events","data-cases", "cases", "modelname", "type","id"],
-          }
-        );
+        const sectionAttrs = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
+        sectionAttrs.class = "section";
+        const section = writer.createEditableElement("section", sectionAttrs, {
+          renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "data-cases", "cases", "modelname", "type", "id"],
+        });
         return toWidgetEditable(section, writer);
       },
     });
@@ -115,24 +103,27 @@ export default class SectionEditing extends Plugin {
     conversion.for("downcast").elementToElement({
       model: "p",
       view: (modelElement, { writer }) => {
-        console.log(modelElement);
-        console.log(modelElement.getAttribute("label"), modelElement.getAttribute("value"));
-        const option = writer.createEditableElement("p", {
-          class: "p",
-          label: modelElement.getAttribute("label"),
-          value: modelElement.getAttribute("value"),
-        },{
-          renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "data-cases", "modelname", "type","label", "value"]
-        }
+        const option = writer.createEditableElement(
+          "p",
+          {
+            class: "p",
+            label: modelElement.getAttribute("label"),
+            value: modelElement.getAttribute("value"),
+          },
+          {
+            renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "data-cases", "modelname", "type", "label", "value"],
+          }
         );
         return toWidgetEditable(option, writer);
       },
-      
     });
+
+    // 原
     conversion.for("downcast").elementToElement({
       model: V_SPAN,
       view: (modelEle, { writer }) => {
-        const attributesList = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
+        let attributesList = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
+        // "data-cke-ignore-events" 会导致失焦，无法选中元素
         const span = writer.createEditableElement("span", attributesList, {
           renderUnsafeAttributes: ["data-cke-ignore-events"],
         });
