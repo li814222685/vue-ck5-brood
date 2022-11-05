@@ -163,8 +163,11 @@ export default {
       const modelSelection = model.document.selection;
       const casesList = {
         caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方</span></section>`,
-        caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>CASE B</p></section></p>`,
-        caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><span class="restricted-editing-exception restricted-editing-exception_collapsed">怎么才能可编辑</span><p>CASE C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">怎么才能可编辑2</span></section>`,
+        caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落B</p></section>`,
+        caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方</span></section>`,
+        // caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>CASE B</p></section></p>`,
+        // caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><span class="restricted-editing-exception restricted-editing-exception_collapsed">怎么才能可编辑</span><p>CASE C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">怎么才能可编辑2</span></section>`,
+        // caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>CASE C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">怎么才能可编辑2</span></section>`,
       };
       const sectionVal = casesList[caseName];
       // editor.setData(sectionVal);
@@ -179,8 +182,10 @@ export default {
         // 通过section 范围获取到范围内的 element
         const elementRange = writer.createRange(firstRange, LastRange);
         const element = model.schema.getLimitElement(elementRange);
+        console.log(element);
         range = writer.createRangeOn(element);
         const markerList = Array.from(markers.getMarkersIntersectingRange(range))
+        console.log(elementRange, range);
         // 删除移除范围内的所有marker
         markerList.map(marker => writer.removeMarker(marker.name))
         // 移除范围和范围内元素，再去插入
@@ -188,7 +193,6 @@ export default {
         // 创建新的element，插入
         const newElement = this.createSectionInner(writer, parserSection, null);
         model.insertContent(newElement, range);
-        console.log(markers);
       });
     },
     /**
@@ -227,6 +231,7 @@ export default {
               text += i.content;
             }
             const word = writer.createText(text);
+            console.log(parentElement);
             writer.append(word, parentElement);
             this.$nextTick(() => {
               const range = writer.createRangeOn(word);
@@ -235,7 +240,9 @@ export default {
               model.change(writer => {
                 const ranges = toRaw(this.spanRanges);
                 // 添加可编辑的 marker，进行 markertohighlight 的下行转换
-                const markerName = `restrictedEditingException:` + (Array.from(model.markers).length + 1);
+                const markers = Array.from(model.markers)
+                const lastMarkerName = Number(markers[markers.length - 1].name.split(":")[1]);
+                const markerName = `restrictedEditingException:` + (lastMarkerName + 1);
                 writer.addMarker(markerName, { range: ranges, usingOperation: true });
               });
             });

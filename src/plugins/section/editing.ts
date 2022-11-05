@@ -58,7 +58,6 @@ export default class SectionEditing extends Plugin {
       isLimit: true,
       isSelectable: true,
       isInline: true,
-      allowIn: V_SECTION,
       allowContentOf: "$root",
       allowAttributes: ["label", "value"],
     });
@@ -90,8 +89,17 @@ export default class SectionEditing extends Plugin {
         return toWidgetEditable(section, writer);
       },
     });
-
-    // 原
+    conversion.for("downcast").elementToElement({
+      model: "p",
+      view: (modelEle, { writer }) => {
+        let attributesList = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
+        // "data-cke-ignore-events" 会导致失焦，无法选中元素
+        const span = writer.createEditableElement("p", attributesList, {
+          renderUnsafeAttributes: ["data-cke-ignore-events"],
+        });
+        return toWidgetEditable(span, writer);
+      },
+    });
     conversion.for("downcast").elementToElement({
       model: V_SPAN,
       view: (modelEle, { writer }) => {
