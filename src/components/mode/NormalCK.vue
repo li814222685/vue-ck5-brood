@@ -65,7 +65,7 @@
         >Topping</el-button>
     </el-form-item>
     <el-form-item>
-      <!-- <el-button type="primary" @click="submitForm(dynamicValidateForm)">Submit</el-button> -->
+      <el-button type="primary" @click="submitSection()">SubmitSection</el-button>
       <el-button @click="addDomain">New cases</el-button>
       <el-button @click="resetForm()">Reset</el-button>
     </el-form-item>
@@ -179,7 +179,6 @@ export default {
       emitter.on(SECTION_MODAL, this.sectionModal);
       emitter.on(GET_OPTIONS, this.setOptionListFromSelect);
     },
-
     /** 向当前select 插入options */
     insertOptionsToSelect(options: Option[]) {
       (window as any).devEditor.execute(COMMAND_NAME__INSERT_OPTIONS, options);
@@ -188,7 +187,6 @@ export default {
     InsertSectionCommand(section: Section[]) {
       (window as any).devEditor.execute(COMMAND__INSERT_SECTION, section);
     },
-
     /** 获取当前select的options list */
     setOptionListFromSelect(options: Option[]) {
       this.selectedOptions = _.cloneDeep(options);
@@ -250,6 +248,7 @@ export default {
     /** 切换选中的section */
     CheckDomain(item){
       const index = this.dynamicValidateForm.cases.indexOf(item)
+      console.log(this.dynamicValidateForm.cases)
       let SectionData = JSON.parse(JSON.stringify(this.SectionData[index]))
       let SectionDataHTML = JSON.parse(JSON.stringify(this.SectionDataHTML[index]))
       const parserSection = parse(SectionDataHTML);
@@ -299,7 +298,7 @@ export default {
         // console.log(check.outerHTML)
       }
     },
-    /** 提交保存section数据 */
+    /** 保存当前cases的section数据 */
     submitForm (item,formEl) {
       const index = this.dynamicValidateForm.cases.indexOf(item)
       const userFormData = JSON.parse(JSON.stringify(formEl))
@@ -350,6 +349,15 @@ export default {
         },1000)
     });
     },
+    /** 提交当前modelname所属的section数据 */
+    submitSection(){
+      const HTMLdata = JSON.parse(JSON.stringify(this.SectionDataHTML))
+      HTMLdata.map((item,index)=>{
+        let data = item.match(/ data-cases=\"(.*?)\"/g)[0]
+        HTMLdata[index] =  HTMLdata[index].replace(data,' data-cases="["aa","bb","cc"]" ')
+      })
+      this.SectionDataHTML = HTMLdata
+    },
     resetForm(formEl) {
       if (!formEl) return
       formEl.resetFields()
@@ -385,41 +393,17 @@ export default {
         })
         return create;
       }
-      console.log(modeData)
       const create = writer.createElement(V_SECTION,modeData);
       DocumentData.map(item=>{
-        console.log(item)
         const p = writer.createElement(item.name); 
         let dataname = "";
         item.children.map((items,index)=>{
-          console.log(items)
             let text = writer.createText(items.data,items.attributes);
               writer.append( text, p);
               writer.append( p, create);
           })
       })
-      console.log(create)
-      // 创建section 及子元素
-      // ,{type:data.radio,cases:data.cases[0].value,modelName:data.modelName}
-      // (data || []).forEach(opt => {
-      // })
-      // const p = writer.createElement("p"); 
-      // writer.append( p, create);
-
-       // 创建section的子元素
-      //  const create = writer.createElement(V_SECTION); 
-      // (data || []).forEach(opt => {
-      //   console.log(opt)
-      //   const p = writer.createElement("p", opt as any); 
-      //   console.log(create)
-      //   writer.append( p, create);
-      // })
-      // const p = writer.appendText( 'foo', create );
-      
-      // console.log(data)
-
       return create
-      
     },
     createSectionInner(writer, parserDom, parentElement) {
       let elementList = [],

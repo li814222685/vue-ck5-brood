@@ -89,7 +89,7 @@ export default class SectionEditing extends Plugin {
           "section",
           {
             class: "section",
-            "data-cases": JSON.stringify(sectionAttrs["data-cases"]),
+            "data-cases": sectionAttrs["data-cases"],
             modelname: sectionAttrs.modelname,
             type: sectionAttrs.type,
             id:sectionAttrs.id,
