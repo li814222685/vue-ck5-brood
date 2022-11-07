@@ -46,6 +46,10 @@ export default class TableControlsUI extends Plugin {
           withText: true,
           label: "插入Select",
           cmd: COMMAND_NAME__INSERT_TABLE_SELECT,
+          options: [
+            { label: "早安", value: "morning" },
+            { label: "晚安", value: "evening" },
+          ],
         }),
       });
 

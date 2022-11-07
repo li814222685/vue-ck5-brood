@@ -5,16 +5,22 @@
 import Command from "@ckeditor/ckeditor5-core/src/command";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import _ from "lodash";
-import { RESTRICTED_EDITING } from "./constant";
-import { createSelect } from "./util";
+import { COMMAND_NAME__INSERT_TABLE_NORMAL, RESTRICTED_EDITING } from "./constant";
+import { createSelect, handleSelectEvent, onTableSelect } from "./util";
+import { V_SELECT } from "./constant";
+import { toClassSelector } from "./util";
 
 interface Option {
   label: string | number;
   value: string | number | boolean;
 }
+
+interface NodeConfig {
+  type: string;
+}
 //todo：普通编辑模式下有个bug ，如果删除当前可编辑元素内的所有字符，它不会保留空白区间。
 export class TableControlsCommand extends Command {
-  execute() {
+  execute(option?: NodeConfig) {
     //插入Table CC
     /**
      * 1.改变单元格背景色
@@ -74,14 +80,45 @@ export class TableSelectCommand extends Command {
       this.editor.editing.view.focus();
     }
     return this.editor.model.change(writer => {
-      return (this.editor.model as any).insertObject(createSelect(writer));
+      // return (this.editor.model as any).insertObject(createSelect(writer));
+
+      const paragraph = writer.createElement("paragraph");
+      writer.insertText(" ", paragraph);
+      (this.editor.model as any).insertContent(paragraph);
+      this.editor.execute(COMMAND_NAME__INSERT_TABLE_NORMAL, { type: "select" });
+
+      console.log(
+        "%c🍉Lee%cline:87%cselection",
+        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+        "color:#fff;background:rgb(34, 8, 7);padding:3px;border-radius:2px",
+        selection
+      );
     });
   }
 
   refresh() {
+    console.log(
+      "%c🍉Lee%cline:82%c我更新！！！",
+      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      "color:#fff;background:rgb(95, 92, 51);padding:3px;border-radius:2px",
+      "我更新！！！"
+    );
     const model = this.editor.model;
     const selection = model.document.selection;
     const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
+    //绑定select 的events
+    try {
+      const select: any = document?.querySelector(toClassSelector(V_SELECT));
+
+      if (select) {
+        handleSelectEvent(select);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
     this.isEnabled = true;
   }
 }

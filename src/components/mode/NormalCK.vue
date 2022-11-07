@@ -1,13 +1,24 @@
 <template>
   <div id="normalMode">
-    <JqxDropDownList :width="200" :height="25" :source="['htmlData', 'nowMode', 'onchange']" :selectedIndex="1"> </JqxDropDownList>
+    <JqxDropDownList
+      :width="200"
+      :height="25"
+      :source="['htmlData', 'nowMode', 'onchange']"
+      :selectedIndex="1"
+    >
+    </JqxDropDownList>
     <el-button type="primary" @click="exportData" plain>导出</el-button>
     <br />
     <br />
 
     <div id="devEditor"></div>
   </div>
-  <SelectDialog :visible="dialogVisible" :change-visible="swtichModal" :table-data="selectedOptions" :insert-options-to-select="insertOptionsToSelect" />
+  <SelectDialog
+    :visible="dialogVisible"
+    :change-visible="swtichModal"
+    :table-data="selectedOptions"
+    :insert-options-to-select="insertOptionsToSelect"
+  />
 </template>
 <style scoped>
 .hidden-item {
@@ -40,7 +51,17 @@ export default {
       deposit: {},
       dialogVisible: false,
       selectedOptions: [], //当前选中select 有哪些options，用来将options传递到弹窗表格内
-      source: ["Affogato", "Americano", "Bicerin", "Breve", "Café Bombón", "Café au lait", "Caffé Corretto", "Irish coffee", "Liqueur coffee"],
+      source: [
+        "Affogato",
+        "Americano",
+        "Bicerin",
+        "Breve",
+        "Café Bombón",
+        "Café au lait",
+        "Caffé Corretto",
+        "Irish coffee",
+        "Liqueur coffee",
+      ],
     };
   },
   components: { SelectDialog, JqxDropDownList },
@@ -132,7 +153,6 @@ export default {
 /* Select 的选择框 */
 .v_select_dropDown {
   position: relative;
-  height: inherit;
   background: inherit !important;
 }
 .v_select_dropDown:focus {

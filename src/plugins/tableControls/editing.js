@@ -6,7 +6,11 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
 import { converDowncastCell, isRestrictedElement, isTableSelect, onTableSelect } from "./util";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
-import { COMMAND_NAME__INSERT_TABLE_SELECT, COMMAND_NAME__INSERT_TABLE_NORMAL, V_SELECT_DROPDOWN_TEXT_SELE } from "./constant";
+import {
+  COMMAND_NAME__INSERT_TABLE_SELECT,
+  COMMAND_NAME__INSERT_TABLE_NORMAL,
+  V_SELECT_DROPDOWN_TEXT_SELE,
+} from "./constant";
 import { TableControlsCommand, TableSelectCommand } from "./command";
 import { V_SELECT } from "./constant";
 import { toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
@@ -20,9 +24,15 @@ export default class TableControlsEditing extends Plugin {
   init() {
     this._defineSchema();
     this._defineConverters();
-    this._listenToClick();
-    this.editor.commands.add(COMMAND_NAME__INSERT_TABLE_NORMAL, new TableControlsCommand(this.editor));
-    this.editor.commands.add(COMMAND_NAME__INSERT_TABLE_SELECT, new TableSelectCommand(this.editor));
+    // this._listenToClick();
+    this.editor.commands.add(
+      COMMAND_NAME__INSERT_TABLE_NORMAL,
+      new TableControlsCommand(this.editor)
+    );
+    this.editor.commands.add(
+      COMMAND_NAME__INSERT_TABLE_SELECT,
+      new TableSelectCommand(this.editor)
+    );
   }
 
   _defineSchema() {
@@ -36,7 +46,14 @@ export default class TableControlsEditing extends Plugin {
       allowIn: ["v-div", "v-div-c"],
       isLimit: true,
       allowContentOf: "$root",
-      allowAttributes: ["class", "id", "contenteditable", "data-value", "label", "data-cke-ignore-events"],
+      allowAttributes: [
+        "class",
+        "id",
+        "contenteditable",
+        "data-value",
+        "label",
+        "data-cke-ignore-events",
+      ],
     });
     schema.register("v-span", {
       allowWhere: "$block",
@@ -70,7 +87,10 @@ export default class TableControlsEditing extends Plugin {
     conversion.for("editingDowncast").elementToElement({
       model: "v-div",
       view: (modelEle, { writer }) => {
-        return toWidgetEditable(writer.createEditableElement("div", modelEle.getAttributes()), writer);
+        return toWidgetEditable(
+          writer.createEditableElement("div", modelEle.getAttributes()),
+          writer
+        );
       },
       renderUnsafeAttributes: ["data-cke-ignore-events"],
     });
@@ -96,8 +116,4 @@ export default class TableControlsEditing extends Plugin {
   //     // const modelEle = editor.editing.mapper.toModelElement(target);
   //   });
   // }
-
-  _listenToClick() {
-    window.addEventListener("click", onTableSelect);
-  }
 }
