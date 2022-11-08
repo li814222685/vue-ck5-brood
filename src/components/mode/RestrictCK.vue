@@ -48,7 +48,7 @@ export default {
       attributsList: [],
       range: null,
       clickDom: null,
-      spanRanges: [],
+      // spanRanges: [],
     };
   },
   mounted() {
@@ -111,6 +111,10 @@ export default {
     exportData() {
       this.onchange(window.editor.getData());
     },
+    /**
+     * @description 获取caseName,找到case结构进行section替换
+     * @param caseName caseName
+     */
     changeCase(caseName) {
       changeCaseValue(caseName, this);
     },

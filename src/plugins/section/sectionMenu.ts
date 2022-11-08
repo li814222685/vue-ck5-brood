@@ -1,10 +1,14 @@
 /**
  * @description restrict model section menu
  */
-import { toRaw } from "vue";
 import { parse, stringify } from "himalaya";
 import { V_SECTION } from "./constant";
+import _ from "lodash";
 
+/**
+ * @description Section Menu展示逻辑
+ * @param ele dom
+ */
 export function getDomPath(ele) {
   let path = ele.nodeName;
   let parent = ele.parentNode;
@@ -14,7 +18,11 @@ export function getDomPath(ele) {
   }
   return path;
 }
-//Section Menu展示逻辑
+/**
+ * @description Section Menu展示逻辑
+ * @param clickDom 点击的dom
+ * @param vueObject vue:this
+ */
 export function toShowSectionMenu(clickDom, vueObject) {
   const domAncestorsPath = getDomPath(clickDom);
   const tagName = clickDom.tagName;
@@ -48,7 +56,8 @@ export function toShowSectionMenu(clickDom, vueObject) {
 }
 /**
  * @description 获取caseName,找到case结构进行section替换
- * @param val caseName
+ * @param caseName caseName
+ * @param vueObject vue:this
  */
 export function changeCaseValue(caseName, vueObject) {
   const editor = (window as any).editor;
@@ -56,13 +65,14 @@ export function changeCaseValue(caseName, vueObject) {
   const view = editing.view;
   const modelSelection = model.document.selection;
   const casesList = {
-    caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方</span></section>`,
-    caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" contenteditable="true"><p>我只是一个段落B</p></section>`,
-    caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" contenteditable="true"><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方</span></section>`,
+    caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方A</span></section>`,
+    caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落B<span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span></p></section>`,
+    caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方C</span></section>`,
   };
   const sectionVal = casesList[caseName];
   // 获取html标签字符串转换的对象
   const parserSection = parse(sectionVal);
+  const newParserSection = changeObject(_.clone(parserSection));
   let range = null;
   const firstRange = modelSelection.getFirstPosition();
   const LastRange = modelSelection.getLastPosition();
@@ -71,10 +81,18 @@ export function changeCaseValue(caseName, vueObject) {
     // 获取section范围
     // 通过section 范围获取到范围内的 element
     const elementRange = writer.createRange(firstRange, LastRange);
-    const element = model.schema.getLimitElement(elementRange);
-    const finition = model.schema.getDefinitions();
+    let element = model.schema.getLimitElement(elementRange);
+    if (element.name == "$root") {
+      console.log(element, firstRange, LastRange, "$root");
+      const children = Array.from(element.getChildren());
+      for (let item of children as any) {
+        if (item.name == "v-section") {
+          element = item;
+        }
+      }
+      console.log(element, "$root");
+    }
     range = writer.createRangeOn(element);
-    console.log(range, finition, "range");
     const markerList = Array.from(markers.getMarkersIntersectingRange(range));
     // 删除移除范围内的所有marker
     markerList.map(marker => writer.removeMarker((marker as any).name));
@@ -83,21 +101,46 @@ export function changeCaseValue(caseName, vueObject) {
     // 创建新的element，插入
     const params = {
       writer: writer,
-      parserDom: parserSection,
+      parserDom: newParserSection,
       parentElement: null,
       vueObject: vueObject,
     };
     const newElement = createSectionInner(params);
-    model.insertContent(newElement, range);
+    model.insertObject(newElement, range);
   });
 }
-
+function changeObject(list) {
+  let text = "",
+    newList = [],
+    object = { content: "", type: "text", tagName: "span" };
+  for (let item of list) {
+    object = item;
+    if (item.tagName == "span") {
+      text = "";
+      for (let i of item.children) {
+        text += i.content;
+      }
+      object.content = text;
+      object.type = "text";
+      item = object;
+      delete item.children;
+    }
+    if (item.children && item.tagName != "span") {
+      changeObject(item.children);
+    }
+    newList.push(item);
+  }
+  return newList;
+}
 /**
  * @description 创建section内的元素
+ * @param params object 包括：
  * @param writer model 编写器
  * @param parserDom 元素结构转化的对象
  * @param parentElement 父级元素
+ * @param vueObject vue:this
  */
+let templateWord = null;
 function createSectionInner(params) {
   const { writer, parserDom, parentElement, vueObject } = params;
   let elementList = [],
@@ -122,22 +165,19 @@ function createSectionInner(params) {
       if (parentElement) {
         writer.append(dom, parentElement);
       }
-    } else {
-      // span 和元素內的文字需要创建文字插入到dom中
+    } else if (parentElement) {
+      let word = writer.createText(item.content);
+      writer.append(word, parentElement);
       if (item.tagName && item.tagName === "span") {
-        for (let i of item.children) {
-          text += i.content;
-        }
-        const word = writer.createText(text);
-        // console.log(parentElement);
-        writer.append(word, parentElement);
+        let data = templateWord;
+        data._data = word._data;
+        word = !word.parent ? data : word;
+        // console.log(_.clone(word), _.clone(parentElement), "text");
         vueObject.$nextTick(() => {
-          const range = writer.createRangeOn(word);
-          console.log(word, range);
-          vueObject.spanRanges = range;
+          const ranges = writer.createRangeOn(word);
           const { model } = (window as any).editor;
           model.change(writer => {
-            const ranges = toRaw(vueObject.spanRanges);
+            console.log(ranges);
             // 添加可编辑的 marker，进行 markertohighlight 的下行转换
             const markers = Array.from(model.markers);
             const lastMarkerName = Number((markers as any)[markers.length - 1].name.split(":")[1]);
@@ -145,9 +185,8 @@ function createSectionInner(params) {
             writer.addMarker(markerName, { range: ranges, usingOperation: true });
           });
         });
-      } else if (parentElement) {
-        const word = writer.createText(item.content);
-        writer.append(word, parentElement);
+      } else {
+        templateWord = _.clone(word);
       }
     }
     // 递归
