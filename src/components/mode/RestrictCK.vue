@@ -48,7 +48,6 @@ export default {
       attributsList: [],
       range: null,
       clickDom: null,
-      // spanRanges: [],
     };
   },
   mounted() {
@@ -114,9 +113,10 @@ export default {
     /**
      * @description 获取caseName,找到case结构进行section替换
      * @param caseName caseName
+     * @param currentCase 当前case
      */
-    changeCase(caseName) {
-      changeCaseValue(caseName, this);
+    changeCase(caseName, currentCase) {
+      changeCaseValue(caseName, currentCase, this);
     },
     //v-select 相关的展示逻辑
     toShowSelect(clickDom, editor) {

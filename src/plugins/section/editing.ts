@@ -50,7 +50,7 @@ export default class SectionEditing extends Plugin {
       allowAttributesOf: "$text",
 
       // The placeholder can have many types, like date, name, surname, etc:
-      allowAttributes: ["modelname", "type", "cases", "data-cases", "data-cke-ignore-events", "class", "id"],
+      allowAttributes: ["modelname", "type", "case", "data-cases", "data-cke-ignore-events", "class", "id"],
       inheritAllFrom: "$container",
     });
     schema.register("p", {
@@ -84,7 +84,7 @@ export default class SectionEditing extends Plugin {
         const sectionAttrs = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
         sectionAttrs.class = "section";
         const section = writer.createEditableElement("section", sectionAttrs, {
-          renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "data-cases", "cases", "modelname", "type", "id"],
+          renderUnsafeAttributes: ["onchange", "data-cke-ignore-events", "data-cases", "case", "modelname", "type", "id"],
         });
         return toWidgetEditable(section, writer);
       },

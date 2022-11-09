@@ -74,7 +74,7 @@ const showList = () => {
 
 const chengeCase = (item: string) => {
   if(currentCase.value != item) {
-    emit("changeCase", item);
+    emit("changeCase", item, currentCase.value);
   }
   currentCase.value = item;
 };

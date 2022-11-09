@@ -59,15 +59,16 @@ export function toShowSectionMenu(clickDom, vueObject) {
  * @param caseName caseName
  * @param vueObject vue:this
  */
-export function changeCaseValue(caseName, vueObject) {
+export function changeCaseValue(caseName, currentCase, vueObject) {
   const editor = (window as any).editor;
   const { model, editing } = editor;
   const view = editing.view;
   const modelSelection = model.document.selection;
   const casesList = {
-    caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方A</span></section>`,
-    caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落B<span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span></p></section>`,
-    caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC"]" role="textbox" contenteditable="true"><p>我只是一个段落C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方C</span></section>`,
+    caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseA" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方A</span></section>`,
+    caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseB" contenteditable="true"><p>我只是一个段落B<span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span></p></section>`,
+    caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseC" contenteditable="true"><p>我只是一个段落C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方C</span></section>`,
+    caseD: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseD" contenteditable="true"><p>我只是一个段落D</p></section>`,
   };
   const sectionVal = casesList[caseName];
   // 获取html标签字符串转换的对象
@@ -79,18 +80,18 @@ export function changeCaseValue(caseName, vueObject) {
   const markers = model.markers;
   model.change(writer => {
     // 获取section范围
-    // 通过section 范围获取到范围内的 element
     const elementRange = writer.createRange(firstRange, LastRange);
+    // 通过section 范围获取到范围内的 element
     let element = model.schema.getLimitElement(elementRange);
     if (element.name == "$root") {
-      console.log(element, firstRange, LastRange, "$root");
-      const children = Array.from(element.getChildren());
-      for (let item of children as any) {
-        if (item.name == "v-section") {
-          element = item;
-        }
+      const parent = firstRange.parent;
+      const previousSibling = parent.previousSibling;
+      const nextSibling = parent.nextSibling;
+      if (previousSibling && previousSibling.name == "v-section" && previousSibling.getAttribute("case") == currentCase) {
+        element = previousSibling;
+      } else if (nextSibling && nextSibling.name == "v-section" && nextSibling.getAttribute("case") == currentCase) {
+        element = nextSibling;
       }
-      console.log(element, "$root");
     }
     range = writer.createRangeOn(element);
     const markerList = Array.from(markers.getMarkersIntersectingRange(range));
@@ -109,6 +110,10 @@ export function changeCaseValue(caseName, vueObject) {
     model.insertObject(newElement, range);
   });
 }
+/**
+ * @description 修改section中span的结构
+ * @param list 元素结构转化的对象
+ */
 function changeObject(list) {
   let text = "",
     newList = [],
@@ -143,11 +148,10 @@ function changeObject(list) {
 let templateWord = null;
 function createSectionInner(params) {
   const { writer, parserDom, parentElement, vueObject } = params;
-  let elementList = [],
-    text = null,
-    dom = null;
+  let dom = null,
+    beforePosition = null,
+    afterPosition = null;
   for (let item of parserDom) {
-    text = "";
     dom = "";
     if (item.type === "element" && item.tagName !== "span") {
       // 返回元素属性对象
@@ -166,18 +170,20 @@ function createSectionInner(params) {
         writer.append(dom, parentElement);
       }
     } else if (parentElement) {
-      let word = writer.createText(item.content);
-      writer.append(word, parentElement);
+      let text = writer.createText(item.content);
+      writer.append(text, parentElement);
+      let ranges = null
       if (item.tagName && item.tagName === "span") {
-        let data = templateWord;
-        data._data = word._data;
-        word = !word.parent ? data : word;
-        // console.log(_.clone(word), _.clone(parentElement), "text");
+        if (!text.parent) {
+          afterPosition = _.clone(beforePosition);
+          afterPosition.path = [beforePosition.path[0], beforePosition.path[1] + text.offsetSize];
+          ranges = writer.createRange(beforePosition, afterPosition);
+        }else {
+          ranges = writer.createRangeOn(text);
+        }
         vueObject.$nextTick(() => {
-          const ranges = writer.createRangeOn(word);
           const { model } = (window as any).editor;
           model.change(writer => {
-            console.log(ranges);
             // 添加可编辑的 marker，进行 markertohighlight 的下行转换
             const markers = Array.from(model.markers);
             const lastMarkerName = Number((markers as any)[markers.length - 1].name.split(":")[1]);
@@ -186,7 +192,7 @@ function createSectionInner(params) {
           });
         });
       } else {
-        templateWord = _.clone(word);
+        beforePosition = writer.createPositionAfter(text);
       }
     }
     // 递归
