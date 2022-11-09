@@ -66,6 +66,7 @@ export class TableSelectCommand extends Command {
     const tableCell = [...selection.getSelectedBlocks()][0] as any;
 
     const td = mapper.toViewElement(tableCell.parent);
+
     this.editor.editing.view.change(writer => {
       writer.setStyle(
         {
@@ -73,20 +74,19 @@ export class TableSelectCommand extends Command {
         },
         td
       );
+      writer.setAttribute("type", "select", td);
     });
-    if (!_.isEqual(selection.anchor.path.slice(-2), [0, 0])) {
-      console.log("我又全选了！");
-      this.editor.execute("selectAll");
-      this.editor.editing.view.focus();
-    }
+
     return this.editor.model.change(writer => {
       // return (this.editor.model as any).insertObject(createSelect(writer));
-
+      this.editor.execute("selectAll");
       const paragraph = writer.createElement("paragraph");
-      writer.insertText(" ", paragraph);
+      writer.insertText("点击展示Select", paragraph);
       (this.editor.model as any).insertContent(paragraph);
-      this.editor.execute(COMMAND_NAME__INSERT_TABLE_NORMAL, { type: "select" });
-
+      this.editor.execute("selectAll");
+      this.editor.editing.view.focus();
+      this.editor.execute(RESTRICTED_EDITING);
+      writer.setAttribute("type", "select", tableCell.parent);
       console.log(
         "%c🍉Lee%cline:87%cselection",
         "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",

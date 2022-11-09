@@ -4,7 +4,13 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { converDowncastCell, isRestrictedElement, isTableSelect, onTableSelect } from "./util";
+import {
+  converDowncastCell,
+  downcastCell,
+  isRestrictedElement,
+  isTableSelect,
+  onTableSelect,
+} from "./util";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
 import {
   COMMAND_NAME__INSERT_TABLE_SELECT,
@@ -55,6 +61,9 @@ export default class TableControlsEditing extends Plugin {
         "data-cke-ignore-events",
       ],
     });
+    schema.extend("tableCell", {
+      allowAttributes: ["type", "colspan", "rowspan"],
+    });
     schema.register("v-span", {
       allowWhere: "$block",
       isInline: true,
@@ -67,7 +76,7 @@ export default class TableControlsEditing extends Plugin {
   _defineConverters() {
     const conversion = this.editor.conversion;
 
-    //Table 单元格outputData 的逻辑重写
+    //Cover :Table 单元格outputData 的逻辑重写
     conversion.for("dataDowncast").elementToElement({
       model: "tableCell",
       view: converDowncastCell(),

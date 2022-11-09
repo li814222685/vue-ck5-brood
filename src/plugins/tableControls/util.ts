@@ -52,6 +52,20 @@ export function converDowncastCell(options = { asWidget: true }) {
             element
           );
         }
+
+        console.log(
+          "%c🍉Lee%cline:55%ctableCell",
+          "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+          "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+          "color:#fff;background:rgb(178, 190, 126);padding:3px;border-radius:2px",
+          tableCell
+        );
+        const getCellType = tableCell.parent.getAttribute("type");
+        if (getCellType) {
+          //获取model上的attrs
+          writer.setAttribute("type", getCellType, element);
+        }
+
         return element;
       }
     }

@@ -68,8 +68,6 @@ export default {
   mounted() {
     //挂载Emitter
     this.hangUpAllEmitFunctions();
-    const color = "rgba(255,169,77,.2)";
-    const style = `style="background-color:hsl(30deg 100% 94%);"`;
     ClassicEditor.create(document.querySelector("#devEditor"), NORMAL_CONFIG)
       .then(editor => {
         CKEditorInspector.attach(editor);
