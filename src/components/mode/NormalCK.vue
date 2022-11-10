@@ -41,6 +41,7 @@ import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constan
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import { parse as toAst, stringify as toHtmlString } from "himalaya";
 import JqxDropDownList from "jqwidgets-scripts/jqwidgets-vue/vue_jqxdropdownlist.vue";
+import { onGlobalClick } from "./define";
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
@@ -68,6 +69,8 @@ export default {
   mounted() {
     //挂载Emitter
     this.hangUpAllEmitFunctions();
+    window.addEventListener("mousedown", onGlobalClick.onClickEntry);
+
     ClassicEditor.create(document.querySelector("#devEditor"), NORMAL_CONFIG)
       .then(editor => {
         CKEditorInspector.attach(editor);

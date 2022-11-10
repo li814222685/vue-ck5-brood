@@ -4,13 +4,7 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import {
-  converDowncastCell,
-  downcastCell,
-  isRestrictedElement,
-  isTableSelect,
-  onTableSelect,
-} from "./util";
+import { converDowncastCell } from "./util";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
 import {
   COMMAND_NAME__INSERT_TABLE_SELECT,

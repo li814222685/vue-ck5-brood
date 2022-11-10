@@ -82,11 +82,11 @@ export class TableSelectCommand extends Command {
       this.editor.execute("selectAll");
       const paragraph = writer.createElement("paragraph");
       writer.insertText("点击展示Select", paragraph);
+      writer.setAttribute("type", "select", tableCell.parent);
       (this.editor.model as any).insertContent(paragraph);
       this.editor.execute("selectAll");
       this.editor.editing.view.focus();
       this.editor.execute(RESTRICTED_EDITING);
-      writer.setAttribute("type", "select", tableCell.parent);
       console.log(
         "%c🍉Lee%cline:87%cselection",
         "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
