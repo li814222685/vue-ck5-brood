@@ -154,6 +154,11 @@ export default class FormControlEditing extends Plugin {
           },
           [writer.createText("我就是控件点我试试？")]
         );
+
+        // const span = writer.createText("我就是控件点我试试？");
+
+        // const range = writer.createRangeOn(span)
+        console.log(ele, writer);
         console.log(span);
         return span;
       },

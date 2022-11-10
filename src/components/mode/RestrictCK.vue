@@ -16,7 +16,7 @@
 <script>
 import { toRaw } from "vue";
 import _ from "lodash";
-import { toShowSectionMenu, changeCaseValue } from "../../plugins/section/sectionMenu.ts";
+import { toShowSectionMenu, changeCaseValue, setMarker } from "../../plugins/section/sectionMenu.ts";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 import { getMarkerAtPosition } from "@/plugins/formControls/utils.js";
 import { RESTRICT_CONFIG } from "./config.js";
@@ -75,6 +75,14 @@ export default {
         const editor = window.editor;
         const { model, editing } = editor;
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
+        const isControlSelect = Array.from(clickDom.classList).includes("control-select");
+        if (isControlSelect) {
+          // const modelSelection = model.document.selection;
+          // const firstRange = modelSelection.getFirstPosition();
+          // const LastRange = modelSelection.getLastPosition();
+          // let element = model.schema.getLimitElement(elementRange);
+          // console.log(modelSelection, firstRange, LastRange);
+        }
         toShowSectionMenu(clickDom, this);
       }, 1);
     },

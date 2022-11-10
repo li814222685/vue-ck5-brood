@@ -1,15 +1,30 @@
 /**
  * @description restrict model section menu
  */
-import { parse, stringify } from "himalaya";
+import { parse } from "himalaya";
 import { V_SECTION } from "./constant";
 import _ from "lodash";
+
+/**
+ * @description 添加marker
+ * @param range marker的范围
+ */
+export function setMarker(range) {
+  const { model } = (window as any).editor;
+  model.change(writer => {
+    // 添加可编辑的 marker，进行 markertohighlight 的下行转换
+    const markers = Array.from(model.markers);
+    const lastMarkerName = Number((markers as any)[markers.length - 1].name.split(":")[1]);
+    const markerName = `restrictedEditingException:` + (lastMarkerName + 1);
+    writer.addMarker(markerName, { range: range, usingOperation: true });
+  });
+}
 
 /**
  * @description Section Menu展示逻辑
  * @param ele dom
  */
-export function getDomPath(ele) {
+export function getDomPath(ele: HTMLElement) {
   let path = ele.nodeName;
   let parent = ele.parentNode;
   while (parent) {
@@ -18,12 +33,13 @@ export function getDomPath(ele) {
   }
   return path;
 }
+
 /**
  * @description Section Menu展示逻辑
  * @param clickDom 点击的dom
  * @param vueObject vue:this
  */
-export function toShowSectionMenu(clickDom, vueObject) {
+export function toShowSectionMenu(clickDom: HTMLElement, vueObject: any) {
   const domAncestorsPath = getDomPath(clickDom);
   const tagName = clickDom.tagName;
   const classList = clickDom.classList;
@@ -54,12 +70,13 @@ export function toShowSectionMenu(clickDom, vueObject) {
     vueObject.positionRange = [sectionMenuPostionX, sectionMenuPostionY];
   }
 }
+
 /**
  * @description 获取caseName,找到case结构进行section替换
  * @param caseName caseName
  * @param vueObject vue:this
  */
-export function changeCaseValue(caseName, currentCase, vueObject) {
+export function changeCaseValue(caseName: string, currentCase: string, vueObject: any) {
   const editor = (window as any).editor;
   const { model, editing } = editor;
   const view = editing.view;
@@ -102,7 +119,7 @@ export function changeCaseValue(caseName, currentCase, vueObject) {
     // 创建新的element，插入
     const params = {
       writer: writer,
-      parserDom: newParserSection,
+      parseDom: newParserSection,
       parentElement: null,
       vueObject: vueObject,
     };
@@ -110,11 +127,12 @@ export function changeCaseValue(caseName, currentCase, vueObject) {
     model.insertObject(newElement, range);
   });
 }
+
 /**
  * @description 修改section中span的结构
  * @param list 元素结构转化的对象
  */
-function changeObject(list) {
+function changeObject(list: any[]) {
   let text = "",
     newList = [],
     object = { content: "", type: "text", tagName: "span" };
@@ -137,21 +155,21 @@ function changeObject(list) {
   }
   return newList;
 }
+
 /**
  * @description 创建section内的元素
  * @param params object 包括：
  * @param writer model 编写器
- * @param parserDom 元素结构转化的对象
+ * @param parseDom 元素结构转化的对象
  * @param parentElement 父级元素
  * @param vueObject vue:this
  */
-let templateWord = null;
 function createSectionInner(params) {
-  const { writer, parserDom, parentElement, vueObject } = params;
+  const { writer, parseDom, parentElement, vueObject } = params;
   let dom = null,
     beforePosition = null,
     afterPosition = null;
-  for (let item of parserDom) {
+  for (let item of parseDom) {
     dom = "";
     if (item.type === "element" && item.tagName !== "span") {
       // 返回元素属性对象
@@ -172,24 +190,17 @@ function createSectionInner(params) {
     } else if (parentElement) {
       let text = writer.createText(item.content);
       writer.append(text, parentElement);
-      let ranges = null
+      let range = null;
       if (item.tagName && item.tagName === "span") {
         if (!text.parent) {
           afterPosition = _.clone(beforePosition);
           afterPosition.path = [beforePosition.path[0], beforePosition.path[1] + text.offsetSize];
-          ranges = writer.createRange(beforePosition, afterPosition);
-        }else {
-          ranges = writer.createRangeOn(text);
+          range = writer.createRange(beforePosition, afterPosition);
+        } else {
+          range = writer.createRangeOn(text);
         }
         vueObject.$nextTick(() => {
-          const { model } = (window as any).editor;
-          model.change(writer => {
-            // 添加可编辑的 marker，进行 markertohighlight 的下行转换
-            const markers = Array.from(model.markers);
-            const lastMarkerName = Number((markers as any)[markers.length - 1].name.split(":")[1]);
-            const markerName = `restrictedEditingException:` + (lastMarkerName + 1);
-            writer.addMarker(markerName, { range: ranges, usingOperation: true });
-          });
+          setMarker(range);
         });
       } else {
         beforePosition = writer.createPositionAfter(text);
@@ -199,7 +210,7 @@ function createSectionInner(params) {
     if (item.children) {
       const params = {
         writer: writer,
-        parserDom: item.children,
+        parseDom: item.children,
         parentElement: dom,
         vueObject: vueObject,
       };
