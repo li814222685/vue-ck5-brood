@@ -1,12 +1,5 @@
 <template>
   <div id="normalMode">
-    <JqxDropDownList
-      :width="200"
-      :height="25"
-      :source="['htmlData', 'nowMode', 'onchange']"
-      :selectedIndex="1"
-    >
-    </JqxDropDownList>
     <el-button type="primary" @click="exportData" plain>导出</el-button>
     <br />
     <br />
@@ -35,13 +28,21 @@
 import _ from "lodash";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 import { NORMAL_CONFIG } from "./config.js";
-import { emitter, SWITCH_MODAL, Option, GET_OPTIONS } from "./mitt";
+import {
+  emitter,
+  SWITCH_MODAL,
+  Option,
+  GET_OPTIONS,
+  SAVE_HIDDEN_ITEM,
+  REPLACE_HIDDEN_ITEM_TEXT,
+} from "./mitt";
 import SelectDialog from "./SelectDialog/index.vue";
 import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
-import { parse as toAst, stringify as toHtmlString } from "himalaya";
 import JqxDropDownList from "jqwidgets-scripts/jqwidgets-vue/vue_jqxdropdownlist.vue";
-import { onGlobalClick } from "./define";
+import { removeClass, removeElement } from "../utils.js";
+import { EditorClasses } from "./define";
+import { toRaw } from "@vue/reactivity";
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
@@ -49,27 +50,19 @@ export default {
     return {
       editor: {},
       anchor: null,
-      deposit: {},
+      deposit: {
+        range: null,
+        element: null,
+      },
       dialogVisible: false,
       selectedOptions: [], //当前选中select 有哪些options，用来将options传递到弹窗表格内
-      source: [
-        "Affogato",
-        "Americano",
-        "Bicerin",
-        "Breve",
-        "Café Bombón",
-        "Café au lait",
-        "Caffé Corretto",
-        "Irish coffee",
-        "Liqueur coffee",
-      ],
     };
   },
   components: { SelectDialog, JqxDropDownList },
   mounted() {
     //挂载Emitter
     this.hangUpAllEmitFunctions();
-    window.addEventListener("mousedown", onGlobalClick.onClickEntry);
+    // window.addEventListener("mousedown", onGlobalClick.onClickEntry);
 
     ClassicEditor.create(document.querySelector("#devEditor"), NORMAL_CONFIG)
       .then(editor => {
@@ -94,6 +87,8 @@ export default {
     hangUpAllEmitFunctions() {
       emitter.on(SWITCH_MODAL, this.swtichModal);
       emitter.on(GET_OPTIONS, this.setOptionListFromSelect);
+      emitter.on(SAVE_HIDDEN_ITEM, this.saveCellItemAndSelectRange);
+      emitter.on(REPLACE_HIDDEN_ITEM_TEXT, this.setRestrictedTextFromTableSelect);
     },
 
     /** 向当前select 插入options */
@@ -103,8 +98,37 @@ export default {
 
     /** 获取当前select的options list */
     setOptionListFromSelect(options: Option[]) {
-      console.log(options);
       this.selectedOptions = _.cloneDeep(options);
+    },
+
+    /** 缓存隐藏的元素和TableSelect的范围 */
+    saveCellItemAndSelectRange(deposit) {
+      this.deposit = deposit;
+    },
+
+    /** TableSelect的值填入 可编辑文字元素 */
+    setRestrictedTextFromTableSelect(val: string) {
+      const editor = (window as any).devEditor;
+      const model = editor.model;
+      const { element: restoreItem, range: removeRange } = toRaw(this.deposit);
+
+      console.log(
+        "%c🍉Lee%cline:114%crestoreItem",
+        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+        "color:#fff;background:rgb(153, 80, 84);padding:3px;border-radius:2px",
+        restoreItem
+      );
+      //1.显示隐藏的元素
+      removeClass(EditorClasses.HIDDEN_CLASS, restoreItem);
+      //2.将value 替换 元素内的文本
+      // model.change(writer => {
+      //   const range = writer.createRangeIn(restoreItem);
+      //   const text = writer.createText(val, restoreItem.getAttributes());
+      //   model.insertContent(text, range);
+      // });
+      // //3. 销毁掉Select
+      // removeElement(removeRange);
     },
   },
   computed: {
@@ -165,7 +189,7 @@ export default {
   display: block;
   height: inherit;
   /* padding: 0 10px; */
-  border-bottom: 1px solid #d8d7d9 !important;
+  // border-bottom: 1px solid #d8d7d9 !important;
   border-radius: 4px;
   font-size: 16px;
   color: #333;

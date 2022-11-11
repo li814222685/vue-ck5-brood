@@ -53,7 +53,7 @@ export class TableControlsCommand extends Command {
     const model = this.editor.model;
     const selection = model.document.selection;
     const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
-    this.isEnabled = true;
+    this.isEnabled = allowedIn.name === "tableCell";
   }
 }
 
@@ -78,22 +78,15 @@ export class TableSelectCommand extends Command {
     });
 
     return this.editor.model.change(writer => {
-      // return (this.editor.model as any).insertObject(createSelect(writer));
       this.editor.execute("selectAll");
       const paragraph = writer.createElement("paragraph");
       writer.insertText("点击展示Select", paragraph);
       writer.setAttribute("type", "select", tableCell.parent);
-      (this.editor.model as any).insertContent(paragraph);
+      const range = (this.editor.model as any).insertContent(paragraph);
+
       this.editor.execute("selectAll");
       this.editor.editing.view.focus();
       this.editor.execute(RESTRICTED_EDITING);
-      console.log(
-        "%c🍉Lee%cline:87%cselection",
-        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-        "color:#fff;background:rgb(34, 8, 7);padding:3px;border-radius:2px",
-        selection
-      );
     });
   }
 
@@ -108,6 +101,9 @@ export class TableSelectCommand extends Command {
     const model = this.editor.model;
     const selection = model.document.selection;
     const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
+    console.log(allowedIn);
+    this.isEnabled = allowedIn.name === "tableCell";
+
     //绑定select 的events
     try {
       const select: any = document?.querySelector(toClassSelector(V_SELECT));
@@ -118,8 +114,6 @@ export class TableSelectCommand extends Command {
     } catch (error) {
       console.error(error);
     }
-
-    this.isEnabled = true;
   }
 }
 

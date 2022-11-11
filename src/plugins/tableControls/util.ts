@@ -18,7 +18,7 @@ import {
 } from "./constant";
 import { EditorClasses } from "../../components/mode/define";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
-import { Option } from "../../components/mode/mitt";
+import { emitter, Option, REPLACE_HIDDEN_ITEM_TEXT } from "../../components/mode/mitt";
 
 /** Table Cell dataDowncast逻辑重写 */
 /**
@@ -81,8 +81,12 @@ const isCellChildHasRestricted = (ele: Element): any => {
 
 /** 当前点击的元素是否是限制编辑元素 */
 export const isRestrictedElement = (ele: AttributeElement): boolean => {
-  //Todo：这里暂时只考虑了Cell内的元素deep 为2，后续可能需要结合需求或者具体场景，使用遍历递归实现
   return [...ele.getClassNames()].includes(EditorClasses.EDITABLE_CLASS);
+};
+
+/** 当前点击的元素是否为TableSelect */
+export const isCellHasTableSelect = (ele: AttributeElement): boolean => {
+  return ele.findAncestor({ name: "td" })?.getAttribute("type") === "select";
 };
 
 export const createSelect = (writer: Writer, options?: Option[]) => {
@@ -206,14 +210,14 @@ export const onTableSelect = e => {
   }
 };
 
+/** SelectEvent 集合 */
+
 class SelectClickCollection {
   /** 监听Select点击处理逻辑 */
   static onSelectClick() {
     try {
       if (document.querySelector(".v_select_dropDown_text_sele")) return;
-
       (document.querySelector(".v_select_optionList") as any).style.display = "block";
-
       document.querySelector(".v_select_dropDown_text").className = V_SELECT_DROPDOWN_TEXT_SELE;
       document.getElementById("theme_icon").className = TRIANGlE_DOWN;
     } catch (error) {
@@ -226,7 +230,7 @@ class SelectClickCollection {
     console.log(target.getAttribute(DATA_VALUE)); //可获取自定义属性值
     const dropdown_text = document.getElementById(V_SELECT_DROPDOWN_TEXT);
     dropdown_text.innerText = target.getAttribute(DATA_VALUE);
-    console.log(dropdown_text);
+    emitter.emit(REPLACE_HIDDEN_ITEM_TEXT, target.getAttribute(DATA_VALUE));
   }
   /** 绑定Select的监听器*/
   static bindSelectListener(dropdownText: HTMLDOM) {
@@ -234,13 +238,11 @@ class SelectClickCollection {
     //select 失焦处理
     document.onclick = function (event) {
       const target: any = event.target;
-
       if (target.tagName !== "P" && V_SELECT_DROPDOWN_TEXT_SELE != target.className) {
         if (!document.querySelector(".v_select_optionList")) return;
         (document.querySelector(".v_select_optionList") as any).style.display = "none";
         document.getElementById(V_SELECT_DROPDOWN_TEXT).className = V_SELECT_DROPDOWN_TEXT;
         document.getElementById("theme_icon").className = TRIANGlE_UP;
-        console.log("77777777777777");
       }
     };
 

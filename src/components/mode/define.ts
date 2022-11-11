@@ -23,7 +23,6 @@ const isPositionInRangeBoundaries = (range, position) => {
 };
 
 const getMarkerAtPosition = (editor, position) => {
-  console.log("%cdefine.ts line:26 323", "color: #007acc;", editor.model.markers);
   //todo:这里获取不到marker
   for (const marker of editor.model.markers) {
     const markerRange = marker.getRange();
@@ -63,19 +62,22 @@ export class onGlobalClick {
     const model = editor.model;
     const editing = editor.editing;
     const modelSelection = model.document.selection;
-    const marker = getMarkerAtPosition(editor, modelSelection.anchor);
-    console.log(marker);
-    if (!marker) return;
-    const itemEnd = marker.getEnd();
+    // const marker = getMarkerAtPosition(editor, modelSelection.anchor);
+    const ranges = modelSelection.getLastRange();
+
+    const endPosition = modelSelection.getLastPosition();
+
+    console.log(
+      "%c🍉Lee%cline:69%cgetSelectedElement",
+      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      "color:#fff;background:rgb(38, 157, 128);padding:3px;border-radius:2px",
+      ranges
+    );
     // replace编辑器指定位置的DOM
-    new Promise<void>(res => {
-      editing.view.change(writer => {
-        const newRange = editor.execute(COMMAND_NAME__INSERT_TABLE_SELECT, itemEnd);
-        //缓存将要移除的marker 和 当前的range
-        const [oldViewElement] = [...editor.editing.mapper.markerNameToElements(marker.name)];
-        writer.addClass(EditorClasses.HIDDEN_CLASS, oldViewElement);
-        res();
-      });
+    editing.view.change(writer => {
+      // const newRange = editor.execute(COMMAND_NAME__INSERT_TABLE_SELECT, endPosition);
+      // writer.addClass(EditorClasses.HIDDEN_CLASS, getSelectedElement);
     });
   }
   static insertDatePicker() {
