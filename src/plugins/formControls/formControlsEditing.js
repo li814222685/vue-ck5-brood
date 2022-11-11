@@ -7,6 +7,7 @@ import { InsertSimpleBoxCommand, createSimpleBox } from "./insertsimpleboxcomman
 import { toWidget, toWidgetEditable, viewToModelPositionOutsideModelElement } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
 import { getMarkerAtPosition } from "./utils";
+import { setMarker } from "../section/sectionMenu";
 export default class FormControlEditing extends Plugin {
   static get requires() {
     return [Widget];
@@ -138,35 +139,44 @@ export default class FormControlEditing extends Plugin {
     conversion.for("upcast").elementToElement({
       view: "control-select",
       model: (ele, { writer }) => {
-        console.log(ele.getClassNames());
-        return writer.createElement("control-select", { class: [...ele.getClassNames()].join(" ") });
+        // console.log(ele.getClassNames());
+        console.log(ele);
+        const span = writer.createElement("span", { class: [...ele.getClassNames()].join(" ") });
+        const model = this.editor.model;
+        setTimeout(() => {
+          model.change(writers => {
+            const range = writers.createRangeOn(span);
+            // const markers = Array.from(model.markers);
+            // const lastMarkerName = Number(markers[markers.length - 1].name.split(":")[1]);
+            // const markerName = `restrictedEditingException:` + (lastMarkerName + 1);
+            // writers.addMarker(markerName, { range: range, usingOperation: true });
+            setMarker(range)
+            // console.log(ele, span, range, model.markers, markerName);
+          });
+        }, 1);
+        return span;
       },
       converterPriority: "highest",
     });
 
     conversion.for("downcast").elementToElement({
-      model: "control-select",
+      model: "span",
       view: (ele, { writer }) => {
         const span = writer.createContainerElement(
+        // const span = writer.createEditableElement(
           "span",
           {
             class: ele.getAttribute("class"),
           },
           [writer.createText("我就是控件点我试试？")]
         );
-
-        // const span = writer.createText("我就是控件点我试试？");
-
-        // const range = writer.createRangeOn(span)
-        console.log(ele, writer);
-        console.log(span);
         return span;
       },
       converterPriority: "highest",
     });
 
     // conversion.for("downcast").markerToHighlight({
-    //   model: "restrictedEditingException",
+    //   model: "span",
     //   // Use callback to return new object every time new marker instance is created - otherwise it will be seen as the same marker.
     //   view: (data, { writer }) => {
     //     console.log(data, writer, this.editor.model.markers);

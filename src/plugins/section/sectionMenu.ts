@@ -83,7 +83,7 @@ export function changeCaseValue(caseName: string, currentCase: string, vueObject
   const modelSelection = model.document.selection;
   const casesList = {
     caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseA" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方A</span></section>`,
-    caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseB" contenteditable="true"><p>我只是一个段落B<span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span></p></section>`,
+    caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseB" contenteditable="true"><p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span>我只是一个段落B</p><p>我只是一个段落B<span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span></p></section>`,
     caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseC" contenteditable="true"><p>我只是一个段落C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方C</span></section>`,
     caseD: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseD" contenteditable="true"><p>我只是一个段落D</p></section>`,
   };
@@ -192,9 +192,10 @@ function createSectionInner(params) {
       writer.append(text, parentElement);
       let range = null;
       if (item.tagName && item.tagName === "span") {
-        if (!text.parent) {
+        if ((!text.parent && beforePosition) || !beforePosition) {
+          beforePosition = !beforePosition ? writer.createPositionBefore(text) : beforePosition;
           afterPosition = _.clone(beforePosition);
-          afterPosition.path = [beforePosition.path[0], beforePosition.path[1] + text.offsetSize];
+          afterPosition.path = afterPosition.path.length < 2 ? [beforePosition.path[0] + text.offsetSize] : [beforePosition.path[0], beforePosition.path[1] + text.offsetSize];
           range = writer.createRange(beforePosition, afterPosition);
         } else {
           range = writer.createRangeOn(text);
@@ -203,7 +204,7 @@ function createSectionInner(params) {
           setMarker(range);
         });
       } else {
-        beforePosition = writer.createPositionAfter(text);
+        beforePosition = !beforePosition ? writer.createPositionAfter(text) : beforePosition;
       }
     }
     // 递归
