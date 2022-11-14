@@ -29,12 +29,12 @@ enum EditorMode {
 
 const nowMode = ref(EditorMode.Normal);
 const htmlData = ref(
-  `<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p ><v-section modelName="模块名" type="switch" currentcase="caseA" data-cases=${JSON.stringify(
-    ["caseA", "caseB", "caseC", "caseD"]
-  )}><p>我只是一个段落</p ><span class="restricted-editing-exception">只是一个可编辑的地方</span></v-section>
-    <p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p >`
-  // `<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p >
+  // `<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p ><v-section modelName="模块名" type="switch" currentcase="caseA" data-cases=${JSON.stringify(
+  //   ["caseA", "caseB", "caseC", "caseD"]
+  // )}><p>我只是一个段落</p ><span class="restricted-editing-exception">只是一个可编辑的地方</span></v-section>
   //   <p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p >`
+  `<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p >
+    <p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p >`
 );
 const { value: editorMode } = nowMode;
 
