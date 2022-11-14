@@ -13,7 +13,7 @@ interface SectionAttrs {
   modelname: string;
   type: string;
   currentcase: string;
-  "data-cases": [];
+  "data-cases": string;
   id: string;
 }
 
@@ -91,7 +91,7 @@ export default class SectionEditing extends Plugin {
     });
     conversion.for("dataDowncast").elementToElement({
       model: V_SECTION,
-      view:(modelEle,{writer}) => writer.createContainerElement(V_SECTION,modelEle.getAttributes(),{
+      view:(modelEle,{writer}) => writer.createContainerElement(V_SECTION,modelEle.getAttributes() as any,{
         renderUnsafeAttributes: [ "data-cases", "currentcase", "modelname", "type", "id"],
       })
     });
