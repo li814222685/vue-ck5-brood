@@ -31,7 +31,7 @@ import "../../plugins/theme/style-setion.css"
 const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
 
 export default {
-  props: ["htmlData", "nowMode", "onchange"],
+  props: ["htmlData", "sectionData", "nowMode", "onchange"],
   components: { SectionMenu },
   data() {
     return {
@@ -125,7 +125,7 @@ export default {
      * @param currentCase 当前case
      */
     changeCase(caseName, currentCase) {
-      changeCaseValue(caseName, currentCase, this);
+      changeCaseValue(caseName, currentCase, casesList, this);
     },
     //v-select 相关的展示逻辑
     toShowSelect(clickDom, editor) {

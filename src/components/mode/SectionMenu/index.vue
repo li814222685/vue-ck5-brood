@@ -57,6 +57,8 @@ const showList = () => {
   const attributes = toRaw(attributsList.value);
   for (let i of attributes) {
     if (i.key == "data-cases") {
+      console.log(i.value, typeof i.value);
+      
       cases.data = JSON.parse(i.value);
       if(!currentCase.value) {
         currentCase.value = cases.data[0]

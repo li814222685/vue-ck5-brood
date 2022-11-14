@@ -11,7 +11,7 @@
       :nowMode="nowMode"
       @getStudentName="getStudentName"
     />
-    <RestrictCK v-else :htmlData="htmlData" :onchange="changeHtmlData" :nowMode="nowMode" />
+    <RestrictCK v-else :htmlData="htmlData" :sectionData="sectionData" :onchange="changeHtmlData" :nowMode="nowMode" />
   </div>
 </template>
 <style></style>
@@ -20,12 +20,13 @@
 import RestrictCK from "./mode/RestrictCK.vue";
 import NormalCK from "./mode/NormalCK.vue";
 
-import { onUpdated, ref } from "vue";
+import { onUpdated, ref, toRaw } from "vue";
 
 enum EditorMode {
   Normal = "normal",
   Restrict = "restrict",
 }
+let sectionData = ref("")
 
 const nowMode = ref(EditorMode.Normal);
 const htmlData = ref(
@@ -48,7 +49,9 @@ const changeHtmlData = (val: string) => {
   htmlData.value = val;
 };
 const getStudentName = (val: string) => {
-  console.log(val);
+  // console.log(val);
+  sectionData.value = val
+  console.log(sectionData, toRaw(sectionData.value));
   // htmlData.value = val;
 };
 </script>
