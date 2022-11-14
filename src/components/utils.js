@@ -34,6 +34,13 @@ export const addClass = (itemClass, view) => {
 export const removeClass = (itemClass, view) => {
   const { editing } = window.editor || window.devEditor;
 
+  console.log(
+    "%c🍉Lee%cline:36%cview",
+    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+    "color:#fff;background:rgb(254, 67, 101);padding:3px;border-radius:2px",
+    view
+  );
   editing.view.change(writer => {
     writer.removeClass(itemClass, view);
   });
@@ -45,6 +52,14 @@ export const removeClass = (itemClass, view) => {
  */
 export const removeElement = range => {
   const { model } = window.editor || window.devEditor;
+
+  console.log(
+    "%c🍉Lee%cline:55%crangeRemove",
+    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+    "color:#fff;background:rgb(89, 61, 67);padding:3px;border-radius:2px",
+    range
+  );
   model.change(writer => {
     writer.remove(range);
   });

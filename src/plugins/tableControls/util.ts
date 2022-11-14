@@ -227,6 +227,14 @@ class SelectClickCollection {
   /** 监听Option点击处理逻辑 */
   static onOptionsClick(event) {
     const target = event.target;
+
+    console.log(
+      "%c🍉Lee%cline:230%cvalue",
+      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      "color:#fff;background:rgb(114, 83, 52);padding:3px;border-radius:2px",
+      target.getAttribute(DATA_VALUE)
+    );
     console.log(target.getAttribute(DATA_VALUE)); //可获取自定义属性值
     const dropdown_text = document.getElementById(V_SELECT_DROPDOWN_TEXT);
     dropdown_text.innerText = target.getAttribute(DATA_VALUE);

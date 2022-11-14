@@ -14,16 +14,16 @@ import { ClickObserver } from "@ckeditor/ckeditor5-engine";
 import {
   COMMAND_NAME__INSERT_TABLE_SELECT,
   COMMAND_NAME__INSERT_TABLE_NORMAL,
+  COMMAND_NAME__SET_TABLE_SELECT_OPTIONS,
   V_SELECT_DROPDOWN_TEXT_SELE,
   HIDDEN_ITEM,
 } from "./constant";
-import { TableControlsCommand, TableSelectCommand } from "./command";
+import { TableControlsCommand, TableSelectCommand, SetTableSelectOptionList } from "./command";
 import { V_SELECT } from "./constant";
 import { toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import { toWidget } from "@ckeditor/ckeditor5-widget/src/utils";
-import { V_SELECT_DROPDOWN_TEXT } from "./constant";
 import { emitter } from "../../components/mode/mitt";
-import { SAVE_HIDDEN_ITEM } from "../../components/mode/mitt";
+import { SWITCH_MODAL, SET_OPTIONS, SET_TARGET } from "../../components/mode/mitt";
 export default class TableControlsEditing extends Plugin {
   static get requires() {
     return [Widget];
@@ -40,6 +40,10 @@ export default class TableControlsEditing extends Plugin {
     this.editor.commands.add(
       COMMAND_NAME__INSERT_TABLE_SELECT,
       new TableSelectCommand(this.editor)
+    );
+    this.editor.commands.add(
+      COMMAND_NAME__SET_TABLE_SELECT_OPTIONS,
+      new SetTableSelectOptionList(this.editor)
     );
   }
 
@@ -119,27 +123,43 @@ export default class TableControlsEditing extends Plugin {
     const model = editor.model;
     const editingView = editor.editing.view;
     const viewDocument = editor.editing.view.document;
+    const selection = model.document.selection;
+    const mapper = editor.editing.mapper;
 
     editingView.addObserver(ClickObserver);
     this.listenTo(viewDocument, "click", (event, data) => {
+      console.log(
+        "%c🍉Lee%cline:128%cdata",
+        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+        "color:#fff;background:rgb(131, 175, 155);padding:3px;border-radius:2px",
+        data
+      );
       const target = data.target;
       const isRestrict = isRestrictedElement(target);
       const isHasTableSelect = isCellHasTableSelect(target);
 
       if (isRestrict && isHasTableSelect) {
-        new Promise(res => {
-          editingView.change(writer => {
-            writer.addClass(HIDDEN_ITEM, target);
-            res(target);
-          });
-        }).then(hidEle => {
-          model.change(writer => {
-            const tableSelectRange = model.insertObject(createSelect(writer), null, null, {
-              setSelection: "on",
-            });
-            emitter.emit(SAVE_HIDDEN_ITEM, { element: hidEle, range: tableSelectRange });
-          });
-        });
+        //Normal
+        emitter.emit(SET_TARGET, target);
+        //todo: 在这里传递当前单元格的select-options
+        emitter.emit(SET_OPTIONS, []);
+        emitter.emit(SWITCH_MODAL);
+        //Restrict
+        // new Promise(res => {
+        //   editingView.change(writer => {
+        //     writer.addClass(HIDDEN_ITEM, target);
+        //     res(target);
+        //   });
+        // }).then(hidEle => {
+        //   model.change(writer => {
+        //     //Todo:这里的插入会导致文字元素被拆分，两种方式解决：
+        //     //1.获取文字元素的end Position
+        //     //2.findOptimalPosition 插入合适位置后，再隐藏和保存文字元素
+        //     const tableSelectRange = model.insertObject(createSelect(writer));
+        //     emitter.emit(SAVE_HIDDEN_ITEM, { element: hidEle, range: tableSelectRange });
+        //   });
+        // });
       }
 
       // const modelEle = editor.editing.mapper.toModelElement(target);

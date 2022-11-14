@@ -11,6 +11,7 @@
     :change-visible="swtichModal"
     :table-data="selectedOptions"
     :insert-options-to-select="insertOptionsToSelect"
+    :needEditElement="needEditElement"
   />
 </template>
 <style scoped>
@@ -32,9 +33,10 @@ import {
   emitter,
   SWITCH_MODAL,
   Option,
-  GET_OPTIONS,
+  SET_OPTIONS,
   SAVE_HIDDEN_ITEM,
   REPLACE_HIDDEN_ITEM_TEXT,
+  SET_TARGET,
 } from "./mitt";
 import SelectDialog from "./SelectDialog/index.vue";
 import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
@@ -43,6 +45,11 @@ import JqxDropDownList from "jqwidgets-scripts/jqwidgets-vue/vue_jqxdropdownlist
 import { removeClass, removeElement } from "../utils.js";
 import { EditorClasses } from "./define";
 import { toRaw } from "@vue/reactivity";
+import {
+  COMMAND_NAME__SET_TABLE_SELECT_OPTIONS,
+  HIDDEN_ITEM,
+} from "../../plugins/tableControls/constant";
+import { Element } from "@ckeditor/ckeditor5-engine";
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
@@ -50,6 +57,7 @@ export default {
     return {
       editor: {},
       anchor: null,
+      needEditElement: null,
       deposit: {
         range: null,
         element: null,
@@ -80,20 +88,31 @@ export default {
     swtichModal() {
       this.dialogVisible = !this.dialogVisible;
       //每次关闭MODAL后都清空 Table 数据
-      emitter.emit(GET_OPTIONS, []);
+      emitter.emit(SET_OPTIONS, []);
     },
 
     /** emitter函数挂起 */
     hangUpAllEmitFunctions() {
       emitter.on(SWITCH_MODAL, this.swtichModal);
-      emitter.on(GET_OPTIONS, this.setOptionListFromSelect);
+      emitter.on(SET_OPTIONS, this.setOptionListFromSelect);
       emitter.on(SAVE_HIDDEN_ITEM, this.saveCellItemAndSelectRange);
       emitter.on(REPLACE_HIDDEN_ITEM_TEXT, this.setRestrictedTextFromTableSelect);
+      emitter.on(SET_TARGET, this.setNeedEditElement);
     },
 
     /** 向当前select 插入options */
     insertOptionsToSelect(options: Option[]) {
-      (window as any).devEditor.execute(COMMAND_NAME__INSERT_OPTIONS, options);
+      //Table Select 配置Option
+      if (this.needEditElement) {
+        (window as any).devEditor.execute(
+          COMMAND_NAME__SET_TABLE_SELECT_OPTIONS,
+          options,
+          toRaw(this.needEditElement)
+        );
+      } else {
+        //Normal Select 配置Option
+        (window as any).devEditor.execute(COMMAND_NAME__INSERT_OPTIONS, options);
+      }
     },
 
     /** 获取当前select的options list */
@@ -113,22 +132,33 @@ export default {
       const { element: restoreItem, range: removeRange } = toRaw(this.deposit);
 
       console.log(
-        "%c🍉Lee%cline:114%crestoreItem",
+        "%c🍉Lee%cline:114%crestoreItem33333",
         "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
         "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
         "color:#fff;background:rgb(153, 80, 84);padding:3px;border-radius:2px",
         restoreItem
       );
       //1.显示隐藏的元素
-      removeClass(EditorClasses.HIDDEN_CLASS, restoreItem);
-      //2.将value 替换 元素内的文本
+      removeClass(HIDDEN_ITEM, restoreItem);
+      //2.Todo：Restricted ：将value 替换 元素内的文本
       // model.change(writer => {
-      //   const range = writer.createRangeIn(restoreItem);
-      //   const text = writer.createText(val, restoreItem.getAttributes());
-      //   model.insertContent(text, range);
+      //   const range = writer.createRangeOn(restoreItem._children[0]);
+      //   console.log(
+      //     "%c🍉Lee%cline:128%crange",
+      //     "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      //     "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      //     "color:#fff;background:rgb(60, 79, 57);padding:3px;border-radius:2px",
+      //     range
+      //   );
+      //   // const text = writer.createText(val, restoreItem.getAttributes());
+      //   // model.insertContent(text, range);
       // });
       // //3. 销毁掉Select
-      // removeElement(removeRange);
+      removeElement(removeRange);
+    },
+
+    setNeedEditElement(ele: Element) {
+      this.needEditElement = ele;
     },
   },
   computed: {

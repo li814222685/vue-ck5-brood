@@ -1,7 +1,7 @@
 import { Element } from "@ckeditor/ckeditor5-engine";
 import Selection from "@ckeditor/ckeditor5-engine/src/model/selection";
 import { CUSTOM_PROPERTY__SELECT, RESTRICTED_CELL_BGCOLOR } from "./constant";
-import { emitter, GET_OPTIONS, Option } from "../../components/mode/mitt";
+import { emitter, SET_OPTIONS, Option } from "../../components/mode/mitt";
 import EditableElement from "@ckeditor/ckeditor5-engine/src/view/editableelement";
 import TableWalker from "@ckeditor/ckeditor5-table/src/tablewalker";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
@@ -35,7 +35,7 @@ const getOptionsFromSelect = (viewElement: Element) => {
         value,
       };
     });
-    emitter.emit(GET_OPTIONS, options);
+    emitter.emit(SET_OPTIONS, options);
   } catch (error) {
     console.error(error);
   }

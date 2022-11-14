@@ -9,6 +9,8 @@ import { COMMAND_NAME__INSERT_TABLE_NORMAL, RESTRICTED_EDITING } from "./constan
 import { createSelect, handleSelectEvent, onTableSelect } from "./util";
 import { V_SELECT } from "./constant";
 import { toClassSelector } from "./util";
+import { toWidget } from "@ckeditor/ckeditor5-widget/src/utils";
+import { DowncastWriter } from "@ckeditor/ckeditor5-engine";
 
 interface Option {
   label: string | number;
@@ -42,7 +44,6 @@ export class TableControlsCommand extends Command {
     });
     //用户选择全部单元格元素时候不再需要执行全选了，二次权限会导致选中当前表格
     if (!_.isEqual(selection.anchor.path.slice(-2), [0, 0])) {
-      console.log("我又全选了！");
       this.editor.execute("selectAll");
       this.editor.editing.view.focus();
     }
@@ -80,13 +81,14 @@ export class TableSelectCommand extends Command {
     return this.editor.model.change(writer => {
       this.editor.execute("selectAll");
       const paragraph = writer.createElement("paragraph");
-      writer.insertText("点击展示Select", paragraph);
+      writer.insertText("点击配置Select", paragraph);
       writer.setAttribute("type", "select", tableCell.parent);
       const range = (this.editor.model as any).insertContent(paragraph);
 
       this.editor.execute("selectAll");
       this.editor.editing.view.focus();
       this.editor.execute(RESTRICTED_EDITING);
+      writer.setSelection(null);
     });
   }
 
@@ -117,7 +119,27 @@ export class TableSelectCommand extends Command {
   }
 }
 
+export class SetTableSelectOptionList extends Command {
+  execute(options, target) {
+    const model = this.editor.model;
+
+    const selection = this.editor.model.document.selection;
+    const tableCell = [...selection.getSelectedBlocks()][0] as any;
+    console.log(
+      "%c🍉Lee%cline:128%cfindTd",
+      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      "color:#fff;background:rgb(248, 214, 110);padding:3px;border-radius:2px",
+      tableCell
+    );
+    model.change(writer => {
+      writer.setAttribute("optionList", JSON.stringify(options), tableCell.parent);
+    });
+  }
+}
+
 export default {
   TableControlsCommand,
   TableSelectCommand,
+  SetTableSelectOptionList,
 };

@@ -28,6 +28,7 @@ export const TABLE_CC_TOOLBAR = "tableCcToolbar";
 -------------------------- */
 export const COMMAND_NAME__INSERT_TABLE_SELECT = "insertTableSelect";
 export const COMMAND_NAME__INSERT_TABLE_NORMAL = "insertTableNormal";
+export const COMMAND_NAME__SET_TABLE_SELECT_OPTIONS = "setTableSelectOptions";
 
 export const COMMAND_NAME__OPEN_CONTROL_MODAL = "openControlModal";
 
