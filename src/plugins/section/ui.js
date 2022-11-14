@@ -54,7 +54,7 @@ export default class SectionUI extends Plugin {
     this.listenTo(viewDocument, "click", () => {
       const parentLink = this._getSelectedLinkElement();
       // 判断当前标记类型
-      console.log(this._getSelectedLinkElement());
+      // console.log(this._getSelectedLinkElement());
       if (parentLink) {
         // this._showUI();
       }
