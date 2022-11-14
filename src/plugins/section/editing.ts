@@ -78,7 +78,7 @@ export default class SectionEditing extends Plugin {
       model: (viewEle, { writer }) => writer.createElement(V_SECTION, viewEle.getAttributes() as any),
     });
 
-    conversion.for("downcast").elementToElement({
+    conversion.for("editingDowncast").elementToElement({
       model: V_SECTION,
       view: (modelEle, { writer }) => {
         const sectionAttrs = Object.fromEntries([...(modelEle.getAttributes() as Generator<[string, string], any, unknown>)]);
@@ -88,6 +88,12 @@ export default class SectionEditing extends Plugin {
         });
         return toWidgetEditable(section, writer);
       },
+    });
+    conversion.for("dataDowncast").elementToElement({
+      model: V_SECTION,
+      view:(modelEle,{writer}) => writer.createContainerElement(V_SECTION,modelEle.getAttributes(),{
+        renderUnsafeAttributes: [ "data-cases", "currentcase", "modelname", "type", "id"],
+      })
     });
   }
 }

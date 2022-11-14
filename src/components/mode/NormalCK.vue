@@ -248,6 +248,7 @@ export default {
     /** 切换选中的section */
     CheckDomain(item){
       const index = this.dynamicValidateForm.cases.indexOf(item)
+      console.log(this.dynamicValidateForm.cases)
       let SectionData = JSON.parse(JSON.stringify(this.SectionData[index]))
       let SectionDataHTML = JSON.parse(JSON.stringify(this.SectionDataHTML[index]))
       const parserSection = parse(SectionDataHTML);
@@ -264,7 +265,9 @@ export default {
         writer.remove(range);
         // 创建新的element，插入   newElement ：dom创建   sectionElement ：element元素创建
         const newElement = this.createSectionInner(writer, parserSection, null);
-        // const sectionElement =  this.createSectionElement(writer,SectionData);
+        console.log(newElement)
+        const sectionElement =  this.createSectionElement(writer,SectionData);
+        console.log(sectionElement)
         model.insertContent(newElement, model.document.selection,'on')
       })
     },
@@ -274,6 +277,7 @@ export default {
       let data = this.SectionData
       let datas = this.dynamicValidateForm.cases
       let datass = this.SectionDataHTML
+      console.log(data)
       data.map((items,indexs) => {
         if(index == indexs){
           data.unshift(data.splice(indexs , 1)[0]);
