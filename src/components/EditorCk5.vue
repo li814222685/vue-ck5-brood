@@ -9,6 +9,7 @@
       :htmlData="htmlData"
       :onchange="changeHtmlData"
       :nowMode="nowMode"
+      @getStudentName="getStudentName"
     />
     <RestrictCK v-else :htmlData="htmlData" :onchange="changeHtmlData" :nowMode="nowMode" />
   </div>
@@ -42,6 +43,10 @@ onUpdated(() => {
 const changeHtmlData = (val: string) => {
   console.log(val);
   htmlData.value = val;
+};
+const getStudentName = (val: string) => {
+  console.log(val);
+  // htmlData.value = val;
 };
 </script>
 <style scoped>

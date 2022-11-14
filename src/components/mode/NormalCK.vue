@@ -248,7 +248,6 @@ export default {
     /** 切换选中的section */
     CheckDomain(item){
       const index = this.dynamicValidateForm.cases.indexOf(item)
-      console.log(this.dynamicValidateForm.cases)
       let SectionData = JSON.parse(JSON.stringify(this.SectionData[index]))
       let SectionDataHTML = JSON.parse(JSON.stringify(this.SectionDataHTML[index]))
       const parserSection = parse(SectionDataHTML);
@@ -275,7 +274,6 @@ export default {
       let data = this.SectionData
       let datas = this.dynamicValidateForm.cases
       let datass = this.SectionDataHTML
-      console.log(data)
       data.map((items,indexs) => {
         if(index == indexs){
           data.unshift(data.splice(indexs , 1)[0]);
@@ -337,7 +335,6 @@ export default {
         const sectionElement =   this.createSectionElement(writer,DocumentData,modelData)
         console.log(JSON.parse(JSON.stringify(this.SectionData)))
         console.log(this.SectionData)
-        // if(this.SectionData)
         this.SectionData[index] = (JSON.parse(JSON.stringify(sectionElement)))
         model.insertContent(sectionElement, model.document.selection,'on')
         let idname = "section" + userFormData.cases.length
@@ -352,11 +349,17 @@ export default {
     /** 提交当前modelname所属的section数据 */
     submitSection(){
       const HTMLdata = JSON.parse(JSON.stringify(this.SectionDataHTML))
+      console.log(this.dynamicValidateForm.cases)
+      const cases = []
+      this.dynamicValidateForm.cases.map(item=>{
+        cases.push(item.value)
+      })
       HTMLdata.map((item,index)=>{
         let data = item.match(/ data-cases=\"(.*?)\"/g)[0]
-        HTMLdata[index] =  HTMLdata[index].replace(data,' data-cases="["aa","bb","cc"]" ')
+        HTMLdata[index] =  HTMLdata[index].replace(data,JSON.stringify(cases))
       })
       this.SectionDataHTML = HTMLdata
+      this.$emit("getStudentName", HTMLdata)
     },
     resetForm(formEl) {
       if (!formEl) return
@@ -379,7 +382,6 @@ export default {
         }
       }
       if(DocumentData.name && DocumentData.name =='v-section'){
-        console.log(123)
         const create = writer.createElement(V_SECTION,DocumentData.attributes);
         DocumentData.children.map(item=>{
           const p = writer.createElement(item.name); 
