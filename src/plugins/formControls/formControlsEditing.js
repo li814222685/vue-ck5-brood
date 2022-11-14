@@ -139,31 +139,16 @@ export default class FormControlEditing extends Plugin {
     conversion.for("upcast").elementToElement({
       view: "control-select",
       model: (ele, { writer }) => {
-        // console.log(ele.getClassNames());
-        console.log(ele);
-        const span = writer.createElement("span", { class: [...ele.getClassNames()].join(" ") });
-        const model = this.editor.model;
-        setTimeout(() => {
-          model.change(writers => {
-            const range = writers.createRangeOn(span);
-            // const markers = Array.from(model.markers);
-            // const lastMarkerName = Number(markers[markers.length - 1].name.split(":")[1]);
-            // const markerName = `restrictedEditingException:` + (lastMarkerName + 1);
-            // writers.addMarker(markerName, { range: range, usingOperation: true });
-            setMarker(range)
-            // console.log(ele, span, range, model.markers, markerName);
-          });
-        }, 1);
+        const span = writer.createElement("control-select", { class: [...ele.getClassNames()].join(" ") });
         return span;
       },
       converterPriority: "highest",
     });
 
     conversion.for("downcast").elementToElement({
-      model: "span",
+      model: "control-select",
       view: (ele, { writer }) => {
         const span = writer.createContainerElement(
-        // const span = writer.createEditableElement(
           "span",
           {
             class: ele.getAttribute("class"),

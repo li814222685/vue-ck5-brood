@@ -26,6 +26,7 @@ import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import SectionMenu from "./SectionMenu/index";
 import { parse, stringify } from "himalaya";
 import { V_SECTION, V_SPAN } from "../../plugins/section/constant.ts";
+import "../../plugins/theme/style-setion.css"
 
 const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
 
