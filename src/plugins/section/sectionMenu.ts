@@ -78,8 +78,7 @@ export function toShowSectionMenu(clickDom: HTMLElement, vueObject: any) {
  */
 export function changeCaseValue(caseName: string, currentCase: string, vueObject: any) {
   const editor = (window as any).editor;
-  const { model, editing } = editor;
-  const view = editing.view;
+  const { model } = editor;
   const modelSelection = model.document.selection;
   const casesList = {
     caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" currentcase="caseA" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方A</span></section>`,
@@ -87,43 +86,33 @@ export function changeCaseValue(caseName: string, currentCase: string, vueObject
     caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" currentcase="caseC" contenteditable="true"><p>我只是一个段落C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方C</span></section>`,
     caseD: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" currentcase="caseD" contenteditable="true"><p>我只是一个段落D</p></section>`,
   };
-  const sectionVal = casesList[caseName];
   // 获取html标签字符串转换的对象
-  const parserSection = parse(sectionVal);
-  const newParserSection = changeObject(_.clone(parserSection));
-  let range = null;
-  const firstRange = modelSelection.getFirstPosition();
-  const LastRange = modelSelection.getLastPosition();
-  const markers = model.markers;
+  const newParserSection = changeObject(_.clone(parse(casesList[caseName])));
   model.change(writer => {
     // 获取section范围
-    const elementRange = writer.createRange(firstRange, LastRange);
+    const elementRange = writer.createRange(modelSelection.getFirstPosition(), modelSelection.getLastPosition());
     // 通过section 范围获取到范围内的 element
     let element = model.schema.getLimitElement(elementRange);
     if (element.name == "$root") {
-      const parent = firstRange.parent;
-      const previousSibling = parent.previousSibling;
-      const nextSibling = parent.nextSibling;
-      if (previousSibling && previousSibling.name == "v-section" && previousSibling.getAttribute("currentcase") == currentCase) {
-        element = previousSibling;
-      } else if (nextSibling && nextSibling.name == "v-section" && nextSibling.getAttribute("currentcase") == currentCase) {
-        element = nextSibling;
+      const parent = modelSelection.getFirstPosition().parent;
+      if (parent.previousSibling && parent.previousSibling.name == "v-section" && parent.previousSibling.getAttribute("currentcase") == currentCase) {
+        element = parent.previousSibling;
+      } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && parent.nextSibling.getAttribute("currentcase") == currentCase) {
+        element = parent.nextSibling;
       }
     }
-    range = writer.createRangeOn(element);
-    const markerList = Array.from(markers.getMarkersIntersectingRange(range));
+    const range = writer.createRangeOn(element);
     // 删除移除范围内的所有marker
-    markerList.map(marker => writer.removeMarker((marker as any).name));
+    Array.from(model.markers.getMarkersIntersectingRange(range)).map(marker => writer.removeMarker((marker as any).name));
     // 移除范围和范围内元素，再去插入
     writer.remove(range);
     // 创建新的element，插入
-    const params = {
+    const newElement = createSectionInner({
       writer: writer,
       parseDom: newParserSection,
       parentElement: null,
       vueObject: vueObject,
-    };
-    const newElement = createSectionInner(params);
+    });
     model.insertObject(newElement, range);
   });
 }
@@ -133,26 +122,17 @@ export function changeCaseValue(caseName: string, currentCase: string, vueObject
  * @param list 元素结构转化的对象
  */
 function changeObject(list: any[]) {
-  let text = "",
-    newList = [],
-    object = { content: "", type: "text", tagName: "span" };
-  for (let item of list) {
-    object = item;
-    if (item.tagName == "span") {
-      text = "";
-      for (let i of item.children) {
-        text += i.content;
-      }
-      object.content = text;
-      object.type = "text";
-      item = object;
+  const newList = list.map(item => {
+    if (item.tagName === "span" && Object.fromEntries([...item.attributes.map(item => [item.key, item.value])]).class.includes("restricted-editing-exception")) {
+      item.content = item.children.map(i => i.content).join("");
+      item.type = "text";
       delete item.children;
     }
     if (item.children && item.tagName != "span") {
       changeObject(item.children);
     }
-    newList.push(item);
-  }
+    return item;
+  });
   return newList;
 }
 
@@ -166,15 +146,14 @@ function changeObject(list: any[]) {
  */
 function createSectionInner(params) {
   const { writer, parseDom, parentElement, vueObject } = params;
-  let dom = null,
-    beforePosition = null,
-    afterPosition = null;
+  let dom: any = null,
+    beforePosition: any = null,
+    afterPosition: any = null;
   for (let item of parseDom) {
     dom = "";
     if (item.type === "element" && item.tagName !== "span") {
       // 返回元素属性对象
-      let atttibutesList = item.attributes.map(item => [item.key, item.value]);
-      atttibutesList = Object.fromEntries([...atttibutesList]);
+      const atttibutesList = Object.fromEntries([...item.attributes.map(item => [item.key, item.value])]);
       // 创建元素
       if (item.tagName === "section") {
         dom = writer.createElement(V_SECTION, atttibutesList);
@@ -209,13 +188,12 @@ function createSectionInner(params) {
     }
     // 递归
     if (item.children) {
-      const params = {
+      createSectionInner({
         writer: writer,
         parseDom: item.children,
         parentElement: dom,
         vueObject: vueObject,
-      };
-      createSectionInner(params);
+      });
     }
   }
   return dom;
