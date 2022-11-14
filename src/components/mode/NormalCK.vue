@@ -38,9 +38,9 @@
       ]"
       label="type">
       <el-radio-group v-model="dynamicValidateForm.radio" @change="changeRadio">
-        <el-radio :label="1">Option A</el-radio>
-        <el-radio :label="2">Option B</el-radio>
-        <el-radio :label="3">Option C</el-radio>
+        <el-radio label="deletable">Option A</el-radio>
+        <el-radio label="switchable">Option B</el-radio>
+        <el-radio label="applicable">Option C</el-radio>
       </el-radio-group>
     </el-form-item>
     <el-form-item
@@ -131,7 +131,7 @@ export default {
           },
         ],
         modelName: '',
-        radio:1,
+        radio:"deletable",
       },
       SectionData:[],
       SectionDataHTML:[],
@@ -359,8 +359,8 @@ export default {
         cases.push(item.value)
       })
       HTMLdata.map((item,index)=>{
-        let data = item.match(/ data-cases=\"(.*?)\"/g)[0]
-        HTMLdata[index] =  HTMLdata[index].replace(data,JSON.stringify(cases))
+        let data = item.match(/data-cases=\"(.*?)\"/g)[0]
+        HTMLdata[index] =  HTMLdata[index].replace(data,'data-cases="'+JSON.stringify(cases)+'"')
       })
       this.SectionDataHTML = HTMLdata
       this.$emit("getStudentName", HTMLdata)
@@ -377,12 +377,14 @@ export default {
      */
     createSectionElement(writer: Writer,DocumentData,data){
       let modeData ={}
+      console.log(data)
       if(data){
          modeData = {
           modelname:data.modelname,
           type:data.type,
-          "data-cases":data["data-cases"],
-          id:data.id
+          "data-cases": "["+data["data-cases"]+"]",
+          id:data.id,
+          currentcase:data["data-cases"][0]
         }
       }
       if(DocumentData.name && DocumentData.name =='v-section'){
