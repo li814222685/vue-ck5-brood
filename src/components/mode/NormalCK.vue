@@ -380,7 +380,7 @@ export default {
     createSectionElement(writer: Writer, DocumentData, data) {
       let modeData = {};
       console.log(data);
-      if (data) {
+      if (data) { 
         modeData = {
           modelname: data.modelname,
           type: data.type,
