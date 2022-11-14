@@ -82,10 +82,10 @@ export function changeCaseValue(caseName: string, currentCase: string, vueObject
   const view = editing.view;
   const modelSelection = model.document.selection;
   const casesList = {
-    caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseA" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方A</span></section>`,
-    caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseB" contenteditable="true"><p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span>我只是一个段落B</p><p>我只是一个段落B<span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span></p></section>`,
-    caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseC" contenteditable="true"><p>我只是一个段落C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方C</span></section>`,
-    caseD: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" case="caseD" contenteditable="true"><p>我只是一个段落D</p></section>`,
+    caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" currentcase="caseA" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方A</span></section>`,
+    caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" currentcase="caseB" contenteditable="true"><p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span>我只是一个段落B</p><p>我只是一个段落B<span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span></p></section>`,
+    caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" currentcase="caseC" contenteditable="true"><p>我只是一个段落C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方C</span></section>`,
+    caseD: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" currentcase="caseD" contenteditable="true"><p>我只是一个段落D</p></section>`,
   };
   const sectionVal = casesList[caseName];
   // 获取html标签字符串转换的对象
@@ -104,9 +104,9 @@ export function changeCaseValue(caseName: string, currentCase: string, vueObject
       const parent = firstRange.parent;
       const previousSibling = parent.previousSibling;
       const nextSibling = parent.nextSibling;
-      if (previousSibling && previousSibling.name == "v-section" && previousSibling.getAttribute("case") == currentCase) {
+      if (previousSibling && previousSibling.name == "v-section" && previousSibling.getAttribute("currentcase") == currentCase) {
         element = previousSibling;
-      } else if (nextSibling && nextSibling.name == "v-section" && nextSibling.getAttribute("case") == currentCase) {
+      } else if (nextSibling && nextSibling.name == "v-section" && nextSibling.getAttribute("currentcase") == currentCase) {
         element = nextSibling;
       }
     }
