@@ -81,6 +81,6 @@ export const safeJsonParse = jsonStr => {
     return JSON.parse(jsonStr);
   } catch (error) {
     console.error(error);
-    return {};
+    return [];
   }
 };

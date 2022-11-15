@@ -4,12 +4,7 @@
       <el-radio :label="EditorMode.Normal" size="large">编辑模式</el-radio>
       <el-radio :label="EditorMode.Restrict" size="large">模版模式</el-radio>
     </el-radio-group>
-    <NormalCK
-      v-if="nowMode === EditorMode.Normal"
-      :htmlData="htmlData"
-      :onchange="changeHtmlData"
-      :nowMode="nowMode"
-    />
+    <NormalCK v-if="nowMode === EditorMode.Normal" :htmlData="htmlData" :onchange="changeHtmlData" :nowMode="nowMode" />
     <RestrictCK v-else :htmlData="htmlData" :onchange="changeHtmlData" :nowMode="nowMode" />
   </div>
 </template>

@@ -4,7 +4,7 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
-import { converDowncastCell, isRestrictedElement, isCellHasTableSelect, createSelect } from "./util";
+import { converDowncastCell, isRestrictedElement, isCellHasTableSelect, converEditinghDowncastCell } from "./util";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
 import { COMMAND_NAME__INSERT_TABLE_SELECT, COMMAND_NAME__INSERT_TABLE_NORMAL, COMMAND_NAME__SET_TABLE_SELECT_OPTIONS, V_SELECT_DROPDOWN_TEXT_SELE, HIDDEN_ITEM } from "./constant";
 import { TableControlsCommand, TableSelectCommand, SetTableSelectOptionList } from "./command";
@@ -58,13 +58,23 @@ export default class TableControlsEditing extends Plugin {
   _defineConverters() {
     const conversion = this.editor.conversion;
 
-    //Cover :Table 单元格outputData 的逻辑重写
+    //TableCell Cover逻辑重写
+
+    conversion.for("editingDowncast").elementToElement({
+      model: "tableCell",
+      view: converEditinghDowncastCell({ asWidget: true }),
+      converterPriority: "highest",
+    });
     conversion.for("dataDowncast").elementToElement({
       model: "tableCell",
       view: converDowncastCell(),
       converterPriority: "highest",
       renderUnsafeAttributes: ["optionList", "type", "style"],
     });
+
+    conversion.for("upcast").elementToElement({ model: (viewEle, { writer }) => writer.createElement("tableCell", viewEle.getAttributes()), view: "td", converterPriority: "highest" });
+    conversion.for("upcast").elementToElement({ model: (viewEle, { writer }) => writer.createElement("tableCell", viewEle.getAttributes()), view: "th", converterPriority: "highest" });
+
     conversion.for("editingDowncast").elementToElement({
       model: {
         name: "v-div-c",
@@ -76,6 +86,7 @@ export default class TableControlsEditing extends Plugin {
       },
       renderUnsafeAttributes: ["data-cke-ignore-events"],
     });
+
     conversion.for("editingDowncast").elementToElement({
       model: "v-div",
       view: (modelEle, { writer }) => {
@@ -83,6 +94,7 @@ export default class TableControlsEditing extends Plugin {
       },
       renderUnsafeAttributes: ["data-cke-ignore-events"],
     });
+
     conversion.for("editingDowncast").elementToElement({
       model: "v-span",
       view: (modelEle, { writer }) => {
@@ -100,13 +112,6 @@ export default class TableControlsEditing extends Plugin {
 
     editingView.addObserver(ClickObserver);
     this.listenTo(viewDocument, "click", (event, data) => {
-      console.log(
-        "%c🍉Lee%cline:128%cdata",
-        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-        "color:#fff;background:rgb(131, 175, 155);padding:3px;border-radius:2px",
-        data
-      );
       const target = data.target;
       const isRestrict = isRestrictedElement(target);
       const isHasTableSelect = isCellHasTableSelect(target);
@@ -116,6 +121,7 @@ export default class TableControlsEditing extends Plugin {
         /** 从上级元素里寻找td 的optionList属性 */
 
         const findOptionListFromAncestorTd = target.findAncestor("td").getAttribute("optionList");
+        if (!findOptionListFromAncestorTd) return;
         const plainOptionList = safeJsonParse(findOptionListFromAncestorTd);
         emitter.emit(SET_TARGET, target);
         //在这里传递当前单元格的select-options

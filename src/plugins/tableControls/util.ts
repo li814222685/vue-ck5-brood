@@ -19,6 +19,7 @@ import {
 import { EditorClasses } from "../../components/mode/define";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import { emitter, Option, REPLACE_HIDDEN_ITEM_TEXT } from "../../components/mode/mitt";
+import _ from "lodash";
 
 /** Table Cell dataDowncast逻辑重写 */
 /**
@@ -40,9 +41,7 @@ export function converDowncastCell(options = { asWidget: true }) {
       if (tableSlot.cell == tableCell) {
         const isHeading = tableSlot.row < headingRows || tableSlot.column < headingColumns;
         const cellElementName = isHeading ? "th" : "td";
-        const element = (options as any).asWidget
-          ? toWidgetEditable(writer.createEditableElement(cellElementName), writer)
-          : writer.createContainerElement(cellElementName);
+        const element = (options as any).asWidget ? toWidgetEditable(writer.createEditableElement(cellElementName), writer) : writer.createContainerElement(cellElementName);
         //给output的th or td添加背景样式
         if (isCellChildHasRestricted(tableCell)) {
           writer.setStyle(
@@ -52,15 +51,6 @@ export function converDowncastCell(options = { asWidget: true }) {
             element
           );
         }
-
-        console.log(
-          "%c🍉Lee%cline:55%ctableCell",
-          "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-          "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-          "color:#fff;background:rgb(178, 190, 126);padding:3px;border-radius:2px",
-          tableCell
-        );
-
         //model上获取tableCell 上的属性
         const useAttrs = ["type", "optionList"]
           .map(attrKey => ({
@@ -69,7 +59,7 @@ export function converDowncastCell(options = { asWidget: true }) {
           }))
           .filter(({ attrKey, value }) => value);
 
-        if (useAttrs.length != 0 && !useAttrs.includes(undefined)) {
+        if (useAttrs.length != 0) {
           //获取model上的attrs
           useAttrs.forEach(({ attrKey, value }) => {
             writer.setAttribute(attrKey, value, element);
@@ -77,6 +67,69 @@ export function converDowncastCell(options = { asWidget: true }) {
         }
         //过滤掉data上不需要的属性
         ["class", "role", "contenteditable"].forEach(item => writer.removeAttribute(item, element));
+
+        return element;
+      }
+    }
+  };
+}
+
+/** 寻找子元素中 限制编辑元素的 id(marker.name) */
+const findRestrictExecptionId = element => {
+  if (_.startsWith(element?._id, "restrictedEditingException:")) {
+    return element?._id;
+  }
+
+  if (element?._children && [...element?._children]?.length > 0) {
+    return [...element?._children].map(child => findRestrictExecptionId(child)).filter(res => res);
+  }
+  return null;
+};
+
+/** Table Cell editingDowncast逻辑重写 */
+/**
+ * @param {Object} [options]
+ * @param {Boolean} [options.asWidget]
+ * @returns {Function}
+ */
+export function converEditinghDowncastCell(options = { asWidget: true }) {
+  return (tableCell, { writer }) => {
+    const tableRow = tableCell.parent;
+    const table = tableRow.parent;
+    const rowIndex = table.getChildIndex(tableRow);
+
+    const tableWalker: any = new TableWalker(table, { row: rowIndex });
+    const headingRows = table.getAttribute("headingRows") || 0;
+    const headingColumns = table.getAttribute("headingColumns") || 0;
+
+    for (const tableSlot of tableWalker) {
+      if (tableSlot.cell == tableCell) {
+        const isHeading = tableSlot.row < headingRows || tableSlot.column < headingColumns;
+        const cellElementName = isHeading ? "th" : "td";
+        const element = (options as any).asWidget ? toWidgetEditable(writer.createEditableElement(cellElementName), writer) : writer.createContainerElement(cellElementName);
+        //给output的th or td添加背景样式
+        if (isCellChildHasRestricted(tableCell)) {
+          writer.setStyle(
+            {
+              "background-color": "rgba(255, 169, 77, 0.2)",
+            },
+            element
+          );
+        }
+        //model上获取tableCell 上的属性
+        const useAttrs = ["type", "optionlist"]
+          .map(attrKey => ({
+            attrKey,
+            value: tableCell.getAttribute(attrKey),
+          }))
+          .filter(({ attrKey, value }) => value);
+
+        if (useAttrs.length != 0) {
+          //获取model上的attrs
+          useAttrs.forEach(({ attrKey, value }) => {
+            writer.setAttribute(attrKey, value, element);
+          });
+        }
 
         return element;
       }
@@ -170,25 +223,14 @@ class HTMLDOM extends globalThis.Element {
   onclick?: () => void;
 }
 /** DOM元素是否为TableSelect */
-export const isTableSelect = (dom: HTMLDOM): boolean =>
-  [V_SELECT_DROPDOWN_TEXT, V_SELECT_DROPDOWN_TEXT_SELE].some(className =>
-    [...dom.classList].includes(className)
-  );
+export const isTableSelect = (dom: HTMLDOM): boolean => [V_SELECT_DROPDOWN_TEXT, V_SELECT_DROPDOWN_TEXT_SELE].some(className => [...dom.classList].includes(className));
 
 /** classString To classSelector  */
 export const toClassSelector = (classString: string): string => "." + classString;
 
 /** 处理Table-Select的事件 */
 export const handleSelectEvent = (dom: HTMLDOM) => {
-  const [
-    container,
-    dorpdown,
-    dropdown_text,
-    dropdown_text_sele,
-    optionList,
-    optionList_item,
-    theme_icon,
-  ] = [
+  const [container, dorpdown, dropdown_text, dropdown_text_sele, optionList, optionList_item, theme_icon] = [
     V_SELECT,
     V_SELECT_DROPDOWN,
     V_SELECT_DROPDOWN_TEXT,
@@ -197,9 +239,7 @@ export const handleSelectEvent = (dom: HTMLDOM) => {
     V_SELECT_OPTION_LIST_ITEM,
     THEME_ICON,
   ].map(selectorString =>
-    selectorString === V_SELECT_OPTION_LIST_ITEM
-      ? (document.querySelectorAll(toClassSelector(selectorString)) as any)
-      : document.querySelector(toClassSelector(selectorString))
+    selectorString === V_SELECT_OPTION_LIST_ITEM ? (document.querySelectorAll(toClassSelector(selectorString)) as any) : document.querySelector(toClassSelector(selectorString))
   );
   const { onSelectClick, onOptionsClick, bindSelectListener } = SelectClickCollection;
 
