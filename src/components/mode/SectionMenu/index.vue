@@ -15,6 +15,7 @@
 </template>
 <script lang="ts" setup>
 import { reactive, ref, toRaw, toRefs, watch, nextTick } from "vue";
+import _ from "lodash";
 interface AttributeOption {
   key: string;
   value: string;
@@ -57,7 +58,8 @@ const showList = () => {
   const attributes = toRaw(attributsList.value);
   for (let i of attributes) {
     if (i.key == "data-cases") {
-      console.log(i.value, typeof i.value);
+      const dataCases = _.unescape(i.value);
+      console.log(i.value, dataCases);
       
       cases.data = JSON.parse(i.value);
       if(!currentCase.value) {
