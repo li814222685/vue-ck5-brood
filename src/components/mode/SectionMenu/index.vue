@@ -16,6 +16,7 @@
 <script lang="ts" setup>
 import { reactive, ref, toRaw, toRefs, watch, nextTick } from "vue";
 import _ from "lodash";
+import { safeJsonStringify, safeJsonParse } from "../../utils";
 interface AttributeOption {
   key: string;
   value: string;
@@ -58,12 +59,10 @@ const showList = () => {
   const attributes = toRaw(attributsList.value);
   for (let i of attributes) {
     if (i.key == "data-cases") {
-      const dataCases = _.unescape(i.value);
-      console.log(i.value, dataCases);
-      
-      cases.data = JSON.parse(i.value);
-      if(!currentCase.value) {
-        currentCase.value = cases.data[0]
+      _.unescape(i.value);
+      cases.data = safeJsonParse(i.value);
+      if (!currentCase.value) {
+        currentCase.value = cases.data[0];
       }
     }
   }
@@ -77,7 +76,7 @@ const showList = () => {
 };
 
 const chengeCase = (item: string) => {
-  if(currentCase.value != item) {
+  if (currentCase.value != item) {
     emit("changeCase", item, currentCase.value);
   }
   currentCase.value = item;

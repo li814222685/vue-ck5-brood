@@ -125,7 +125,7 @@ export default {
      * @param currentCase 当前case
      */
     changeCase(caseName, currentCase) {
-      changeCaseValue(caseName, currentCase, casesList, this);
+      changeCaseValue(caseName, currentCase, toRaw(this.sectionData), this);
     },
     //v-select 相关的展示逻辑
     toShowSelect(clickDom, editor) {
