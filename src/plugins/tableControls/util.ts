@@ -60,11 +60,23 @@ export function converDowncastCell(options = { asWidget: true }) {
           "color:#fff;background:rgb(178, 190, 126);padding:3px;border-radius:2px",
           tableCell
         );
-        const getCellType = tableCell.parent.getAttribute("type");
-        if (getCellType) {
+
+        //model上获取tableCell 上的属性
+        const useAttrs = ["type", "optionList"]
+          .map(attrKey => ({
+            attrKey,
+            value: tableCell.getAttribute(attrKey),
+          }))
+          .filter(({ attrKey, value }) => value);
+
+        if (useAttrs.length != 0 && !useAttrs.includes(undefined)) {
           //获取model上的attrs
-          writer.setAttribute("type", getCellType, element);
+          useAttrs.forEach(({ attrKey, value }) => {
+            writer.setAttribute(attrKey, value, element);
+          });
         }
+        //过滤掉data上不需要的属性
+        ["class", "role", "contenteditable"].forEach(item => writer.removeAttribute(item, element));
 
         return element;
       }

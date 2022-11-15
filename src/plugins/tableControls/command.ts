@@ -135,6 +135,13 @@ export class SetTableSelectOptionList extends Command {
     model.change(writer => {
       writer.setAttribute("optionList", JSON.stringify(options), tableCell.parent);
     });
+    this.editor.editing.view.change(writer => {
+      writer.setAttribute(
+        "optionList",
+        JSON.stringify(options),
+        target.findAncestor({ name: "td" })
+      );
+    });
   }
 }
 

@@ -1,7 +1,7 @@
 <template>
-  <el-dialog v-model="props.visible" title="下拉选项设置" width="30%">
+  <el-dialog v-model="props.visible" title="下拉选项设置" width="40%">
     <el-table :data="tableData" style="width: 100%">
-      <el-table-column prop="label" label="名称" width="180">
+      <el-table-column prop="label" label="名称">
         <template #default="scope">
           <el-input
             v-if="targetRow == scope.$index"
@@ -11,7 +11,7 @@
           <span v-else>{{ scope.row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="value" label="值" width="180">
+      <el-table-column prop="value" label="值">
         <template #default="scope">
           <el-input
             v-if="targetRow == scope.$index"
@@ -21,7 +21,7 @@
           <span v-else>{{ scope.row.value }}</span>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作">
+      <el-table-column fixed="right" label="操作" width="100">
         <template #default="scope">
           <el-button
             v-if="targetRow == scope.$index"
@@ -41,7 +41,9 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-button class="mt-4" style="width: 100%" @click="onAddItem">添加</el-button>
+    <el-button class="mt-4" :icon="Plus" style="width: 100%; margin-top: 20px" @click="onAddItem"
+      >添加</el-button
+    >
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="changeVisible">取消</el-button>
@@ -52,6 +54,7 @@
 </template>
 <script lang="ts" setup>
 import { reactive, ref, toRaw, toRefs } from "vue";
+import { Plus } from "@element-plus/icons-vue";
 
 export interface Option {
   label: string | number;
@@ -65,18 +68,7 @@ interface SelectDialogProps {
   insertOptionsToSelect: (attr: Option[]) => void;
 }
 
-const mock = [
-  {
-    label: "猫猫",
-    value: "cat",
-  },
-  {
-    label: "狗狗",
-    value: "dog",
-  },
-];
 const props = defineProps<SelectDialogProps>();
-// const refTableData = reactive(props.tableData);
 const state = reactive<SelectDialogProps>(props);
 const { tableData } = toRefs(state);
 const targetRow = ref<number>(null);

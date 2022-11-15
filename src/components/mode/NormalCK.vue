@@ -87,8 +87,12 @@ export default {
     },
     swtichModal() {
       this.dialogVisible = !this.dialogVisible;
-      //每次关闭MODAL后都清空 Table 数据
-      emitter.emit(SET_OPTIONS, []);
+      if (!this.dialogVisible) {
+        //每次关闭MODAL后都清空 Table 数据
+        emitter.emit(SET_OPTIONS, []);
+        //每次关闭后清空tableSelect 的 缓存 target
+        this.needEditElement = null;
+      }
     },
 
     /** emitter函数挂起 */
@@ -117,6 +121,13 @@ export default {
 
     /** 获取当前select的options list */
     setOptionListFromSelect(options: Option[]) {
+      console.log(
+        "%c🍉Lee%cline:120%coptions",
+        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+        "color:#fff;background:rgb(178, 190, 126);padding:3px;border-radius:2px",
+        options
+      );
       this.selectedOptions = _.cloneDeep(options);
     },
 

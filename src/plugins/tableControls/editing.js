@@ -70,7 +70,7 @@ export default class TableControlsEditing extends Plugin {
       ],
     });
     schema.extend("tableCell", {
-      allowAttributes: ["type", "colspan", "rowspan"],
+      allowAttributes: ["type", "colspan", "rowspan", "optionList"],
     });
     schema.register("v-span", {
       allowWhere: "$block",
@@ -89,6 +89,7 @@ export default class TableControlsEditing extends Plugin {
       model: "tableCell",
       view: converDowncastCell(),
       converterPriority: "highest",
+      renderUnsafeAttributes: ["optionList", "type", "style"],
     });
     conversion.for("editingDowncast").elementToElement({
       model: {
@@ -141,10 +142,21 @@ export default class TableControlsEditing extends Plugin {
 
       if (isRestrict && isHasTableSelect) {
         //Normal
-        emitter.emit(SET_TARGET, target);
-        //todo: 在这里传递当前单元格的select-options
-        emitter.emit(SET_OPTIONS, []);
-        emitter.emit(SWITCH_MODAL);
+        /** 从上级元素里寻找td 的optionList属性 */
+
+        try {
+          const findOptionListFromAncestorTd = target.findAncestor("td").getAttribute("optionList");
+          const plainOptionList = findOptionListFromAncestorTd
+            ? JSON.parse(findOptionListFromAncestorTd)
+            : [];
+          emitter.emit(SET_TARGET, target);
+          //在这里传递当前单元格的select-options
+          emitter.emit(SET_OPTIONS, plainOptionList);
+          emitter.emit(SWITCH_MODAL);
+        } catch (error) {
+          console.error(error);
+        }
+
         //Restrict
         // new Promise(res => {
         //   editingView.change(writer => {
