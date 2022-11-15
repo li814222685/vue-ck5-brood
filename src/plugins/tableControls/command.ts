@@ -11,6 +11,7 @@ import { V_SELECT } from "./constant";
 import { toClassSelector } from "./util";
 import { toWidget } from "@ckeditor/ckeditor5-widget/src/utils";
 import { DowncastWriter } from "@ckeditor/ckeditor5-engine";
+import { safeJsonStringify } from "../../components/utils";
 
 interface Option {
   label: string | number;
@@ -133,14 +134,10 @@ export class SetTableSelectOptionList extends Command {
       tableCell
     );
     model.change(writer => {
-      writer.setAttribute("optionList", JSON.stringify(options), tableCell.parent);
+      writer.setAttribute("optionList", safeJsonStringify(options), tableCell.parent);
     });
     this.editor.editing.view.change(writer => {
-      writer.setAttribute(
-        "optionList",
-        JSON.stringify(options),
-        target.findAncestor({ name: "td" })
-      );
+      writer.setAttribute("optionList", safeJsonStringify(options), target.findAncestor({ name: "td" }));
     });
   }
 }

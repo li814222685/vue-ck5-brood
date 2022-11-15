@@ -7,6 +7,7 @@ import { Model } from "@ckeditor/ckeditor5-engine";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import { CONTROLS_CONTAINER, V_OPTION, V_OPTIONS, V_SELECT } from "./constant";
 import _ from "lodash";
+import { safeJsonStringify } from "../../components/utils";
 
 interface Option {
   label: string | number;
@@ -23,10 +24,7 @@ export class InsertControlsCommand extends Command {
   refresh() {
     const model = this.editor.model;
     const selection = model.document.selection;
-    const allowedIn = model.schema.findAllowedParent(
-      selection.getFirstPosition(),
-      CONTROLS_CONTAINER
-    );
+    const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), CONTROLS_CONTAINER);
 
     this.isEnabled = allowedIn !== null;
   }
@@ -73,7 +71,7 @@ export function createSimpleBox(writer: Writer, attrs?: Option[]) {
   if (attrs?.length > 0) {
     const controls = writer.createElement(CONTROLS_CONTAINER); // => span
     const v_select = writer.createElement(V_SELECT); // => select
-    writer.setAttribute("optionList", JSON.stringify(attrs), v_select);
+    writer.setAttribute("optionList", safeJsonStringify(attrs), v_select);
 
     (attrs || []).forEach(opt => {
       const v_option = writer.createElement(V_OPTION, opt as any); // => option
