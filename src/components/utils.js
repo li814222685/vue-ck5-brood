@@ -64,3 +64,23 @@ export const removeElement = range => {
     writer.remove(range);
   });
 };
+
+/** safe Json Stringify */
+export const safeJsonStringify = target => {
+  try {
+    return JSON.stringify(target);
+  } catch (error) {
+    console.error(error);
+    return "";
+  }
+};
+
+/** safe Json Parse */
+export const safeJsonParse = jsonStr => {
+  try {
+    return JSON.parse(jsonStr);
+  } catch (error) {
+    console.error(error);
+    return {};
+  }
+};
