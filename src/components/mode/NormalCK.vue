@@ -380,11 +380,11 @@ export default {
     createSectionElement(writer: Writer, DocumentData, data) {
       let modeData = {};
       console.log(data);
-      if (data) {
+      if (data) { 
         modeData = {
           modelname: data.modelname,
           type: data.type,
-          "data-cases": "[" + data["data-cases"] + "]",
+          "data-cases": JSON.stringify(data["data-cases"]),
           id: data.id,
           currentcase: data["data-cases"][0],
         };
