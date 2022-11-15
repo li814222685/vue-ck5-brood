@@ -94,6 +94,7 @@ export function changeCaseValue(caseName: string, currentCase: string, casesList
     // 通过section 范围获取到范围内的 element
     let element = model.schema.getLimitElement(elementRange);
     if (element.name == "$root") {
+      // 获取根节点时根据光标获取光标所在元素，再找到section
       const parent = modelSelection.getFirstPosition().parent;
       if (parent.previousSibling && parent.previousSibling.name == "v-section" && parent.previousSibling.getAttribute("currentcase") == currentCase) {
         element = parent.previousSibling;
@@ -123,11 +124,13 @@ export function changeCaseValue(caseName: string, currentCase: string, casesList
  */
 function changeObject(list: any[]) {
   const newList = list.map(item => {
+    // 判断如果是可编辑的span 改变span的type 将span的children的文字内容合并，改为span的content，方便递归生成元素时的操作
     if (item.tagName === "span" && Object.fromEntries([...item.attributes.map(item => [item.key, item.value])]).class.includes("restricted-editing-exception")) {
       item.content = item.children.map(i => i.content).join("");
       item.type = "text";
       delete item.children;
     }
+    // 递归
     if (item.children && item.tagName != "span") {
       changeObject(item.children);
     }
@@ -151,6 +154,7 @@ function createSectionInner(params) {
     afterPosition: any = null;
   for (let item of parseDom) {
     dom = "";
+    // 当时span元素外的元素时创建元素
     if (item.type === "element" && item.tagName !== "span") {
       // 返回元素属性对象
       const atttibutesList = Object.fromEntries([...item.attributes.map(item => [item.key, item.value])]);
@@ -166,23 +170,41 @@ function createSectionInner(params) {
       if (parentElement) {
         writer.append(dom, parentElement);
       }
+      // span和非元素类
     } else if (parentElement) {
+      // 创建文字元素
       let text = writer.createText(item.content);
       writer.append(text, parentElement);
       let range = null;
+      // span元素的不同位置
       if (item.tagName && item.tagName === "span") {
+        /**
+         * 当使用模型编写器更改模型并且文本节点与另一个文本节点合并时，
+         * 会发生Text实例可能会间接从模型树中删除然后，将删除两个文本节点，
+         * 并将一个新的文本节点插入到模型中。
+         * 由于这种行为，不建议保留对文本的引用。
+         * 相反，考虑在文本节点之前创建位置。
+         * https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_text-Text.html
+         */
+        // 当span不是第一个text元素时 , 或者单独一行时
         if ((!text.parent && beforePosition) || !beforePosition) {
+          // 创建span前面的位置
           beforePosition = !beforePosition ? writer.createPositionBefore(text) : beforePosition;
+          // 创建span后面的位置
           afterPosition = _.clone(beforePosition);
           afterPosition.path = afterPosition.path.length < 2 ? [beforePosition.path[0] + text.offsetSize] : [beforePosition.path[0], beforePosition.path[1] + text.offsetSize];
+          // 生成span的位置，供添加marker使用
           range = writer.createRange(beforePosition, afterPosition);
         } else {
+          // 当span是第一个text元素且不是单独一行时创建范围
           range = writer.createRangeOn(text);
         }
+        // 添加marker
         vueObject.$nextTick(() => {
           setMarker(range);
         });
       } else {
+        // 如果不是span元素的话，创建text的后面的位置作为span前面的位置
         beforePosition = !beforePosition ? writer.createPositionAfter(text) : beforePosition;
       }
     }

@@ -61,10 +61,13 @@ const showList = () => {
     if (i.key == "data-cases") {
       _.unescape(i.value);
       cases.data = safeJsonParse(i.value);
-      if (!currentCase.value) {
-        currentCase.value = cases.data[0];
-      }
     }
+    if (i.key === "currentcase") {
+      currentCase.value = i.value;
+    }
+  }
+  if (!currentCase.value) {
+    currentCase.value = cases.data[0];
   }
   listVisible.value = true;
   nextTick(() => {

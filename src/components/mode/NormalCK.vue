@@ -65,34 +65,13 @@
     </div>
   </div>
   <SelectDialog :visible="dialogVisible" :change-visible="swtichModal" :table-data="selectedOptions" :insert-options-to-select="insertOptionsToSelect" />
-  <SectionDialog
-    :visible="sectionVisible"
-    :type-radio="typeRadio"
-    :change-visible="sectionModal"
-    :form-data="sectionOption"
-    :insert-section-command="InsertSectionCommand"
-    @getFormValue="getFormValue"
-  />
 </template>
-<style scoped>
-.hidden-item {
-  display: none;
-}
-.extendBackground {
-  background-color: rgba(255, 169, 77, 0.2) !important;
-}
-.ck-editor {
-  width: 700px !important;
-}
-</style>
-
 <script lang="ts">
 import _ from "lodash";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 import { NORMAL_CONFIG } from "./config.js";
 import { emitter, SWITCH_MODAL, SECTION_MODAL, Option, Section, GET_OPTIONS } from "./mitt";
 import SelectDialog from "./SelectDialog/index.vue";
-import SectionDialog from "./SectionDialog/index.vue";
 import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
 import { COMMAND__INSERT_SECTION } from "../../plugins/section/constant";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
@@ -112,17 +91,6 @@ export default {
       dialogVisible: false,
       selectedOptions: [], //当前选中select 有哪些options，用来将options传递到弹窗表格内
       attr_id: 1,
-      sectionVisible: false,
-      typeRadio: [
-        { label: "可删除", value: "delete" },
-        { label: "可切换", value: "switch" },
-        { label: "适用/不适用", value: "applicable" },
-      ],
-      sectionOption: {
-        modelName: "",
-        type: "switch",
-        cases: [],
-      },
       dynamicValidateForm: {
         cases: [
           {
@@ -136,7 +104,7 @@ export default {
       SectionDataHTML: [],
     };
   },
-  components: { SelectDialog, SectionDialog },
+  components: { SelectDialog },
   mounted() {
     window.addEventListener("mousedown", this.onParagraph);
     //挂载Emitter
@@ -159,19 +127,6 @@ export default {
       //每次关闭MODAL后都清空 Table 数据
       emitter.emit(GET_OPTIONS, []);
     },
-    sectionModal() {
-      this.sectionVisible = !this.sectionVisible;
-      this.sectionOption = {
-        modelName: "",
-        type: "switch",
-        cases: [],
-      };
-      //每次关闭MODAL后都清空 Table 数据
-      // emitter.emit(GET_OPTIONS, []);
-    },
-    getFormValue(val) {
-      this.sectionInfo = JSON.stringify(val);
-    },
     /** emitter函数挂起 */
     hangUpAllEmitFunctions() {
       emitter.on(SWITCH_MODAL, this.swtichModal);
@@ -181,10 +136,6 @@ export default {
     /** 向当前select 插入options */
     insertOptionsToSelect(options: Option[]) {
       (window as any).devEditor.execute(COMMAND_NAME__INSERT_OPTIONS, options);
-    },
-    /** 向当前section 插入section + 属性 */
-    InsertSectionCommand(section: Section[]) {
-      (window as any).devEditor.execute(COMMAND__INSERT_SECTION, section);
     },
     /** 获取当前select的options list */
     setOptionListFromSelect(options: Option[]) {
@@ -258,7 +209,7 @@ export default {
         let elementRange = writer.createRange(firstRange, LastRange);
         // 通过section 范围获取到范围内的 element
         const element = model.schema.getLimitElement(elementRange);
-        
+
         const range = writer.createRangeOn(element);
         // 删除section
         // writer.remove(range);
@@ -271,6 +222,7 @@ export default {
     },
     /** 置顶当前选中的section */
     CheckTopping(item) {
+      console.log(item, this.SectionDataHTML, this.SectionData, "CheckTopping");
       const index = this.dynamicValidateForm.cases.indexOf(item);
       let data = this.SectionData;
       let datas = this.dynamicValidateForm.cases;
@@ -310,27 +262,32 @@ export default {
       };
       const model = (window as any).devEditor.model;
       const selection: selection = model.document.selection;
-      const parent = Array.from(selection.getSelectedBlocks())[0].parent;
       const blocks = Array.from(Array.from(selection.getSelectedBlocks())[0].parent.getChildren());
-
-      const DocumentData = [];
-      blocks.map(item => {
-        DocumentData.push(item.toJSON());
-      });
+      let DocumentData = blocks.map(item => item.toJSON());
       model.change(writer => {
         // 通过section 范围获取到范围内的 element
         const firstRange = selection.getFirstPosition();
         const LastRange = selection.getLastPosition();
-        let elementRange = writer.createRange(firstRange, LastRange);
-        const element = model.schema.getLimitElement(elementRange);
-        console.log(element);
+        const elementRange = writer.createRange(firstRange, LastRange);
+        let element = model.schema.getLimitElement(elementRange);
+        const parent: any = selection.getFirstPosition().parent;
+        console.log(element, parent, blocks, Array.from(selection.getSelectedBlocks())[0].parent);
+        if (element.name === "$root") {
+          if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
+            element = parent.previousSibling;
+          } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
+            element = parent.nextSibling;
+          }
+          DocumentData = Array.from(element.getChildren()).map((item: any) => item.toJSON());
+          console.log(DocumentData);
+        }
         const range = writer.createRangeOn(element);
         // 删除section
         // writer.remove(range);
         // 执行创建section元素并添加子元素
         const sectionElement = this.createSectionElement(writer, DocumentData, modelData);
         this.SectionData[index] = JSON.parse(JSON.stringify(sectionElement));
-        console.log(sectionElement, range, element, "DocumentData");
+        // console.log(sectionElement, range, element, "DocumentData");
         model.insertObject(sectionElement, range);
         // model.insertContent(sectionElement, model.document.selection, "on");
         let idname = "section" + userFormData.cases.length;
@@ -369,6 +326,7 @@ export default {
      */
     createSectionElement(writer: Writer, DocumentData, data) {
       let modeData = {};
+      console.log(DocumentData, data);
       if (data) {
         modeData = {
           modelname: data.modelname,
@@ -455,4 +413,15 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+.hidden-item {
+  display: none;
+}
+.extendBackground {
+  background-color: rgba(255, 169, 77, 0.2) !important;
+}
+.ck-editor {
+  width: 700px !important;
+}
+</style>
+

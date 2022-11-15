@@ -35,6 +35,7 @@ const htmlData = ref(
   // )}><p>我只是一个段落<span class="restricted-editing-exception">只是一个可编辑的地方</span></p ></v-section>
   //   <p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p >`
   `<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p >
+    <p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p >
     <p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p >`
 );
 const { value: editorMode } = nowMode;
