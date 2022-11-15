@@ -247,7 +247,6 @@ export default {
     /** 切换选中的section */
     CheckDomain(item) {
       const index = this.dynamicValidateForm.cases.indexOf(item);
-      console.log(this.dynamicValidateForm.cases);
       let SectionData = JSON.parse(JSON.stringify(this.SectionData[index]));
       let SectionDataHTML = JSON.parse(JSON.stringify(this.SectionDataHTML[index]));
       const parserSection = parse(SectionDataHTML);
@@ -263,10 +262,8 @@ export default {
         // 删除section
         writer.remove(range);
         // 创建新的element，插入   newElement ：dom创建   sectionElement ：element元素创建
-        const newElement = this.createSectionInner(writer, parserSection, null);
-        console.log(newElement);
+        const newElement = this.createSectionInner(writer, parserSection, null,this);
         const sectionElement = this.createSectionElement(writer, SectionData);
-        console.log(sectionElement);
         model.insertContent(newElement, model.document.selection, "on");
       });
     },
@@ -276,7 +273,6 @@ export default {
       let data = this.SectionData;
       let datas = this.dynamicValidateForm.cases;
       let datass = this.SectionDataHTML;
-      console.log(data);
       data.map((items, indexs) => {
         if (index == indexs) {
           data.unshift(data.splice(indexs, 1)[0]);
@@ -284,19 +280,13 @@ export default {
           datass.unshift(datass.splice(indexs, 1)[0]);
         }
       });
-      // console.log(JSON.parse(JSON.stringify(data)) )
     },
     /** 增加section的cases */
     addDomain() {
       if (this.dynamicValidateForm.cases.length < 4) {
         this.dynamicValidateForm.cases.push({
-          // key: Date.now(),
           value: "",
         });
-        // let num = this.dynamicValidateForm.cases.length-1
-        // let check = document.getElementsByClassName("Check")[0];
-        // console.log(JSON.parse(JSON.stringify(this.SectionData)))
-        // console.log(check.outerHTML)
       }
     },
     /** 保存当前cases的section数据 */
@@ -336,8 +326,6 @@ export default {
         writer.remove(range);
         // 执行创建section元素并添加子元素
         const sectionElement = this.createSectionElement(writer, DocumentData, modelData);
-        console.log(JSON.parse(JSON.stringify(this.SectionData)));
-        console.log(this.SectionData);
         this.SectionData[index] = JSON.parse(JSON.stringify(sectionElement));
         model.insertContent(sectionElement, model.document.selection, "on");
         let idname = "section" + userFormData.cases.length;
@@ -345,25 +333,22 @@ export default {
           // 存储section的html
           let set = document.getElementById(idname);
           this.SectionDataHTML[index] = set.outerHTML;
-          console.log(this.SectionDataHTML);
         }, 1000);
       });
     },
     /** 提交当前modelname所属的section数据 */
     submitSection() {
       const HTMLdata = JSON.parse(JSON.stringify(this.SectionDataHTML));
-      console.log(this.dynamicValidateForm.cases);
       const cases = [];
       this.dynamicValidateForm.cases.map(item => {
         cases.push(item.value);
       });
       let casesList = {}
       HTMLdata.forEach((item, index) => {
-        let data = item.match(/data-cases=\"(.*?)\"/g)[0];
+        let data = item.match(/data-cases=\"(.*?)\]"/g)[0];
         (casesList as any)[cases[index]] = HTMLdata[index].replace(data, 'data-cases="' + JSON.stringify(cases) + '"');
         HTMLdata[index] = HTMLdata[index].replace(data, 'data-cases="' + JSON.stringify(cases) + '"');
       });
-      console.log(casesList, "HTMLdata");
       this.SectionDataHTML = HTMLdata;
       this.$emit("getStudentName", casesList);
     },
@@ -379,7 +364,6 @@ export default {
      */
     createSectionElement(writer: Writer, DocumentData, data) {
       let modeData = {};
-      console.log(data);
       if (data) { 
         modeData = {
           modelname: data.modelname,
@@ -395,7 +379,6 @@ export default {
           const p = writer.createElement(item.name);
           let dataname = "";
           item.children.map((items, index) => {
-            console.log(items);
             let text = writer.createText(items.data, items.attributes);
             writer.append(text, p);
             writer.append(p, create);
@@ -408,7 +391,7 @@ export default {
         const p = writer.createElement(item.name);
         let dataname = "";
         item.children.map((items, index) => {
-          let text = writer.createText(items.data, items.attributes);
+          let text = writer.createText(items.data || items.name, items.attributes);
           writer.append(text, p);
           writer.append(p, create);
         });
@@ -418,7 +401,9 @@ export default {
     createSectionInner(writer, parserDom, parentElement) {
       let elementList = [],
         text = null,
-        dom = null;
+        dom = null,
+        beforePosition: any = null,
+        afterPosition: any = null;
       for (let item of parserDom) {
         if (item.type === "element") {
           // 返回元素属性对象
@@ -430,7 +415,11 @@ export default {
           } else if (item.tagName === "p") {
             dom = writer.createElement("paragraph", atttibutesList);
           } else if (item.tagName === "span") {
-            dom = writer.createElement(V_SPAN, atttibutesList);
+            item.children.map(items=>{
+              dom = writer.createText(items.content, {restrictedEditingException:true});
+            })
+            // dom = writer.createElement(V_SPAN, atttibutesList);
+            // dom = writer.createText(V_SPAN, atttibutesList);
           } else {
             atttibutesList["data-cke-ignore-events"] = true;
             dom = writer.createElement(item.tagName, atttibutesList);
@@ -444,13 +433,13 @@ export default {
           text = writer.insertText(item.content, parentElement);
         }
         // 递归
-        if (item.children) {
+        if (item.children && item.tagName !== "span") {
           this.createSectionInner(writer, item.children, dom);
         }
       }
       return dom;
     },
-    changeRadio(val) {},
+  changeRadio(val) {},
   },
   computed: {
     nowMode() {
