@@ -18,12 +18,43 @@ import TableControls from "../../plugins/tableControls/index";
 import { TABLE_CC_TOOLBAR } from "../../plugins/tableControls/constant";
 
 export const RESTRICT_CONFIG = {
-  plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, RestrictedEditingMode, FormControls, Table, TableToolbar, TableProperties, TableCellProperties, TableControls],
+  plugins: [
+    Heading,
+    Essentials,
+    Bold,
+    Italic,
+    Paragraph,
+    Link,
+    RestrictedEditingMode,
+    FormControls,
+    Table,
+    TableToolbar,
+    TableProperties,
+    TableCellProperties,
+    TableControls,
+  ],
   restrictedEditing: {
     allowedCommands: ["bold", "simpleBox", "heading", "insertSimpleBox"],
     allowedAttributes: ["bold", "simpleBox", "heading", "class", "control-select", "controlType"],
   },
-  toolbar: ["heading", "|", "bold", "italic", "link", "numberedList", "bulletedList", "|", "abbreviation", "abbreviations", "bubble", "simpleBox", "restrictedEditing"],
+  toolbar: [
+    "heading",
+    "|",
+    "bold",
+    "italic",
+    "link",
+    "numberedList",
+    "bulletedList",
+    "|",
+    "abbreviation",
+    "abbreviations",
+    "bubble",
+    "simpleBox",
+    "restrictedEditing",
+  ],
+  tableControls: {
+    isRestrictMode: true,
+  },
 };
 
 const customColorPalette = [
@@ -56,7 +87,23 @@ const customColorPalette = [
 ];
 
 export const NORMAL_CONFIG = {
-  plugins: [Heading, Essentials, Bold, Italic, Paragraph, Link, StandardEditingMode, ControlsMenu, SelectToolbar, Table, TableToolbar, TableProperties, TableCellProperties, Bold, TableControls],
+  plugins: [
+    Heading,
+    Essentials,
+    Bold,
+    Italic,
+    Paragraph,
+    Link,
+    StandardEditingMode,
+    ControlsMenu,
+    SelectToolbar,
+    Table,
+    TableToolbar,
+    TableProperties,
+    TableCellProperties,
+    Bold,
+    TableControls,
+  ],
 
   toolbar: [
     "heading",
@@ -76,7 +123,13 @@ export const NORMAL_CONFIG = {
     TABLE_CC_TOOLBAR,
   ],
   table: {
-    contentToolbar: ["tableColumn", "tableRow", "mergeTableCells", "tableProperties", "tableCellProperties"],
+    contentToolbar: [
+      "tableColumn",
+      "tableRow",
+      "mergeTableCells",
+      "tableProperties",
+      "tableCellProperties",
+    ],
     tableProperties: {
       // ...
     },

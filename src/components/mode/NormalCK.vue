@@ -121,13 +121,6 @@ export default {
 
     /** 获取当前select的options list */
     setOptionListFromSelect(options: Option[]) {
-      console.log(
-        "%c🍉Lee%cline:120%coptions",
-        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-        "color:#fff;background:rgb(178, 190, 126);padding:3px;border-radius:2px",
-        options
-      );
       this.selectedOptions = _.cloneDeep(options);
     },
 
@@ -142,25 +135,11 @@ export default {
       const model = editor.model;
       const { element: restoreItem, range: removeRange } = toRaw(this.deposit);
 
-      console.log(
-        "%c🍉Lee%cline:114%crestoreItem33333",
-        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-        "color:#fff;background:rgb(153, 80, 84);padding:3px;border-radius:2px",
-        restoreItem
-      );
       //1.显示隐藏的元素
       removeClass(HIDDEN_ITEM, restoreItem);
       //2.Todo：Restricted ：将value 替换 元素内的文本
       // model.change(writer => {
       //   const range = writer.createRangeOn(restoreItem._children[0]);
-      //   console.log(
-      //     "%c🍉Lee%cline:128%crange",
-      //     "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-      //     "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-      //     "color:#fff;background:rgb(60, 79, 57);padding:3px;border-radius:2px",
-      //     range
-      //   );
       //   // const text = writer.createText(val, restoreItem.getAttributes());
       //   // model.insertContent(text, range);
       // });

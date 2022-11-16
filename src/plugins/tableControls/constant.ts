@@ -3,11 +3,14 @@
 /* 创建TableSelect 的Class
 -------------------------- */
 
+export const V_DIV_CONTAINER = "v_div_container";
+export const V_DIV = "v_div";
+export const V_SPAN = "v_span";
+
 export const V_SELECT = "v_select";
 export const V_SELECT_DROPDOWN = "v_select_dropDown";
 export const V_SELECT_DROPDOWN_TEXT = "v_select_dropDown_text";
 export const V_SELECT_DROPDOWN_TEXT_SELE = "v_select_dropDown_text_sele";
-
 export const V_SELECT_OPTION_LIST = "v_select_optionList";
 export const V_SELECT_OPTION_LIST_ITEM = "v_select_optionList_item";
 

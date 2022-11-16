@@ -9,12 +9,15 @@ import {
   THEME_ICON,
   TRIANGlE_DOWN,
   TRIANGlE_UP,
+  V_DIV,
+  V_DIV_CONTAINER,
   V_SELECT,
   V_SELECT_DROPDOWN,
   V_SELECT_DROPDOWN_TEXT,
   V_SELECT_DROPDOWN_TEXT_SELE,
   V_SELECT_OPTION_LIST,
   V_SELECT_OPTION_LIST_ITEM,
+  V_SPAN,
 } from "./constant";
 import { EditorClasses } from "../../components/mode/define";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
@@ -41,7 +44,9 @@ export function converDowncastCell(options = { asWidget: true }) {
       if (tableSlot.cell == tableCell) {
         const isHeading = tableSlot.row < headingRows || tableSlot.column < headingColumns;
         const cellElementName = isHeading ? "th" : "td";
-        const element = (options as any).asWidget ? toWidgetEditable(writer.createEditableElement(cellElementName), writer) : writer.createContainerElement(cellElementName);
+        const element = (options as any).asWidget
+          ? toWidgetEditable(writer.createEditableElement(cellElementName), writer)
+          : writer.createContainerElement(cellElementName);
         //给output的th or td添加背景样式
         if (isCellChildHasRestricted(tableCell)) {
           writer.setStyle(
@@ -106,7 +111,9 @@ export function converEditinghDowncastCell(options = { asWidget: true }) {
       if (tableSlot.cell == tableCell) {
         const isHeading = tableSlot.row < headingRows || tableSlot.column < headingColumns;
         const cellElementName = isHeading ? "th" : "td";
-        const element = (options as any).asWidget ? toWidgetEditable(writer.createEditableElement(cellElementName), writer) : writer.createContainerElement(cellElementName);
+        const element = (options as any).asWidget
+          ? toWidgetEditable(writer.createEditableElement(cellElementName), writer)
+          : writer.createContainerElement(cellElementName);
         //给output的th or td添加背景样式
         if (isCellChildHasRestricted(tableCell)) {
           writer.setStyle(
@@ -154,9 +161,10 @@ export const isCellHasTableSelect = (ele: AttributeElement): boolean => {
   return ele.findAncestor({ name: "td" })?.getAttribute("type") === "select";
 };
 
-export const createSelect = (writer: Writer, options?: Option[]) => {
+/** 创建Table-Select Struct */
+export const createTableSelect = (writer: Writer, options?: Option[]) => {
   /**最外层容器 */
-  const selectContainer = writer.createElement("v-div-c", {
+  const selectContainer = writer.createElement(V_DIV_CONTAINER, {
     class: V_SELECT,
     "data-cke-ignore-events": true,
   });
@@ -166,18 +174,18 @@ export const createSelect = (writer: Writer, options?: Option[]) => {
    */
 
   /**下拉框*/
-  const dropDown = writer.createElement("v-div", {
+  const dropDown = writer.createElement(V_DIV, {
     class: V_SELECT_DROPDOWN,
     "data-cke-ignore-events": true,
   });
   /**下拉框文字 */
-  const dropDown_text = writer.createElement("v-div", {
+  const dropDown_text = writer.createElement(V_DIV, {
     class: V_SELECT_DROPDOWN_TEXT,
     id: V_SELECT_DROPDOWN_TEXT,
     contenteditable: true,
   });
   /**图标 */
-  const dorpDown_icon = writer.createElement("v-span", {
+  const dorpDown_icon = writer.createElement(V_SPAN, {
     id: THEME_ICON,
     class: TRIANGlE_UP,
     contenteditable: false,
@@ -191,7 +199,7 @@ export const createSelect = (writer: Writer, options?: Option[]) => {
    */
 
   /**列表 */
-  const optionList = writer.createElement("v-div", { class: V_SELECT_OPTION_LIST });
+  const optionList = writer.createElement(V_DIV, { class: V_SELECT_OPTION_LIST });
   (
     options || [
       {
@@ -204,7 +212,7 @@ export const createSelect = (writer: Writer, options?: Option[]) => {
       },
     ]
   ).forEach(({ label, value }) => {
-    const optionItem = writer.createElement("v-div", {
+    const optionItem = writer.createElement(V_DIV, {
       class: V_SELECT_OPTION_LIST_ITEM,
       "data-value": value,
       label,
@@ -223,14 +231,25 @@ class HTMLDOM extends globalThis.Element {
   onclick?: () => void;
 }
 /** DOM元素是否为TableSelect */
-export const isTableSelect = (dom: HTMLDOM): boolean => [V_SELECT_DROPDOWN_TEXT, V_SELECT_DROPDOWN_TEXT_SELE].some(className => [...dom.classList].includes(className));
+export const isTableSelect = (dom: HTMLDOM): boolean =>
+  [V_SELECT_DROPDOWN_TEXT, V_SELECT_DROPDOWN_TEXT_SELE].some(className =>
+    [...dom.classList].includes(className)
+  );
 
 /** classString To classSelector  */
 export const toClassSelector = (classString: string): string => "." + classString;
 
 /** 处理Table-Select的事件 */
 export const handleSelectEvent = (dom: HTMLDOM) => {
-  const [container, dorpdown, dropdown_text, dropdown_text_sele, optionList, optionList_item, theme_icon] = [
+  const [
+    container,
+    dorpdown,
+    dropdown_text,
+    dropdown_text_sele,
+    optionList,
+    optionList_item,
+    theme_icon,
+  ] = [
     V_SELECT,
     V_SELECT_DROPDOWN,
     V_SELECT_DROPDOWN_TEXT,
@@ -239,7 +258,9 @@ export const handleSelectEvent = (dom: HTMLDOM) => {
     V_SELECT_OPTION_LIST_ITEM,
     THEME_ICON,
   ].map(selectorString =>
-    selectorString === V_SELECT_OPTION_LIST_ITEM ? (document.querySelectorAll(toClassSelector(selectorString)) as any) : document.querySelector(toClassSelector(selectorString))
+    selectorString === V_SELECT_OPTION_LIST_ITEM
+      ? (document.querySelectorAll(toClassSelector(selectorString)) as any)
+      : document.querySelector(toClassSelector(selectorString))
   );
   const { onSelectClick, onOptionsClick, bindSelectListener } = SelectClickCollection;
 

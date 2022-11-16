@@ -6,7 +6,7 @@ import Command from "@ckeditor/ckeditor5-core/src/command";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import _ from "lodash";
 import { COMMAND_NAME__INSERT_TABLE_NORMAL, RESTRICTED_EDITING } from "./constant";
-import { createSelect, handleSelectEvent, onTableSelect } from "./util";
+import { createTableSelect, handleSelectEvent, onTableSelect } from "./util";
 import { V_SELECT } from "./constant";
 import { toClassSelector } from "./util";
 import { toWidget } from "@ckeditor/ckeditor5-widget/src/utils";
@@ -126,18 +126,15 @@ export class SetTableSelectOptionList extends Command {
 
     const selection = this.editor.model.document.selection;
     const tableCell = [...selection.getSelectedBlocks()][0] as any;
-    console.log(
-      "%c🍉Lee%cline:128%cfindTd",
-      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-      "color:#fff;background:rgb(248, 214, 110);padding:3px;border-radius:2px",
-      tableCell
-    );
+
+    //将optionList 存储到 Model 的tableCell上
     model.change(writer => {
       writer.setAttribute("optionList", safeJsonStringify(options), tableCell.parent);
     });
+    //将optionList 存储到 View 的td上
+
     this.editor.editing.view.change(writer => {
-      writer.setAttribute("optionList", safeJsonStringify(options), target.findAncestor({ name: "td" }));
+      writer.setAttribute("optionList", safeJsonStringify(options), target);
     });
   }
 }

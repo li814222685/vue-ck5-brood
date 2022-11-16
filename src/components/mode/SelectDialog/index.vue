@@ -55,6 +55,7 @@
 <script lang="ts" setup>
 import { reactive, ref, toRaw, toRefs } from "vue";
 import { Plus } from "@element-plus/icons-vue";
+import _ from "lodash";
 
 export interface Option {
   label: string | number;
@@ -66,6 +67,7 @@ interface SelectDialogProps {
   changeVisible: () => void;
   tableData: Option[];
   insertOptionsToSelect: (attr: Option[]) => void;
+  needEditElement: null | Element;
 }
 
 const props = defineProps<SelectDialogProps>();
@@ -94,8 +96,31 @@ const saveRow = (rowIndex: number, rowVal: Option) => {
   targetRow.value = null;
 };
 
+/** Table Select 提交时的处理逻辑 */
+const handleTableSelectLogic = () => {
+  if (props.needEditElement) {
+    const editor = (window as any).devEditor;
+    const model = editor.model;
+    const selection = model.document.selection;
+    const blocks = editor.model.document.selection.getSelectedBlocks();
+    const block = [...blocks][0];
+
+    model.change(writer => {
+      const range = writer.createRangeIn(block);
+      if (tableData.value[0]?.label) {
+        //将option的第一项作为文本的默认值
+        const itemRange = model.insertContent(
+          writer.createText(tableData.value[0]?.label, { restrictedEditingException: true }),
+          range
+        );
+      }
+    });
+  }
+};
+
 const submitOptions = () => {
   try {
+    handleTableSelectLogic();
     props.insertOptionsToSelect(toRaw(tableData.value) as any);
     props.changeVisible();
   } catch (error) {
