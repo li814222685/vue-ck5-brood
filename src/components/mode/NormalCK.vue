@@ -92,7 +92,7 @@ import { V_SECTION, V_SPAN } from "../../plugins/section/constant";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import selection from "@ckeditor/ckeditor5-engine/src/model/selection";
 import { parse, stringify } from "himalaya";
-import { safeJsonStringify, safeJsonParse } from "../utils"
+import { safeJsonStringify, safeJsonParse } from "../utils";
 export default {
   props: ["htmlData", "nowMode", "onchange"],
   data() {
@@ -113,7 +113,7 @@ export default {
         radio: "deletable",
       },
       SectionData: [], // element元素
-      SectionDataHTML: [],  // html文本
+      SectionDataHTML: [], // html文本
     };
   },
   components: { SelectDialog },
@@ -174,9 +174,9 @@ export default {
           clickDom.classList.add("Check");
           const model = (window as any).devEditor.model;
           const selection: selection = model.document.selection;
-          const parent:any = Array.from(selection.getSelectedBlocks())[0].parent;
-          if(parent.getAttribute('modelname') !== "undefind"){
-            console.log(parent.getAttribute('modelname'))
+          const parent: any = Array.from(selection.getSelectedBlocks())[0].parent;
+          if (parent.getAttribute("modelname") !== "undefind") {
+            console.log(parent.getAttribute("modelname"));
           }
           // clickDom.focus();
         } else {
@@ -211,11 +211,11 @@ export default {
         this.SectionData.splice(index, 1);
         this.SectionDataHTML.splice(index, 1);
       }
-      if(item.value == ""){
-      }else{
-        setTimeout(()=>{
-          this.CheckDomain(this.dynamicValidateForm.cases[0])
-        },500)
+      if (item.value == "") {
+      } else {
+        setTimeout(() => {
+          this.CheckDomain(this.dynamicValidateForm.cases[0]);
+        }, 500);
       }
     },
     /** 切换选中的section */
@@ -231,7 +231,7 @@ export default {
       model.change(writer => {
         let elementRange = writer.createRange(firstRange, LastRange);
         // 通过section 范围获取到范围内的 element
-        const element = model.schema.getLimitElement(elementRange);
+        let element = model.schema.getLimitElement(elementRange);
         const parent: any = selection.getFirstPosition().parent;
         if (element.name === "$root") {
           if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
@@ -270,7 +270,7 @@ export default {
           datass.unshift(datass.splice(indexs, 1)[0]);
         }
       });
-      this.CheckDomain(item)
+      this.CheckDomain(item);
     },
     /** 增加section的cases */
     addDomain() {
@@ -299,7 +299,7 @@ export default {
       };
       const model = (window as any).devEditor.model;
       const selection: selection = model.document.selection;
-      const parent:any = Array.from(selection.getSelectedBlocks())[0].parent;
+      const parent: any = Array.from(selection.getSelectedBlocks())[0].parent;
       const blocks = Array.from(Array.from(selection.getSelectedBlocks())[0].parent.getChildren());
       let DocumentData = blocks.map(item => item.toJSON());
       model.change(writer => {
@@ -342,12 +342,16 @@ export default {
       HTMLdata.forEach((item, index) => {
         let data = item.match(/data-cases=\"(.*?)\]"/g)[0];
         let currentcases = item.match(/currentcase=\"(.*?)\"/g)[0];
-        (casesList as any)[cases[index]] = HTMLdata[index].replace(currentcases, 'currentcase=' + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
+        console.log(this.dynamicValidateForm.cases[0]);
+        (casesList as any)[cases[index]] = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
         (casesList as any)[cases[index]] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
+        let text = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value))
+        console.log((casesList as any)[cases[index]], HTMLdata[index], text, "caselist");
         HTMLdata[index] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
-        HTMLdata[index] = HTMLdata[index].replace(currentcases, 'currentcase=' + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
+        HTMLdata[index] = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
       });
       this.SectionDataHTML = HTMLdata;
+      console.log(casesList, this.SectionDataHTML, "case");
       this.$emit("getStudentName", casesList);
     },
     resetForm(formEl) {
@@ -366,7 +370,7 @@ export default {
         modeData = {
           modelname: data.modelname,
           type: data.type,
-          "data-cases": safeJsonStringify(data["data-cases"]).replace(/"/g,"'")	,
+          "data-cases": safeJsonStringify(data["data-cases"]).replace(/"/g, "'"),
           id: data.id,
           currentcase: data["data-cases"][0],
         };
@@ -407,7 +411,7 @@ export default {
           atttibutesList = Object.fromEntries([...atttibutesList]);
           // 创建元素
           if (item.tagName === "section") {
-            atttibutesList.currentcase = this.dynamicValidateForm.cases[0].value
+            atttibutesList.currentcase = this.dynamicValidateForm.cases[0].value;
             dom = writer.createElement(V_SECTION, atttibutesList);
           } else if (item.tagName === "p") {
             dom = writer.createElement("paragraph", atttibutesList);
@@ -458,4 +462,3 @@ export default {
   width: 700px !important;
 }
 </style>
-
