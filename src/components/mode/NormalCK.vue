@@ -66,6 +66,18 @@
   </div>
   <SelectDialog :visible="dialogVisible" :change-visible="swtichModal" :table-data="selectedOptions" :insert-options-to-select="insertOptionsToSelect" />
 </template>
+<style scoped>
+.hidden-item {
+  display: none;
+}
+.extendBackground {
+  background-color: rgba(255, 169, 77, 0.2) !important;
+}
+.ck-editor {
+  width: 700px !important;
+}
+</style>
+
 <script lang="ts">
 import _ from "lodash";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
@@ -80,9 +92,7 @@ import { V_SECTION, V_SPAN } from "../../plugins/section/constant";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import selection from "@ckeditor/ckeditor5-engine/src/model/selection";
 import { parse, stringify } from "himalaya";
-import { toRaw } from "vue";
-import { safeJsonStringify, safeJsonParse } from "../utils";
-
+import { safeJsonStringify, safeJsonParse } from "../utils"
 export default {
   props: ["htmlData", "nowMode", "onchange"],
   data() {
@@ -102,8 +112,8 @@ export default {
         modelName: "",
         radio: "deletable",
       },
-      SectionData: [],
-      SectionDataHTML: [],
+      SectionData: [], // element元素
+      SectionDataHTML: [],  // html文本
     };
   },
   components: { SelectDialog },
@@ -162,7 +172,12 @@ export default {
             check[i].classList.remove("Check");
           }
           clickDom.classList.add("Check");
-          clickDom.setAttribute("attr_id", "" + this.attr_id++);
+          const model = (window as any).devEditor.model;
+          const selection: selection = model.document.selection;
+          const parent:any = Array.from(selection.getSelectedBlocks())[0].parent;
+          if(parent.getAttribute('modelname') !== "undefind"){
+            console.log(parent.getAttribute('modelname'))
+          }
           // clickDom.focus();
         } else {
           // parent 当前选中元素的父元素
@@ -196,12 +211,18 @@ export default {
         this.SectionData.splice(index, 1);
         this.SectionDataHTML.splice(index, 1);
       }
+      if(item.value == ""){
+      }else{
+        setTimeout(()=>{
+          this.CheckDomain(this.dynamicValidateForm.cases[0])
+        },500)
+      }
     },
     /** 切换选中的section */
     CheckDomain(item) {
       const index = this.dynamicValidateForm.cases.indexOf(item);
       let SectionData = safeJsonParse(safeJsonStringify(this.SectionData[index]));
-      let SectionDataHTML = safeJsonParse(safeJsonStringify(this.SectionDataHTML[index]));
+      let SectionDataHTML = this.SectionDataHTML[index];
       const parserSection = parse(SectionDataHTML);
       const model = (window as any).devEditor.model;
       const selection = model.document.selection;
@@ -211,39 +232,45 @@ export default {
         let elementRange = writer.createRange(firstRange, LastRange);
         // 通过section 范围获取到范围内的 element
         const element = model.schema.getLimitElement(elementRange);
-
+        const parent: any = selection.getFirstPosition().parent;
+        if (element.name === "$root") {
+          if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
+            element = parent.previousSibling;
+          } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
+            element = parent.nextSibling;
+          }
+        }
         const range = writer.createRangeOn(element);
         // 删除section
         // writer.remove(range);
         // 创建新的element，插入   newElement ：dom创建   sectionElement ：element元素创建
         const newElement = this.createSectionInner(writer, parserSection, null, this);
-        const sectionElement = this.createSectionElement(writer, SectionData);
+        // const sectionElement = this.createSectionElement(writer, SectionData);
         // model.insertContent(newElement, model.document.selection, "on");
         model.insertObject(newElement, range);
+        // setTimeout(() => {
+        //   // 存储section的html
+        //   let set = document.getElementById(element.getAttribute('id'));
+        //   console.log(set)
+        //   console.log(this.SectionDataHTML[index])
+        //   this.SectionDataHTML[index] = set.outerHTML;
+        // }, 1000);
       });
     },
     /** 置顶当前选中的section */
     CheckTopping(item) {
       const index = this.dynamicValidateForm.cases.indexOf(item);
-      console.log(toRaw(item), toRaw(this.SectionDataHTML), toRaw(this.SectionData), this.dynamicValidateForm.cases, index, "CheckTopping");
       let data = this.SectionData;
       let datas = this.dynamicValidateForm.cases;
       let datass = this.SectionDataHTML;
-      // this.SectionDataHTML = this.SectionDataHTML.map(element => {
-      //   const parseEle = parse(element);
-      //   parseEle[0].attributes.forEach(i => {
-      //     i.value = i.key == "currentcase" ? toRaw(item).value : i.value;
-      //   });
-      //   return element = stringify(parseEle);
-      // });
       data.map((items, indexs) => {
-        // toRaw(items).attributes.currentcase = toRaw(item).value;
         if (index == indexs) {
           data.unshift(data.splice(indexs, 1)[0]);
           datas.unshift(datas.splice(indexs, 1)[0]);
           datass.unshift(datass.splice(indexs, 1)[0]);
         }
       });
+      this.CheckDomain(item)
     },
     /** 增加section的cases */
     addDomain() {
@@ -272,6 +299,7 @@ export default {
       };
       const model = (window as any).devEditor.model;
       const selection: selection = model.document.selection;
+      const parent:any = Array.from(selection.getSelectedBlocks())[0].parent;
       const blocks = Array.from(Array.from(selection.getSelectedBlocks())[0].parent.getChildren());
       let DocumentData = blocks.map(item => item.toJSON());
       model.change(writer => {
@@ -281,8 +309,6 @@ export default {
         const elementRange = writer.createRange(firstRange, LastRange);
         let element = model.schema.getLimitElement(elementRange);
         const parent: any = selection.getFirstPosition().parent;
-        console.log(element, parent, blocks, Array.from(selection.getSelectedBlocks())[0].parent);
-        // 判断上下行是section
         if (element.name === "$root") {
           if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
             element = parent.previousSibling;
@@ -290,7 +316,6 @@ export default {
             element = parent.nextSibling;
           }
           DocumentData = Array.from(element.getChildren()).map((item: any) => item.toJSON());
-          console.log(DocumentData);
         }
         const range = writer.createRangeOn(element);
         // 删除section
@@ -298,6 +323,7 @@ export default {
         // 执行创建section元素并添加子元素
         const sectionElement = this.createSectionElement(writer, DocumentData, modelData);
         this.SectionData[index] = safeJsonParse(safeJsonStringify(sectionElement));
+        // console.log(sectionElement, range, element, "DocumentData");
         model.insertObject(sectionElement, range);
         // model.insertContent(sectionElement, model.document.selection, "on");
         let idname = "section" + userFormData.cases.length;
@@ -310,15 +336,16 @@ export default {
     },
     /** 提交当前modelname所属的section数据 */
     submitSection() {
-      // const HTMLdata = safeJsonParse(safeJsonStringify(this.SectionDataHTML));
-      const HTMLdata = _.cloneDeep(this.SectionDataHTML);
+      const HTMLdata = safeJsonParse(safeJsonStringify(this.SectionDataHTML));
       const cases = this.dynamicValidateForm.cases.map(item => item.value);
-      console.log(HTMLdata, "HTMLdata");
       let casesList = {};
       HTMLdata.forEach((item, index) => {
         let data = item.match(/data-cases=\"(.*?)\]"/g)[0];
+        let currentcases = item.match(/currentcase=\"(.*?)\"/g)[0];
+        (casesList as any)[cases[index]] = HTMLdata[index].replace(currentcases, 'currentcase=' + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
         (casesList as any)[cases[index]] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
         HTMLdata[index] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
+        HTMLdata[index] = HTMLdata[index].replace(currentcases, 'currentcase=' + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
       });
       this.SectionDataHTML = HTMLdata;
       this.$emit("getStudentName", casesList);
@@ -335,12 +362,11 @@ export default {
      */
     createSectionElement(writer: Writer, DocumentData, data) {
       let modeData = {};
-      console.log(DocumentData, data);
       if (data) {
         modeData = {
           modelname: data.modelname,
           type: data.type,
-          "data-cases": safeJsonStringify(data["data-cases"]),
+          "data-cases": safeJsonStringify(data["data-cases"]).replace(/"/g,"'")	,
           id: data.id,
           currentcase: data["data-cases"][0],
         };
@@ -373,9 +399,7 @@ export default {
     createSectionInner(writer, parserDom, parentElement) {
       let elementList = [],
         text = null,
-        dom = null,
-        beforePosition: any = null,
-        afterPosition: any = null;
+        dom = null;
       for (let item of parserDom) {
         if (item.type === "element") {
           // 返回元素属性对象
@@ -383,6 +407,7 @@ export default {
           atttibutesList = Object.fromEntries([...atttibutesList]);
           // 创建元素
           if (item.tagName === "section") {
+            atttibutesList.currentcase = this.dynamicValidateForm.cases[0].value
             dom = writer.createElement(V_SECTION, atttibutesList);
           } else if (item.tagName === "p") {
             dom = writer.createElement("paragraph", atttibutesList);
@@ -433,3 +458,4 @@ export default {
   width: 700px !important;
 }
 </style>
+
