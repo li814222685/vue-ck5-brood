@@ -80,6 +80,8 @@ import { V_SECTION, V_SPAN } from "../../plugins/section/constant";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import selection from "@ckeditor/ckeditor5-engine/src/model/selection";
 import { parse, stringify } from "himalaya";
+import { toRaw } from "vue";
+import { safeJsonStringify, safeJsonParse } from "../utils";
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
@@ -198,8 +200,8 @@ export default {
     /** 切换选中的section */
     CheckDomain(item) {
       const index = this.dynamicValidateForm.cases.indexOf(item);
-      let SectionData = JSON.parse(JSON.stringify(this.SectionData[index]));
-      let SectionDataHTML = JSON.parse(JSON.stringify(this.SectionDataHTML[index]));
+      let SectionData = safeJsonParse(safeJsonStringify(this.SectionData[index]));
+      let SectionDataHTML = safeJsonParse(safeJsonStringify(this.SectionDataHTML[index]));
       const parserSection = parse(SectionDataHTML);
       const model = (window as any).devEditor.model;
       const selection = model.document.selection;
@@ -217,17 +219,25 @@ export default {
         const newElement = this.createSectionInner(writer, parserSection, null, this);
         const sectionElement = this.createSectionElement(writer, SectionData);
         // model.insertContent(newElement, model.document.selection, "on");
-        model.insertObject(sectionElement, range);
+        model.insertObject(newElement, range);
       });
     },
     /** 置顶当前选中的section */
     CheckTopping(item) {
-      console.log(item, this.SectionDataHTML, this.SectionData, "CheckTopping");
       const index = this.dynamicValidateForm.cases.indexOf(item);
+      console.log(toRaw(item), toRaw(this.SectionDataHTML), toRaw(this.SectionData), this.dynamicValidateForm.cases, index, "CheckTopping");
       let data = this.SectionData;
       let datas = this.dynamicValidateForm.cases;
       let datass = this.SectionDataHTML;
+      // this.SectionDataHTML = this.SectionDataHTML.map(element => {
+      //   const parseEle = parse(element);
+      //   parseEle[0].attributes.forEach(i => {
+      //     i.value = i.key == "currentcase" ? toRaw(item).value : i.value;
+      //   });
+      //   return element = stringify(parseEle);
+      // });
       data.map((items, indexs) => {
+        // toRaw(items).attributes.currentcase = toRaw(item).value;
         if (index == indexs) {
           data.unshift(data.splice(indexs, 1)[0]);
           datas.unshift(datas.splice(indexs, 1)[0]);
@@ -246,7 +256,7 @@ export default {
     /** 保存当前cases的section数据 */
     submitForm(item, formEl) {
       const index = this.dynamicValidateForm.cases.indexOf(item);
-      const userFormData = JSON.parse(JSON.stringify(formEl));
+      const userFormData = safeJsonParse(safeJsonStringify(formEl));
       if (!userFormData.modelName || userFormData.modelName == "") return;
       if (userFormData.cases.some(item => !item.value || item.value == "")) return;
       if (!userFormData) return;
@@ -272,6 +282,7 @@ export default {
         let element = model.schema.getLimitElement(elementRange);
         const parent: any = selection.getFirstPosition().parent;
         console.log(element, parent, blocks, Array.from(selection.getSelectedBlocks())[0].parent);
+        // 判断上下行是section
         if (element.name === "$root") {
           if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
             element = parent.previousSibling;
@@ -286,8 +297,7 @@ export default {
         // writer.remove(range);
         // 执行创建section元素并添加子元素
         const sectionElement = this.createSectionElement(writer, DocumentData, modelData);
-        this.SectionData[index] = JSON.parse(JSON.stringify(sectionElement));
-        // console.log(sectionElement, range, element, "DocumentData");
+        this.SectionData[index] = safeJsonParse(safeJsonStringify(sectionElement));
         model.insertObject(sectionElement, range);
         // model.insertContent(sectionElement, model.document.selection, "on");
         let idname = "section" + userFormData.cases.length;
@@ -300,16 +310,15 @@ export default {
     },
     /** 提交当前modelname所属的section数据 */
     submitSection() {
-      const HTMLdata = JSON.parse(JSON.stringify(this.SectionDataHTML));
-      const cases = [];
-      this.dynamicValidateForm.cases.map(item => {
-        cases.push(item.value);
-      });
+      // const HTMLdata = safeJsonParse(safeJsonStringify(this.SectionDataHTML));
+      const HTMLdata = _.cloneDeep(this.SectionDataHTML);
+      const cases = this.dynamicValidateForm.cases.map(item => item.value);
+      console.log(HTMLdata, "HTMLdata");
       let casesList = {};
       HTMLdata.forEach((item, index) => {
         let data = item.match(/data-cases=\"(.*?)\]"/g)[0];
-        (casesList as any)[cases[index]] = HTMLdata[index].replace(data, 'data-cases="' + JSON.stringify(cases) + '"');
-        HTMLdata[index] = HTMLdata[index].replace(data, 'data-cases="' + JSON.stringify(cases) + '"');
+        (casesList as any)[cases[index]] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
+        HTMLdata[index] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
       });
       this.SectionDataHTML = HTMLdata;
       this.$emit("getStudentName", casesList);
@@ -331,7 +340,7 @@ export default {
         modeData = {
           modelname: data.modelname,
           type: data.type,
-          "data-cases": JSON.stringify(data["data-cases"]),
+          "data-cases": safeJsonStringify(data["data-cases"]),
           id: data.id,
           currentcase: data["data-cases"][0],
         };
@@ -424,4 +433,3 @@ export default {
   width: 700px !important;
 }
 </style>
-

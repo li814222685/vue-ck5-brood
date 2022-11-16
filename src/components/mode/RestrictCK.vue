@@ -4,14 +4,6 @@
     <SectionMenu :position-range="positionRange" :attributs-list="attributsList" :menu-visible="menuVisible" @changeCase="changeCase" />
   </div>
 </template>
-<style>
-.hidden-item {
-  display: none;
-}
-.extendBackground {
-  background-color: rgba(255, 169, 77, 0.2) !important;
-}
-</style>
 
 <script>
 import { toRaw } from "vue";
@@ -187,3 +179,11 @@ export default {
   },
 };
 </script>
+<style scoped>
+.hidden-item {
+  display: none;
+}
+.extendBackground {
+  background-color: rgba(255, 169, 77, 0.2) !important;
+}
+</style>
