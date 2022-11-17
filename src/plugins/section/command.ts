@@ -113,6 +113,7 @@ export class SectionCommand extends Command {
           // writer.addMarker("set", { range, usingOperation: true } );
           writer.setAttributes({ class: "cs" }, range);
           writer.wrap(groupRange, quote);
+          this.editor.editing.view.focus();
         }
         quotesToMerge.push(quote);
       });
