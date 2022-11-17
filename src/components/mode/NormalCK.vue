@@ -174,6 +174,7 @@ export default {
           clickDom.classList.add("Check");
           const model = (window as any).devEditor.model;
           const selection: selection = model.document.selection;
+          console.log(Array.from(selection.getSelectedBlocks()), "getSelectedBlocks");
           const parent: any = Array.from(selection.getSelectedBlocks())[0].parent;
           if (parent.getAttribute("modelname") !== "undefind") {
             // console.log(parent.getAttribute("modelname"));
