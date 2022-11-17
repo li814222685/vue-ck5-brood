@@ -63,6 +63,7 @@ export function toShowSectionMenu(clickDom: HTMLElement, vueObject: any) {
       { key: "type", value: sectionDom.getAttribute("type") },
       { key: "data-cases", value: sectionDom.getAttribute("data-cases") },
       { key: "modelname", value: sectionDom.getAttribute("modelname") },
+      { key: "currentcase", value: sectionDom.getAttribute("currentcase") },
     ];
     const sectionPostion = sectionDom.getBoundingClientRect();
     const [sectionMenuPostionX, sectionMenuPostionY] = [Math.floor(sectionPostion.x), Math.floor(sectionPostion.y)];
