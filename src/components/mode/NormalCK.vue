@@ -34,9 +34,9 @@
           label="type"
         >
           <el-radio-group v-model="dynamicValidateForm.radio" @change="changeRadio">
-            <el-radio label="deletable">Option A</el-radio>
-            <el-radio label="switchable">Option B</el-radio>
-            <el-radio label="applicable">Option C</el-radio>
+            <el-radio label="deletable">deletable</el-radio>
+            <el-radio label="switchable">switchable</el-radio>
+            <el-radio label="applicable">applicable</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item
@@ -274,10 +274,15 @@ export default {
     },
     /** 增加section的cases */
     addDomain() {
-      if (this.dynamicValidateForm.cases.length < 4) {
+      if(this.dynamicValidateForm.radio == "switchable" && this.dynamicValidateForm.cases.length <= 1){
         this.dynamicValidateForm.cases.push({
           value: "",
         });
+      }else if (this.dynamicValidateForm.radio !== "switchable" && this.dynamicValidateForm.cases.length < 4) {
+        this.dynamicValidateForm.cases.push({
+          value: "",
+        });
+      }else{
       }
     },
     /** 保存当前cases的section数据 */
