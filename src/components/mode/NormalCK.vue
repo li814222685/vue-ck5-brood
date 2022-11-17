@@ -234,11 +234,11 @@ export default {
         let element = model.schema.getLimitElement(elementRange);
         const parent: any = selection.getFirstPosition().parent;
         if (element.name === "$root") {
-          // if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
-          //   element = parent.previousSibling;
-          // } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
-          //   element = parent.nextSibling;
-          // }
+          if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
+            element = parent.previousSibling;
+          } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
+            element = parent.nextSibling;
+          }
         }
         const range = writer.createRangeOn(element);
         // 删除section
@@ -274,11 +274,11 @@ export default {
     },
     /** 增加section的cases */
     addDomain() {
-      if(this.dynamicValidateForm.radio == "switchable" && this.dynamicValidateForm.cases.length <= 1){
+      if(this.dynamicValidateForm.radio == "applicable" && this.dynamicValidateForm.cases.length <= 1){
         this.dynamicValidateForm.cases.push({
           value: "",
         });
-      }else if (this.dynamicValidateForm.radio !== "switchable" && this.dynamicValidateForm.cases.length < 4) {
+      }else if (this.dynamicValidateForm.radio !== "applicable" && this.dynamicValidateForm.cases.length < 4) {
         this.dynamicValidateForm.cases.push({
           value: "",
         });
@@ -315,11 +315,11 @@ export default {
         let element = model.schema.getLimitElement(elementRange);
         const parent: any = selection.getFirstPosition().parent;
         if (element.name === "$root") {
-          // if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
-          //   element = parent.previousSibling;
-          // } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
-          //   element = parent.nextSibling;
-          // }
+          if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
+            element = parent.previousSibling;
+          } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
+            element = parent.nextSibling;
+          }
           DocumentData = Array.from(element.getChildren()).map((item: any) => item.toJSON());
         }
         const range = writer.createRangeOn(element);
@@ -375,7 +375,7 @@ export default {
         modeData = {
           modelname: data.modelname,
           type: data.type,
-          "data-cases": safeJsonStringify(data["data-cases"]).replace(/"/g, "'"),
+          "data-cases": safeJsonStringify(data["data-cases"]),
           id: data.id,
           currentcase: data["data-cases"][0],
         };
@@ -417,7 +417,7 @@ export default {
           // 创建元素
           if (item.tagName === "section") {
             const cases = this.dynamicValidateForm.cases.map(item =>item.value);
-            atttibutesList["data-cases"] = safeJsonStringify(cases).replace(/"/g, "'")
+            atttibutesList["data-cases"] = safeJsonStringify(cases)
             atttibutesList.currentcase = this.dynamicValidateForm.cases[0].value;
             dom = writer.createElement(V_SECTION, atttibutesList);
           } else if (item.tagName === "p") {
