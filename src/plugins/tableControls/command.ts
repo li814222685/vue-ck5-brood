@@ -129,12 +129,12 @@ export class SetTableSelectOptionList extends Command {
 
     //将optionList 存储到 Model 的tableCell上
     model.change(writer => {
-      writer.setAttribute("optionList", safeJsonStringify(options), tableCell.parent);
+      writer.setAttribute("optionlist", safeJsonStringify(options), tableCell.parent);
     });
     //将optionList 存储到 View 的td上
 
     this.editor.editing.view.change(writer => {
-      writer.setAttribute("optionList", safeJsonStringify(options), target);
+      writer.setAttribute("optionlist", safeJsonStringify(options), target);
     });
   }
 }

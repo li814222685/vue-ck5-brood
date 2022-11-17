@@ -15,7 +15,7 @@
   />
 </template>
 <style scoped>
-.hidden-item {
+.hidden_item {
   display: none;
 }
 .extendBackground {
@@ -99,8 +99,6 @@ export default {
     hangUpAllEmitFunctions() {
       emitter.on(SWITCH_MODAL, this.swtichModal);
       emitter.on(SET_OPTIONS, this.setOptionListFromSelect);
-      emitter.on(SAVE_HIDDEN_ITEM, this.saveCellItemAndSelectRange);
-      emitter.on(REPLACE_HIDDEN_ITEM_TEXT, this.setRestrictedTextFromTableSelect);
       emitter.on(SET_TARGET, this.setNeedEditElement);
     },
 
@@ -122,29 +120,6 @@ export default {
     /** 获取当前select的options list */
     setOptionListFromSelect(options: Option[]) {
       this.selectedOptions = _.cloneDeep(options);
-    },
-
-    /** 缓存隐藏的元素和TableSelect的范围 */
-    saveCellItemAndSelectRange(deposit) {
-      this.deposit = deposit;
-    },
-
-    /** TableSelect的值填入 可编辑文字元素 */
-    setRestrictedTextFromTableSelect(val: string) {
-      const editor = (window as any).devEditor;
-      const model = editor.model;
-      const { element: restoreItem, range: removeRange } = toRaw(this.deposit);
-
-      //1.显示隐藏的元素
-      removeClass(HIDDEN_ITEM, restoreItem);
-      //2.Todo：Restricted ：将value 替换 元素内的文本
-      // model.change(writer => {
-      //   const range = writer.createRangeOn(restoreItem._children[0]);
-      //   // const text = writer.createText(val, restoreItem.getAttributes());
-      //   // model.insertContent(text, range);
-      // });
-      // //3. 销毁掉Select
-      removeElement(removeRange);
     },
 
     setNeedEditElement(ele: Element) {

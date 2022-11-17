@@ -1,7 +1,7 @@
 import { COMMAND_NAME__INSERT_TABLE_SELECT } from "../../plugins/tableControls/constant";
 
 export const EditorClasses = {
-  HIDDEN_CLASS: "hidden-item",
+  HIDDEN_CLASS: "hidden_item",
   HIGHLIGHT_CLASS: "restricted-editing-exception_selected",
   EDITABLE_CLASS: "restricted-editing-exception",
   V_SELECT: ".virtual-select",

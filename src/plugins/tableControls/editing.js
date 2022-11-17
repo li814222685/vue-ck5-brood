@@ -33,6 +33,7 @@ import {
   SAVE_HIDDEN_ITEM,
 } from "../../components/mode/mitt";
 import { safeJsonParse } from "../../components/utils";
+import { getMarkerAtPosition } from "@/plugins/formControls/utils.js";
 
 export default class TableControlsEditing extends Plugin {
   static get requires() {
@@ -80,7 +81,7 @@ export default class TableControlsEditing extends Plugin {
       ],
     });
     schema.extend("tableCell", {
-      allowAttributes: ["type", "colspan", "rowspan", "optionList"],
+      allowAttributes: ["type", "colspan", "rowspan", "optionlist"],
     });
     schema.register(V_SPAN, {
       allowWhere: "$block",
@@ -105,7 +106,7 @@ export default class TableControlsEditing extends Plugin {
       model: "tableCell",
       view: converDowncastCell(),
       converterPriority: "highest",
-      renderUnsafeAttributes: ["optionList", "type", "style"],
+      renderUnsafeAttributes: ["optionlist", "type", "style"],
     });
 
     conversion.for("upcast").elementToElement({
@@ -169,13 +170,6 @@ export default class TableControlsEditing extends Plugin {
     /** 向上寻找td 的optionList属性 */
     const findOptionListFromAncestorTd = target.findAncestor("td").getAttribute("optionlist");
 
-    console.log(
-      "%c🍉Lee%cline:171%cfindOptionListFromAncestorTd",
-      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-      "color:#fff;background:rgb(251, 178, 23);padding:3px;border-radius:2px",
-      findOptionListFromAncestorTd
-    );
     if (findOptionListFromAncestorTd) {
       const plainOptionList = safeJsonParse(findOptionListFromAncestorTd);
       emitter.emit(SET_OPTIONS, plainOptionList);
@@ -187,6 +181,13 @@ export default class TableControlsEditing extends Plugin {
 
   /** Restrict模式 Document 监听逻辑 */
   listenClickForRestrictMode(target, { model, editingView }) {
+    const modelSelection = model.document.selection;
+    const marker = getMarkerAtPosition(this.editor, modelSelection.anchor);
+
+    if (!marker) return;
+    const findOptionListFromAncestorTd = target.findAncestor("td").getAttribute("optionlist");
+    const plainOptionList = safeJsonParse(findOptionListFromAncestorTd);
+
     new Promise(res => {
       editingView.change(writer => {
         writer.addClass(HIDDEN_ITEM, target);
@@ -194,11 +195,16 @@ export default class TableControlsEditing extends Plugin {
       });
     }).then(hidEle => {
       model.change(writer => {
-        //Todo:这里的插入会导致文字元素被拆分，两种方式解决：
-        //1.获取文字元素的end Position
-        //2.findOptimalPosition 插入合适位置后，再隐藏和保存文字元素
-        const tableSelectRange = model.insertObject(createTableSelect(writer));
-        emitter.emit(SAVE_HIDDEN_ITEM, { element: hidEle, range: tableSelectRange });
+        const targetEndPosition = marker.getEnd();
+        const tableSelectRange = model.insertObject(
+          createTableSelect(writer, plainOptionList),
+          targetEndPosition
+        );
+        emitter.emit(SAVE_HIDDEN_ITEM, {
+          oldViewElement: hidEle,
+          oldMarker: marker,
+          newRange: tableSelectRange,
+        });
       });
     });
   }
@@ -226,8 +232,6 @@ export default class TableControlsEditing extends Plugin {
           ? this.listenClickForRestrictMode(target, { model, editingView })
           : this.listenClickForNormalMode(target);
       }
-
-      // const modelEle = editor.editing.mapper.toModelElement(target);
     });
   }
 }

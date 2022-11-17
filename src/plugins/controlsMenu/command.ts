@@ -24,7 +24,10 @@ export class InsertControlsCommand extends Command {
   refresh() {
     const model = this.editor.model;
     const selection = model.document.selection;
-    const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), CONTROLS_CONTAINER);
+    const allowedIn = model.schema.findAllowedParent(
+      selection.getFirstPosition(),
+      CONTROLS_CONTAINER
+    );
 
     this.isEnabled = allowedIn !== null;
   }
@@ -71,7 +74,7 @@ export function createSimpleBox(writer: Writer, attrs?: Option[]) {
   if (attrs?.length > 0) {
     const controls = writer.createElement(CONTROLS_CONTAINER); // => span
     const v_select = writer.createElement(V_SELECT); // => select
-    writer.setAttribute("optionList", safeJsonStringify(attrs), v_select);
+    writer.setAttribute("optionlist", safeJsonStringify(attrs), v_select);
 
     (attrs || []).forEach(opt => {
       const v_option = writer.createElement(V_OPTION, opt as any); // => option

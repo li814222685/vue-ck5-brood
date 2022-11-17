@@ -5,7 +5,7 @@
   </div>
 </template>
 <style>
-.hidden-item {
+.hidden_item {
   display: none;
 }
 .extendBackground {
@@ -25,6 +25,7 @@ import { RESTRICT_CONFIG } from "./config.js";
 import { regExpReplacer, removeClass, removeElement } from "../utils";
 import { EditorClasses } from "./define";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
+import { emitter, SAVE_HIDDEN_ITEM, REPLACE_HIDDEN_ITEM_TEXT } from "./mitt.ts";
 
 const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
 
@@ -46,7 +47,10 @@ export default {
   },
   mounted() {
     // 注册点击事件监听
-    // window.addEventListener("mousedown", this.onGlobalClick);
+    window.addEventListener("mousedown", this.onGlobalClick);
+    emitter.on(SAVE_HIDDEN_ITEM, this.saveCellItemAndSelectRange);
+    emitter.on(REPLACE_HIDDEN_ITEM_TEXT, this.setRestrictedTextFromTableSelect);
+
     ClassicEditor.create(document.querySelector("#editor"), RESTRICT_CONFIG)
       .then(editor => {
         CKEditorInspector.attach(editor);
@@ -67,7 +71,7 @@ export default {
         const editor = window.editor;
         const { model, editing } = editor;
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
-        const isSelected = Array.from(clickDom.classList).includes(EDITABLE_CLASS);
+        const isSelected = Array.from(clickDom.classList).includes(V_SELECT);
         // 点击可编辑区域时候执行
         if (isSelected) {
           const modelSelection = model.document.selection;
@@ -91,7 +95,7 @@ export default {
             });
           }).then(res => {
             const select = document.querySelector(V_SELECT);
-            const textNode = document.querySelector(".hidden-item");
+            const textNode = document.querySelector(".hidden_item");
             select.focus();
             select.value = textNode.innerText;
             select.onblur = this.onSelectBlur;
@@ -133,6 +137,29 @@ export default {
     },
     exportData() {
       this.onchange(window.devEditor.getData());
+    },
+
+    /** 缓存隐藏的元素和TableSelect的范围 */
+    saveCellItemAndSelectRange(deposit) {
+      this.deposit = deposit;
+    },
+
+    /** TableSelect的值填入 可编辑文字元素 */
+    setRestrictedTextFromTableSelect(val) {
+      const editor = window.editor;
+      const model = editor.model;
+      const { oldViewElement: restoreItem, oldMarker, newRange: removeRange } = toRaw(this.deposit);
+      const oldRange = oldMarker.getRange();
+      //1.显示隐藏的元素
+      removeClass(HIDDEN_CLASS, restoreItem);
+
+      //2.将value 替换 元素内的文本
+      model.change(writer => {
+        const text = writer.createText(val, restoreItem.getAttributes());
+        model.insertContent(text, oldRange);
+      });
+      // 3. 销毁掉Select
+      removeElement(removeRange);
     },
   },
   computed: {

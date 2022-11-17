@@ -57,7 +57,7 @@ export function converDowncastCell(options = { asWidget: true }) {
           );
         }
         //model上获取tableCell 上的属性
-        const useAttrs = ["type", "optionList"]
+        const useAttrs = ["type", "optionlist"]
           .map(attrKey => ({
             attrKey,
             value: tableCell.getAttribute(attrKey),
@@ -200,18 +200,7 @@ export const createTableSelect = (writer: Writer, options?: Option[]) => {
 
   /**列表 */
   const optionList = writer.createElement(V_DIV, { class: V_SELECT_OPTION_LIST });
-  (
-    options || [
-      {
-        label: "朝阳区",
-        value: "朝阳区",
-      },
-      {
-        label: "海淀区",
-        value: "海淀区",
-      },
-    ]
-  ).forEach(({ label, value }) => {
+  (options || []).forEach(({ label, value }) => {
     const optionItem = writer.createElement(V_DIV, {
       class: V_SELECT_OPTION_LIST_ITEM,
       "data-value": value,
