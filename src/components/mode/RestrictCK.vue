@@ -69,13 +69,6 @@ export default {
         const { model, editing } = editor;
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
         const isControlSelect = Array.from(clickDom.classList).includes("control-select");
-        if (isControlSelect) {
-          // const modelSelection = model.document.selection;
-          // const firstRange = modelSelection.getFirstPosition();
-          // const LastRange = modelSelection.getLastPosition();
-          // let element = model.schema.getLimitElement(elementRange);
-          // console.log(modelSelection, firstRange, LastRange);
-        }
         toShowSectionMenu(clickDom, this);
       }, 1);
     },
@@ -110,14 +103,6 @@ export default {
     },
     exportData() {
       this.onchange(window.editor.getData());
-    },
-    /**
-     * @description 获取caseName,找到case结构进行section替换
-     * @param caseName caseName
-     * @param currentCase 当前case
-     */
-    changeCase(caseName, currentCase) {
-      changeCaseValue(caseName, currentCase, toRaw(this.sectionData), this);
     },
     //v-select 相关的展示逻辑
     toShowSelect(clickDom, editor) {
@@ -157,6 +142,20 @@ export default {
           select.onchange = this.onSelectChange;
         });
       }
+    },
+    /**
+     * @description 获取caseName,找到case结构进行section替换
+     * @param caseName caseName
+     * @param currentCase 当前case
+     * @param casesList 所有case列表
+     */
+    changeCase(value) {
+      changeCaseValue({
+        caseName: value.caseName,
+        currentCase: value.currentCase,
+        casesList: toRaw(this.sectionData),
+        vueObject: this,
+      });
     },
   },
   computed: {

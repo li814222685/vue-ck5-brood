@@ -234,11 +234,11 @@ export default {
         let element = model.schema.getLimitElement(elementRange);
         const parent: any = selection.getFirstPosition().parent;
         if (element.name === "$root") {
-          // if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
-          //   element = parent.previousSibling;
-          // } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
-          //   element = parent.nextSibling;
-          // }
+          if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
+            element = parent.previousSibling;
+          } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
+            element = parent.nextSibling;
+          }
         }
         const range = writer.createRangeOn(element);
         // 删除section
@@ -315,11 +315,11 @@ export default {
         let element = model.schema.getLimitElement(elementRange);
         const parent: any = selection.getFirstPosition().parent;
         if (element.name === "$root") {
-          // if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
-          //   element = parent.previousSibling;
-          // } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
-          //   element = parent.nextSibling;
-          // }
+          if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
+            element = parent.previousSibling;
+          } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
+            element = parent.nextSibling;
+          }
           DocumentData = Array.from(element.getChildren()).map((item: any) => item.toJSON());
         }
         const range = writer.createRangeOn(element);
