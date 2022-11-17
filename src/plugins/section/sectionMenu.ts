@@ -5,6 +5,12 @@ import { parse } from "himalaya";
 import { V_SECTION } from "./constant";
 import _ from "lodash";
 
+interface caseValueConfig {
+  caseName: string;
+  currentCase: string;
+  casesList: any;
+  vueObject: any;
+}
 /**
  * @description 添加marker
  * @param range marker的范围
@@ -47,10 +53,10 @@ export function toShowSectionMenu(clickDom: HTMLElement, vueObject: any) {
   // tagname 是svg/path classname 有section-btn / section-menu
   const isSectionBtn = tagName == "svg" || tagName == "path" || Array.from(classList).includes("section-btn") || Array.from(classList).includes("section-menu");
   const hasSection = domAncestorsPath.split("/").includes("SECTION");
-  const sectionDom = document.querySelector(".ck-editor__nested-editable_focused");
+  const sectionDom = <HTMLElement>document.querySelector(".ck-editor__nested-editable_focused");
   // 清空位置
-  vueObject.positionRange = [];
-  vueObject.menuVisible = false;
+  // vueObject.positionRange = [];
+  // vueObject.menuVisible = false;
   //todo ：如果是dom祖先里面有SECTION or tagname 是 svg/path classname 有 section-btn/section-menu 那就展示菜单
   if (hasSection || isSectionBtn) {
     vueObject.menuVisible = true;
@@ -58,7 +64,7 @@ export function toShowSectionMenu(clickDom: HTMLElement, vueObject: any) {
     vueObject.positionRange = [];
     vueObject.menuVisible = false;
   }
-  if (sectionDom) {
+  if (sectionDom) {    
     vueObject.attributsList = [
       { key: "type", value: sectionDom.getAttribute("type") },
       { key: "data-cases", value: sectionDom.getAttribute("data-cases") },
@@ -75,18 +81,15 @@ export function toShowSectionMenu(clickDom: HTMLElement, vueObject: any) {
 /**
  * @description 获取caseName,找到case结构进行section替换
  * @param caseName caseName
+ * @param currentCase 默认case
+ * @param casesList case文本列表
  * @param vueObject vue:this
  */
-export function changeCaseValue(caseName: string, currentCase: string, casesList: any, vueObject: any) {
+export function changeCaseValue(param: caseValueConfig) {
+  const { caseName, currentCase, casesList, vueObject } = param;
   const editor = (window as any).editor;
   const { model } = editor;
   const modelSelection = model.document.selection;
-  // const casesList = {
-  //   caseA: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" currentcase="caseA" contenteditable="true"><p>我只是一个段落</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方A</span></section>`,
-  //   caseB: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" currentcase="caseB" contenteditable="true"><p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span>我只是一个段落B</p><p>我只是一个段落B<span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方B</span></p></section>`,
-  //   caseC: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" currentcase="caseC" contenteditable="true"><p>我只是一个段落C</p><span class="restricted-editing-exception restricted-editing-exception_collapsed">只是一个可编辑的地方C</span></section>`,
-  //   caseD: `<section class="ck-editor__editable ck-editor__nested-editable" modelname="模块名" type="switch" data-cases="["caseA","caseB","caseC", "caseD"]" role="textbox" currentcase="caseD" contenteditable="true"><p>我只是一个段落D</p></section>`,
-  // };
   // 获取html标签字符串转换的对象
   const newParserSection = changeObject(_.clone(parse(casesList[caseName])));
   model.change(writer => {
@@ -108,14 +111,17 @@ export function changeCaseValue(caseName: string, currentCase: string, casesList
     Array.from(model.markers.getMarkersIntersectingRange(range)).map(marker => writer.removeMarker((marker as any).name));
     // 移除范围和范围内元素，再去插入
     writer.remove(range);
-    // 创建新的element，插入
-    const newElement = createSectionInner({
-      writer: writer,
-      parseDom: newParserSection,
-      parentElement: null,
-      vueObject: vueObject,
-    });
-    model.insertObject(newElement, range);
+    if (caseName !== "删除") {
+      // 创建新的element，插入
+      const newElement = createSectionInner({
+        writer: writer,
+        currentCase: caseName,
+        parseDom: newParserSection,
+        parentElement: null,
+        vueObject: vueObject,
+      });
+      model.insertObject(newElement, range);
+    }
   });
 }
 
@@ -149,7 +155,7 @@ function changeObject(list: any[]) {
  * @param vueObject vue:this
  */
 function createSectionInner(params) {
-  const { writer, parseDom, parentElement, vueObject } = params;
+  const { writer, currentCase, parseDom, parentElement, vueObject } = params;
   let dom: any = null,
     beforePosition: any = null,
     afterPosition: any = null;
@@ -161,6 +167,7 @@ function createSectionInner(params) {
       const atttibutesList = Object.fromEntries([...item.attributes.map(item => [item.key, item.value])]);
       // 创建元素
       if (item.tagName === "section") {
+        atttibutesList.currentcase = currentCase;
         dom = writer.createElement(V_SECTION, atttibutesList);
       } else if (item.tagName === "p") {
         dom = writer.createElement("paragraph", atttibutesList);
@@ -213,6 +220,7 @@ function createSectionInner(params) {
     if (item.children) {
       createSectionInner({
         writer: writer,
+        currentCase: null,
         parseDom: item.children,
         parentElement: dom,
         vueObject: vueObject,

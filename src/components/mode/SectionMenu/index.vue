@@ -5,10 +5,10 @@
     ></el-button>
   </span>
   <div>
-    <el-card class="box-card" v-if="listVisible">
-      <div v-for="(item, index) in cases.data" :key="index" class="text item section-menu" @click="chengeCase(item)">
+    <el-card class="box-card" v-if="data.listVisible">
+      <div v-for="(item, index) in data.cases" :key="index" class="text item section-menu" @click="chengeCase(item)">
         {{ item }}
-        <el-icon v-if="currentCase === item" class="select-case"><Select /></el-icon>
+        <el-icon v-if="data.currentCase === item && data.casetype !== 'deletable'" class="select-case"><Select /></el-icon>
       </div>
     </el-card>
   </div>
@@ -32,10 +32,13 @@ const props = defineProps<SectionMenuProps>();
 const state = reactive<SectionMenuProps>(props);
 const { positionRange, attributsList, menuVisible } = toRefs(state);
 const emit = defineEmits(["changeCase"]);
-let listVisible = ref(false);
-let currentCase = ref("");
-let cases = reactive({
-  data: [],
+const data = reactive({
+  currentCase: ref(""),
+  casetype: ref(""),
+  listVisible: ref(false),
+  deleteCase: reactive(["删除"]),
+  applyCase: reactive(["适用", "不适用"]),
+  cases: reactive([]),
 });
 watch(
   positionRange,
@@ -51,25 +54,23 @@ watch(
 );
 watch(menuVisible, (value: boolean) => {
   if (!value) {
-    listVisible.value = false;
+    data.listVisible = false;
   }
 });
 
 const showList = () => {
   const attributes = toRaw(attributsList.value);
-  for (let i of attributes) {
-    if (i.key == "data-cases") {
-      _.unescape(i.value);
-      cases.data = safeJsonParse(i.value);
-    }
-    if (i.key === "currentcase") {
-      currentCase.value = i.value;
-    }
+  data.currentCase = attributes.filter(item => item.key == "currentcase")[0].value;
+  data.casetype = attributes.filter(item => item.key == "type")[0].value;
+  if (data.casetype == "deletable") {
+    data.cases = data.deleteCase;
+  } else if (data.casetype == "applicable") {
+    data.cases = data.applyCase;
+  } else {
+    data.cases = safeJsonParse(_.unescape(attributes.filter(item => item.key == "data-cases")[0].value));
   }
-  if (!currentCase.value) {
-    currentCase.value = cases.data[0];
-  }
-  listVisible.value = true;
+  data.currentCase = !data.currentCase ? data.cases[0] : data.currentCase;
+  data.listVisible = true;
   nextTick(() => {
     const menuBtn = <HTMLImageElement>document.querySelector(".box-card");
     const range = toRaw(positionRange.value);
@@ -79,10 +80,13 @@ const showList = () => {
 };
 
 const chengeCase = (item: string) => {
-  if (currentCase.value != item) {
-    emit("changeCase", item, currentCase.value);
+  if (data.currentCase != item || item === "删除") {
+    emit("changeCase", {
+      caseName: item,
+      currentCase: data.currentCase,
+    });
   }
-  currentCase.value = item;
+  data.currentCase = item;
 };
 </script>
 <style lang="less" scoped>
