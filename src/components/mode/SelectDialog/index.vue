@@ -1,6 +1,6 @@
 <template>
   <el-dialog v-model="props.visible" title="下拉选项设置" width="40%">
-    <el-table :data="tableData" style="width: 100%">
+    <el-table :data="tableData" style="width: 100%" row-key="id">
       <el-table-column prop="label" label="名称">
         <template #default="scope">
           <el-input
@@ -53,9 +53,11 @@
   </el-dialog>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, toRaw, toRefs } from "vue";
+import { reactive, ref, toRaw, toRefs, onMounted, onUpdated } from "vue";
 import { Plus } from "@element-plus/icons-vue";
+import Sortable from "sortablejs";
 import _ from "lodash";
+import { isVisible } from "element-plus/es/utils";
 
 export interface Option {
   label: string | number;
@@ -74,6 +76,12 @@ const props = defineProps<SelectDialogProps>();
 const state = reactive<SelectDialogProps>(props);
 const { tableData } = toRefs(state);
 const targetRow = ref<number>(null);
+
+onUpdated(() => {
+  if (props.visible) {
+    rowDrop();
+  }
+});
 
 const deleteRow = (rowIndex: number) => {
   tableData.value.splice(rowIndex, 1);
@@ -94,6 +102,18 @@ const saveRow = (rowIndex: number, rowVal: Option) => {
   const value = toRaw(rowVal);
   tableData.value[rowIndex] = value;
   targetRow.value = null;
+};
+
+const rowDrop = () => {
+  const tbody = document.querySelector(".el-table__body-wrapper tbody");
+
+  Sortable.create(tbody, {
+    onEnd({ newIndex, oldIndex }) {
+      console.log(newIndex, oldIndex);
+      const originList = tableData.value;
+      [originList[oldIndex], originList[newIndex]] = [originList[newIndex], originList[oldIndex]];
+    },
+  });
 };
 
 /** Table Select 提交时的处理逻辑 */
@@ -121,7 +141,7 @@ const handleTableSelectLogic = () => {
 const submitOptions = () => {
   try {
     handleTableSelectLogic();
-    props.insertOptionsToSelect(toRaw(tableData.value) as any);
+    props.insertOptionsToSelect(toRaw(tableData.value).map(item => _.omit(item, "id")));
     props.changeVisible();
   } catch (error) {
     console.log(error);

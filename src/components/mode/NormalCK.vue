@@ -119,7 +119,10 @@ export default {
 
     /** 获取当前select的options list */
     setOptionListFromSelect(options: Option[]) {
-      this.selectedOptions = _.cloneDeep(options);
+      this.selectedOptions = _.cloneDeep(options).map(item => ({
+        id: _.uniqueId(),
+        ...item,
+      }));
     },
 
     setNeedEditElement(ele: Element) {

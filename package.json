@@ -33,6 +33,7 @@
     "mitt": "^3.0.0",
     "postcss-loader": "^4.3.0",
     "raw-loader": "^4.0.2",
+    "sortablejs": "^1.15.0",
     "vue": "^3.2.13"
   },
   "devDependencies": {

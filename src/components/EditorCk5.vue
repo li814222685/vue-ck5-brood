@@ -26,7 +26,7 @@ enum EditorMode {
   Restrict = "restrict",
 }
 
-const nowMode = ref(EditorMode.Restrict);
+const nowMode = ref(EditorMode.Normal);
 const htmlData = ref(
   '<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p><p>&nbsp;</p><p>&nbsp;</p><figure class="table"><table><tbody><tr><td style="background-color:rgba(255, 169, 77, 0.2);" type="select" optionlist="[{&quot;label&quot;:&quot;朝阳区&quot;,&quot;value&quot;:&quot;朝阳区&quot;},{&quot;label&quot;:&quot;海淀区&quot;,&quot;value&quot;:&quot;海淀区&quot;},{&quot;label&quot;:&quot;昌平区&quot;,&quot;value&quot;:&quot;昌平区&quot;}]"><span class="restricted-editing-exception">朝阳区</span></td><td style="background-color:rgba(255, 169, 77, 0.2);" type="select" optionlist="[{&quot;label&quot;:&quot;居家&quot;,&quot;value&quot;:&quot;居家&quot;},{&quot;label&quot;:&quot;正常&quot;,&quot;value&quot;:&quot;正常&quot;}]"><span class="restricted-editing-exception">居家</span></td><td>🌟</td><td>😈</td><td>💻</td></tr><tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr><tr><td>3312213123123216</td><td>712321312321321</td><td>8321312312</td><td>12331231231</td><td>321332131232112</td></tr><tr><td>32</td><td>231</td><td>312</td><td>3213</td><td>2313</td></tr><tr><td>312321</td><td>321</td><td>312</td><td>3123</td><td>321312</td></tr></tbody></table></figure><p>&nbsp;</p>'
 );
