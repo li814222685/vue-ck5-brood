@@ -176,7 +176,7 @@ export default {
           const selection: selection = model.document.selection;
           const parent: any = Array.from(selection.getSelectedBlocks())[0].parent;
           if (parent.getAttribute("modelname") !== "undefind") {
-            console.log(parent.getAttribute("modelname"));
+            // console.log(parent.getAttribute("modelname"));
           }
           // clickDom.focus();
         } else {
@@ -274,11 +274,11 @@ export default {
     },
     /** 增加section的cases */
     addDomain() {
-      if(this.dynamicValidateForm.radio == "switchable" && this.dynamicValidateForm.cases.length <= 1){
+      if(this.dynamicValidateForm.radio == "applicable" && this.dynamicValidateForm.cases.length <= 1){
         this.dynamicValidateForm.cases.push({
           value: "",
         });
-      }else if (this.dynamicValidateForm.radio !== "switchable" && this.dynamicValidateForm.cases.length < 4) {
+      }else if (this.dynamicValidateForm.radio !== "applicable" && this.dynamicValidateForm.cases.length < 4) {
         this.dynamicValidateForm.cases.push({
           value: "",
         });
@@ -340,23 +340,24 @@ export default {
       });
     },
     /** 提交当前modelname所属的section数据 */
-    submitSection() {
+    submitSection(num) {
       const HTMLdata = safeJsonParse(safeJsonStringify(this.SectionDataHTML));
       const cases = this.dynamicValidateForm.cases.map(item => item.value);
       let casesList = {};
       HTMLdata.forEach((item, index) => {
         let data = item.match(/data-cases=\"(.*?)\]"/g)[0];
         let currentcases = item.match(/currentcase=\"(.*?)\"/g)[0];
-        let text = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value))
         HTMLdata[index] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
         HTMLdata[index] = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
         (casesList as any)[cases[index]] = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
         (casesList as any)[cases[index]] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
-        console.log((casesList as any)[cases[index]], HTMLdata[index], text, "caselist");
       });
       this.SectionDataHTML = HTMLdata;
-      console.log(casesList, this.SectionDataHTML, "case");
-      this.$emit("getStudentName", casesList);
+      if(num == 2){
+        this.$emit("getStudentName", casesList);
+      }else{
+        this.submitSection(2)
+      }
     },
     resetForm(formEl) {
       if (!formEl) return;
@@ -374,7 +375,7 @@ export default {
         modeData = {
           modelname: data.modelname,
           type: data.type,
-          "data-cases": safeJsonStringify(data["data-cases"]).replace(/"/g, "'"),
+          "data-cases": safeJsonStringify(data["data-cases"]),
           id: data.id,
           currentcase: data["data-cases"][0],
         };
@@ -415,6 +416,8 @@ export default {
           atttibutesList = Object.fromEntries([...atttibutesList]);
           // 创建元素
           if (item.tagName === "section") {
+            const cases = this.dynamicValidateForm.cases.map(item =>item.value);
+            atttibutesList["data-cases"] = safeJsonStringify(cases)
             atttibutesList.currentcase = this.dynamicValidateForm.cases[0].value;
             dom = writer.createElement(V_SECTION, atttibutesList);
           } else if (item.tagName === "p") {
