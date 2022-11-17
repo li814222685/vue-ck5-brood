@@ -42,7 +42,7 @@
 .Check {
   border: 3px solid #409EFF !important;
   border-radius: 5px;
-  background: rgb(216, 216, 216);
+  /* background: rgb(216, 216, 216); */
 }
 /* .ck-balloon-panel{
   left: 50px !important;

@@ -8,7 +8,7 @@
       <el-form ref="formRef" :model="dynamicValidateForm" label-width="120px" class="demo-dynamic">
         <el-form-item
           prop="modelName"
-          label="modelName"
+          label="模块名称"
           :rules="[
             {
               required: true,
@@ -31,18 +31,18 @@
               trigger: 'blur',
             },
           ]"
-          label="type"
+          label="Type"
         >
           <el-radio-group v-model="dynamicValidateForm.radio" @change="changeRadio">
-            <el-radio label="deletable">deletable</el-radio>
-            <el-radio label="switchable">switchable</el-radio>
-            <el-radio label="applicable">applicable</el-radio>
+            <el-radio label="deletable">可删除</el-radio>
+            <el-radio label="switchable">可切换</el-radio>
+            <el-radio label="applicable">适用/不适用</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item
           v-for="(domain, index) in dynamicValidateForm.cases"
-          :key="domain.key"
-          :label="'cases' + index"
+          :key="index"
+          :label="'cases' + (index + 1)"
           :prop="'cases.' + index + '.value'"
           :rules="{
             required: true,
@@ -50,16 +50,16 @@
             trigger: 'blur',
           }"
         >
-          <el-input v-model="domain.value" />
-          <el-button class="mt-2" type="primary" @click.prevent="submitForm(domain, dynamicValidateForm)">submit</el-button>
-          <el-button class="mt-2" @click.prevent="removeDomain(domain)">Delete</el-button>
-          <el-button class="mt-2" @click.prevent="CheckDomain(domain)">CheckSection</el-button>
-          <el-button class="mt-2" @click.prevent="CheckTopping(domain)">Topping</el-button>
+          <el-input class="case-input" v-model="domain.value" />
+          <el-button class="mt-2" type="primary" @click.prevent="submitForm(domain, dynamicValidateForm)">保存</el-button>
+          <el-button class="mt-2" @click.prevent="removeDomain(domain)">删除</el-button>
+          <el-button class="mt-2" @click.prevent="CheckDomain(domain)">切换</el-button>
+          <el-button class="mt-2" @click.prevent="CheckTopping(domain)">置顶</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitSection()">SubmitSection</el-button>
-          <el-button @click="addDomain">New cases</el-button>
-          <el-button @click="resetForm()">Reset</el-button>
+          <el-button type="primary" @click="submitSection">保存section</el-button>
+          <el-button @click="addDomain">新增cases</el-button>
+          <!-- <el-button @click="resetForm()">Reset</el-button> -->
         </el-form-item>
       </el-form>
     </div>
@@ -183,7 +183,7 @@ export default {
           // parent 当前选中元素的父元素
           let parent = <HTMLElement>clickDom.parentNode;
           // 选中效果
-          if (parent.className.search("section") !== -1) {
+          if (parent.className && parent.className.search("section") !== -1) {
             let check = document.getElementsByClassName("Check");
             for (let i = 0; i < check.length; i++) {
               check[i].classList.remove("Check");
@@ -232,14 +232,6 @@ export default {
         let elementRange = writer.createRange(firstRange, LastRange);
         // 通过section 范围获取到范围内的 element
         let element = model.schema.getLimitElement(elementRange);
-        const parent: any = selection.getFirstPosition().parent;
-        if (element.name === "$root") {
-          if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
-            element = parent.previousSibling;
-          } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
-            element = parent.nextSibling;
-          }
-        }
         const range = writer.createRangeOn(element);
         // 删除section
         // writer.remove(range);
@@ -274,15 +266,15 @@ export default {
     },
     /** 增加section的cases */
     addDomain() {
-      if(this.dynamicValidateForm.radio == "applicable" && this.dynamicValidateForm.cases.length <= 1){
+      if (this.dynamicValidateForm.radio == "applicable" && this.dynamicValidateForm.cases.length <= 1) {
         this.dynamicValidateForm.cases.push({
           value: "",
         });
-      }else if (this.dynamicValidateForm.radio !== "applicable" && this.dynamicValidateForm.cases.length < 4) {
+      } else if (this.dynamicValidateForm.radio !== "applicable" && this.dynamicValidateForm.cases.length < 4) {
         this.dynamicValidateForm.cases.push({
           value: "",
         });
-      }else{
+      } else {
       }
     },
     /** 保存当前cases的section数据 */
@@ -313,15 +305,6 @@ export default {
         const LastRange = selection.getLastPosition();
         const elementRange = writer.createRange(firstRange, LastRange);
         let element = model.schema.getLimitElement(elementRange);
-        const parent: any = selection.getFirstPosition().parent;
-        if (element.name === "$root") {
-          if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
-            element = parent.previousSibling;
-          } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
-            element = parent.nextSibling;
-          }
-          DocumentData = Array.from(element.getChildren()).map((item: any) => item.toJSON());
-        }
         const range = writer.createRangeOn(element);
         // 删除section
         // writer.remove(range);
@@ -340,7 +323,7 @@ export default {
       });
     },
     /** 提交当前modelname所属的section数据 */
-    submitSection(num) {
+    submitSection(num?) {
       const HTMLdata = safeJsonParse(safeJsonStringify(this.SectionDataHTML));
       const cases = this.dynamicValidateForm.cases.map(item => item.value);
       let casesList = {};
@@ -353,10 +336,10 @@ export default {
         (casesList as any)[cases[index]] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
       });
       this.SectionDataHTML = HTMLdata;
-      if(num == 2){
+      if (num == 2) {
         this.$emit("getStudentName", casesList);
-      }else{
-        this.submitSection(2)
+      } else {
+        this.submitSection(2);
       }
     },
     resetForm(formEl) {
@@ -416,8 +399,8 @@ export default {
           atttibutesList = Object.fromEntries([...atttibutesList]);
           // 创建元素
           if (item.tagName === "section") {
-            const cases = this.dynamicValidateForm.cases.map(item =>item.value);
-            atttibutesList["data-cases"] = safeJsonStringify(cases)
+            const cases = this.dynamicValidateForm.cases.map(item => item.value);
+            atttibutesList["data-cases"] = safeJsonStringify(cases);
             atttibutesList.currentcase = this.dynamicValidateForm.cases[0].value;
             dom = writer.createElement(V_SECTION, atttibutesList);
           } else if (item.tagName === "p") {
@@ -467,5 +450,8 @@ export default {
 }
 .ck-editor {
   width: 700px !important;
+}
+.case-input {
+  margin-bottom: 5px;
 }
 </style>

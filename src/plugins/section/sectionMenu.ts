@@ -20,7 +20,7 @@ export function setMarker(range) {
   model.change(writer => {
     // 添加可编辑的 marker，进行 markertohighlight 的下行转换
     const markers = Array.from(model.markers);
-    const lastMarkerName = Number((markers as any)[markers.length - 1].name.split(":")[1]);
+    const lastMarkerName = markers.length > 0 ? Number((markers as any)[markers.length - 1].name.split(":")[1]) : 0;
     const markerName = `restrictedEditingException:` + (lastMarkerName + 1);
     writer.addMarker(markerName, { range: range, usingOperation: true });
   });
@@ -55,16 +55,13 @@ export function toShowSectionMenu(clickDom: HTMLElement, vueObject: any) {
   const hasSection = domAncestorsPath.split("/").includes("SECTION");
   const sectionDom = <HTMLElement>document.querySelector(".ck-editor__nested-editable_focused");
   // 清空位置
-  // vueObject.positionRange = [];
-  // vueObject.menuVisible = false;
-  //todo ：如果是dom祖先里面有SECTION or tagname 是 svg/path classname 有 section-btn/section-menu 那就展示菜单
   if (hasSection || isSectionBtn) {
     vueObject.menuVisible = true;
   } else {
     vueObject.positionRange = [];
     vueObject.menuVisible = false;
   }
-  if (sectionDom) {    
+  if (sectionDom) {
     vueObject.attributsList = [
       { key: "type", value: sectionDom.getAttribute("type") },
       { key: "data-cases", value: sectionDom.getAttribute("data-cases") },
@@ -212,8 +209,12 @@ function createSectionInner(params) {
           setMarker(range);
         });
       } else {
-        // 如果不是span元素的话，创建text的后面的位置作为span前面的位置
-        beforePosition = !beforePosition ? writer.createPositionAfter(text) : beforePosition;
+        if (!text.parent) {
+          beforePosition.path = beforePosition.path.length < 2 ? [afterPosition.path[0] + text.offsetSize] : [afterPosition.path[0], afterPosition.path[1] + text.offsetSize];
+        } else {
+          // 如果不是span元素的话，创建text的后面的位置作为span前面的位置
+          beforePosition = !beforePosition ? writer.createPositionAfter(text) : beforePosition;
+        }
       }
     }
     // 递归

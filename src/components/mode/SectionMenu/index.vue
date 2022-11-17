@@ -6,9 +6,11 @@
   </span>
   <div>
     <el-card class="box-card" v-if="data.listVisible">
-      <div v-for="(item, index) in data.cases" :key="index" class="text item section-menu" @click="chengeCase(item)">
-        {{ item }}
-        <el-icon v-if="data.currentCase === item && data.casetype !== 'deletable'" class="select-case"><Select /></el-icon>
+      <div v-for="(item, index) in data.cases" :key="index" class="text-item section-menu" @click="chengeCase(item)">
+        <!-- <div class="section-menu"> -->
+          {{ item }}
+          <el-icon v-if="data.currentCase === item && data.casetype !== 'deletable'" class="select-case"><Select /></el-icon>
+        <!-- </div> -->
       </div>
     </el-card>
   </div>
@@ -74,7 +76,7 @@ const showList = () => {
   nextTick(() => {
     const menuBtn = <HTMLImageElement>document.querySelector(".box-card");
     const range = toRaw(positionRange.value);
-    menuBtn.style.left = <any>range[0] - 45 - 100 + "px";
+    menuBtn.style.left = <any>range[0] - 55 - 100 + "px";
     menuBtn.style.top = <any>range[1] - 3 + "px";
   });
 };
@@ -97,19 +99,22 @@ const chengeCase = (item: string) => {
   }
 }
 .box-card {
-  width: 100px;
+  width: 120px;
   position: absolute;
   :deep(.el-card__body) {
     padding: 0;
-    .item {
-      padding: 10px 10px 10px 10px;
+    .text-item {
+      position: relative;
+      padding: 10px 16px 10px 10px;
       text-align: center;
+      white-space: nowrap;
       &:hover {
         background-color: #f5f7fa;
       }
       .select-case {
         position: absolute;
-        right: 10px;
+        top: 13px;
+    right: 3px;
       }
     }
   }

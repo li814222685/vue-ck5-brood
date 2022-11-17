@@ -1,5 +1,7 @@
 <template>
   <div>
+    <!-- <el-button type="primary" @click="exportData" plain>导出</el-button>
+    <el-button type="primary" @click="importData" plain>导入</el-button> -->
     <div id="editor"></div>
     <SectionMenu :position-range="positionRange" :attributs-list="attributsList" :menu-visible="menuVisible" @changeCase="changeCase" />
   </div>
@@ -59,6 +61,14 @@ export default {
       });
   },
   methods: {
+    exportData() {
+      const markers = Array.from(window.editor.model.markers);
+      console.log(markers);
+      this.onchange(window.editor.getData());
+    },
+    importData() {
+      window.editor.setData(this.htmlData);
+    },
     /**
      * @description 全局点击事件
      * @param {event} e
@@ -100,9 +110,6 @@ export default {
         oldMarker: null,
         dom: null,
       };
-    },
-    exportData() {
-      this.onchange(window.editor.getData());
     },
     //v-select 相关的展示逻辑
     toShowSelect(clickDom, editor) {
