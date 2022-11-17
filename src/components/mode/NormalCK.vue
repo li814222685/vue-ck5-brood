@@ -234,11 +234,11 @@ export default {
         let element = model.schema.getLimitElement(elementRange);
         const parent: any = selection.getFirstPosition().parent;
         if (element.name === "$root") {
-          if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
-            element = parent.previousSibling;
-          } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
-            element = parent.nextSibling;
-          }
+          // if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
+          //   element = parent.previousSibling;
+          // } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
+          //   element = parent.nextSibling;
+          // }
         }
         const range = writer.createRangeOn(element);
         // 删除section
@@ -315,11 +315,11 @@ export default {
         let element = model.schema.getLimitElement(elementRange);
         const parent: any = selection.getFirstPosition().parent;
         if (element.name === "$root") {
-          if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
-            element = parent.previousSibling;
-          } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
-            element = parent.nextSibling;
-          }
+          // if (parent.previousSibling && parent.previousSibling.name == "v-section" && !parent.previousSibling.getAttribute("currentcase")) {
+          //   element = parent.previousSibling;
+          // } else if (parent.nextSibling && parent.nextSibling.name == "v-section" && !parent.nextSibling.getAttribute("currentcase")) {
+          //   element = parent.nextSibling;
+          // }
           DocumentData = Array.from(element.getChildren()).map((item: any) => item.toJSON());
         }
         const range = writer.createRangeOn(element);
@@ -347,12 +347,10 @@ export default {
       HTMLdata.forEach((item, index) => {
         let data = item.match(/data-cases=\"(.*?)\]"/g)[0];
         let currentcases = item.match(/currentcase=\"(.*?)\"/g)[0];
-        (casesList as any)[cases[index]] = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
-        (casesList as any)[cases[index]] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
-        let text = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value))
-        // console.log((casesList as any)[cases[index]], HTMLdata[index], text, "caselist");
         HTMLdata[index] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
         HTMLdata[index] = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
+        (casesList as any)[cases[index]] = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
+        (casesList as any)[cases[index]] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
       });
       this.SectionDataHTML = HTMLdata;
       if(num == 2){

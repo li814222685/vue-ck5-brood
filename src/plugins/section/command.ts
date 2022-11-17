@@ -109,7 +109,6 @@ export class SectionCommand extends Command {
         let quote = findQuote(groupRange.start);
         if (!quote) {
           quote = writer.createElement(V_SECTION);
-          const v_section = writer.createElement(V_SECTION); // => section
           // writer.addMarker("set", { range, usingOperation: true } );
           writer.setAttributes({ class: "cs" }, range);
           writer.wrap(groupRange, quote);
