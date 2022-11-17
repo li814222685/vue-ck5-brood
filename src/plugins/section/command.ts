@@ -64,6 +64,9 @@ export class SectionCommand extends Command {
     if (!firstBlock) {
       return false;
     }
+    if(selection.getLastPosition().path[1] == 0 && selection.getLastPosition().path[0] == 0){
+      return false;
+    }
     return checkCanBeQuoted(schema, firstBlock);
   }
   /**

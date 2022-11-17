@@ -247,7 +247,11 @@ export default {
         const newElement = this.createSectionInner(writer, parserSection, null, this);
         // const sectionElement = this.createSectionElement(writer, SectionData);
         // model.insertContent(newElement, model.document.selection, "on");
-        model.insertObject(newElement, range);
+        const newRange = model.insertObject(newElement, range);
+        // console.log(newRange.getWalker())
+        // console.log(newRange.getPositions())
+        // console.log( model.document.selection)
+        // selection.setFocus()
         // setTimeout(() => {
         //   // 存储section的html
         //   let set = document.getElementById(element.getAttribute('id'));
