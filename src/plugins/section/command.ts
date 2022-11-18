@@ -114,8 +114,8 @@ export class SectionCommand extends Command {
           quote = writer.createElement(V_SECTION);
           // writer.addMarker("set", { range, usingOperation: true } );
           writer.setAttributes({ class: "cs" }, range);
-          writer.wrap(groupRange, quote);
           console.log(groupRange, range, blocks);
+          writer.wrap(groupRange, quote);
           // writer.wrap(range, quote);
           this.editor.editing.view.focus();
         }

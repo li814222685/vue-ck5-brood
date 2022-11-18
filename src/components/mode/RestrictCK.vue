@@ -1,7 +1,7 @@
 <template>
   <div>
-    <!-- <el-button type="primary" @click="exportData" plain>导出</el-button>
-    <el-button type="primary" @click="importData" plain>导入</el-button> -->
+    <el-button type="primary" @click="exportData" plain>导出</el-button>
+    <!-- <el-button type="primary" @click="importData" plain>导入</el-button> -->
     <div id="editor"></div>
     <SectionMenu :position-range="positionRange" :attributs-list="attributsList" :menu-visible="menuVisible" @changeCase="changeCase" />
   </div>

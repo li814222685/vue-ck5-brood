@@ -302,7 +302,7 @@ export default {
     },
     /** 提交当前modelname所属的section数据 */
     submitSection(num?: number) {
-      if (this.dynamicValidateForm.radio == "applicable" && this.dynamicValidateForm.cases.length > 0) {
+      if (this.dynamicValidateForm.radio == "applicable" && this.dynamicValidateForm.cases.length > 2) {
         ElMessage({
           message: "适用/不适用类型只能有两个case。",
           type: "warning",
