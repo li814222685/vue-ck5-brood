@@ -274,7 +274,6 @@ export default {
       };
       const model = (window as any).devEditor.model;
       const selection: selection = model.document.selection;
-      const parent: any = Array.from(selection.getSelectedBlocks())[0].parent;
       const blocks = Array.from(Array.from(selection.getSelectedBlocks())[0].parent.getChildren());
       let DocumentData = blocks.map(item => item.toJSON());
       model.change(writer => {
@@ -289,9 +288,7 @@ export default {
         // 执行创建section元素并添加子元素
         const sectionElement = this.createSectionElement(writer, DocumentData, modelData);
         this.SectionData[index] = safeJsonParse(safeJsonStringify(sectionElement));
-        // console.log(sectionElement, range, element, "DocumentData");
         model.insertObject(sectionElement, range);
-        // model.insertContent(sectionElement, model.document.selection, "on");
         let idname = "section" + userFormData.cases.length;
         setTimeout(() => {
           // 存储section的html
