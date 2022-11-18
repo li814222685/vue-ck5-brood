@@ -58,7 +58,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitSection">保存section</el-button>
-          <el-button @click="addDomain">新增cases</el-button>
+          <el-button :disabled="dynamicValidateForm.cases.length >= 2 && dynamicValidateForm.radio == 'applicable'" @click="addDomain">新增cases</el-button>
           <!-- <el-button @click="resetForm()">Reset</el-button> -->
         </el-form-item>
       </el-form>
@@ -93,6 +93,7 @@ import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import selection from "@ckeditor/ckeditor5-engine/src/model/selection";
 import { parse, stringify } from "himalaya";
 import { safeJsonStringify, safeJsonParse } from "../utils";
+import { ElMessage } from "element-plus";
 export default {
   props: ["htmlData", "nowMode", "onchange"],
   data() {
@@ -175,11 +176,7 @@ export default {
           const model = (window as any).devEditor.model;
           const selection: selection = model.document.selection;
           console.log(Array.from(selection.getSelectedBlocks()), "getSelectedBlocks");
-          const parent: any = Array.from(selection.getSelectedBlocks())[0].parent;
-          if (parent.getAttribute("modelname") !== "undefind") {
-            // console.log(parent.getAttribute("modelname"));
-          }
-          // clickDom.focus();
+          // const parent: any = Array.from(selection.getSelectedBlocks())[0].parent;
         } else {
           // parent 当前选中元素的父元素
           let parent = <HTMLElement>clickDom.parentNode;
@@ -190,16 +187,6 @@ export default {
               check[i].classList.remove("Check");
             }
             parent.classList.add("Check");
-          } else {
-            // const editor = window.editor;
-            // console.log(window.editor)
-            //  editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
-            //       console.log( `View document is focused: ${ isFocused }.` );
-            //   } );
-            // let check = document.getElementsByClassName("Check")
-            // for(let i = 0;i<check.length;i++){
-            //   check[i].classList.remove('Check')
-            // }
           }
         }
       }, 1);
@@ -235,23 +222,9 @@ export default {
         let element = model.schema.getLimitElement(elementRange);
         const range = writer.createRangeOn(element);
         // 删除section
-        // writer.remove(range);
         // 创建新的element，插入   newElement ：dom创建   sectionElement ：element元素创建
         const newElement = this.createSectionInner(writer, parserSection, null, this);
-        // const sectionElement = this.createSectionElement(writer, SectionData);
-        // model.insertContent(newElement, model.document.selection, "on");
         const newRange = model.insertObject(newElement, range);
-        // console.log(newRange.getWalker())
-        // console.log(newRange.getPositions())
-        // console.log( model.document.selection)
-        // selection.setFocus()
-        // setTimeout(() => {
-        //   // 存储section的html
-        //   let set = document.getElementById(element.getAttribute('id'));
-        //   console.log(set)
-        //   console.log(this.SectionDataHTML[index])
-        //   this.SectionDataHTML[index] = set.outerHTML;
-        // }, 1000);
       });
     },
     /** 置顶当前选中的section */
@@ -328,7 +301,14 @@ export default {
       });
     },
     /** 提交当前modelname所属的section数据 */
-    submitSection(num?) {
+    submitSection(num?: number) {
+      if (this.dynamicValidateForm.radio == "applicable" && this.dynamicValidateForm.cases.length > 0) {
+        ElMessage({
+          message: "适用/不适用类型只能有两个case。",
+          type: "warning",
+        });
+        return;
+      }
       const HTMLdata = safeJsonParse(safeJsonStringify(this.SectionDataHTML));
       const cases = this.dynamicValidateForm.cases.map(item => item.value);
       let casesList = {};
@@ -384,7 +364,6 @@ export default {
       const create = writer.createElement(V_SECTION, modeData);
       DocumentData.map(item => {
         const p = writer.createElement(item.name);
-        let dataname = "";
         item.children.map((items, index) => {
           let text = writer.createText(items.data || items.name, items.attributes);
           writer.append(text, p);
@@ -394,8 +373,7 @@ export default {
       return create;
     },
     createSectionInner(writer, parserDom, parentElement) {
-      let elementList = [],
-        text = null,
+      let text = null,
         dom = null;
       for (let item of parserDom) {
         if (item.type === "element") {
@@ -414,8 +392,6 @@ export default {
             item.children.map(items => {
               dom = writer.createText(items.content, { restrictedEditingException: true });
             });
-            // dom = writer.createElement(V_SPAN, atttibutesList);
-            // dom = writer.createText(V_SPAN, atttibutesList);
           } else {
             atttibutesList["data-cke-ignore-events"] = true;
             dom = writer.createElement(item.tagName, atttibutesList);
@@ -426,7 +402,7 @@ export default {
           }
         } else {
           // 不是元素的创建文字插入到dom中
-          text = writer.insertText(item.content, parentElement);
+          writer.append( writer.createText(item.content), parentElement);
         }
         // 递归
         if (item.children && item.tagName !== "span") {
