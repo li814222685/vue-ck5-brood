@@ -579,7 +579,7 @@ export default {
           const selection: selection = model.document.selection;
           const elementSection:any = Array.from(selection.getSelectedBlocks())[0].parent
           const currentcase = elementSection.getAttribute("currentcase")
-          this.CheckDomain(2)
+          // this.CheckDomain(2)
         }
       }else{
         if(val =="applicable"){
@@ -613,10 +613,11 @@ export default {
 .ck-editor {
   width: 700px !important;
 }
-.el-button--primary {
+.el-form-item__content >.el-button--primary {
   border-radius: 0px !important;
-  background: #c3bdbd;
-  color: #0b0404;
+  /* background: #c3bdbd; */
+  /* color: #0b0404; */
+  border-right:1px solid #f4efef;
   margin-left: 0px !important;
 }
 </style>
