@@ -149,7 +149,6 @@ import { NORMAL_CONFIG } from "./config.js";
 import { emitter, SWITCH_MODAL, SECTION_MODAL, Option, Section, GET_OPTIONS } from "./mitt";
 import SelectDialog from "./SelectDialog/index.vue";
 import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
-import { COMMAND__INSERT_SECTION } from "../../plugins/section/constant";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import "../../plugins/theme/style-setion.css";
 import { V_SECTION, V_SPAN } from "../../plugins/section/constant";
@@ -184,6 +183,36 @@ export default {
         modelName: "",
         radio: "deletable",
       },
+      ValidateDeletabl:{ 
+        cases: [
+          {
+            value:""
+          }
+        ],
+        modelName: "",
+        radio: "deletable",
+      },
+      ValidateSwitchable:{ 
+        cases: [
+          {
+            value:""
+          }
+        ],
+        modelName: "",
+        radio: "switchable",
+      },
+      ValidateApplicable:{ 
+        cases: [
+          {
+            value:"适用"
+          },
+          {
+            value:"不适用"
+          }
+        ],
+        modelName: "",
+        radio: "applicable",
+      },
       SectionData: [], // element元素
       SectionDataHTML: [], // html文本
     };
@@ -203,9 +232,6 @@ export default {
       .catch(error => {});
   },
   methods: {
-    aa(){
-      console.log(123)
-    },
     exportData() {
       this.onchange((window as any).devEditor.getData());
       this.submitSection()
@@ -526,6 +552,23 @@ export default {
       return dom;
     },
     changeRadio(val) {
+      this.SectionData = [];
+      this.SectionDataHTML = [];
+      this.ValidateDeletabl = this.$options.data().ValidateDeletabl
+      this.ValidateSwitchable = this.$options.data().ValidateSwitchable
+      this.ValidateApplicable = this.$options.data().ValidateApplicable
+      if(val == "deletable"){
+        this.dynamicValidateForm.cases = this.ValidateDeletabl.cases
+        this.dynamicValidateForm.type = this.ValidateDeletabl.radio
+      }
+      if(val == "switchable"){
+        this.dynamicValidateForm.cases = this.ValidateSwitchable.cases
+        this.dynamicValidateForm.type = this.ValidateSwitchable.radio
+      }
+      if(val == "applicable"){
+        this.dynamicValidateForm.cases = this.ValidateApplicable.cases
+        this.dynamicValidateForm.type = this.ValidateApplicable.radio
+      }
       if(this.dynamicValidateForm.cases.length !== 0 && this.dynamicValidateForm.cases[0].value !==""){
         if(val =="applicable"){
           ElMessage({
@@ -535,7 +578,6 @@ export default {
           const model = (window as any).devEditor.model;
           const selection: selection = model.document.selection;
           const elementSection:any = Array.from(selection.getSelectedBlocks())[0].parent
-          console.log(elementSection)
           const currentcase = elementSection.getAttribute("currentcase")
           this.CheckDomain(2)
         }
