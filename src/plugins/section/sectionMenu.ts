@@ -49,7 +49,6 @@ export function toShowSectionMenu(clickDom: HTMLElement, vueObject: any) {
   const domAncestorsPath = getDomPath(clickDom);
   const tagName = clickDom.tagName;
   const classList = clickDom.classList;
-  const isSelected = Array.from(clickDom.classList).includes("visual-select");
   // tagname 是svg/path classname 有section-btn / section-menu
   const isSectionBtn = tagName == "svg" || tagName == "path" || Array.from(classList).includes("section-btn") || Array.from(classList).includes("section-menu");
   const hasSection = domAncestorsPath.split("/").includes("SECTION");
@@ -88,7 +87,7 @@ export function changeCaseValue(param: caseValueConfig) {
   const { model } = editor;
   const modelSelection = model.document.selection;
   // 获取html标签字符串转换的对象
-  const newParserSection = changeObject(_.clone(parse(casesList[caseName])));
+  const newParserSection = caseName== "删除" ?  changeObject(_.clone(parse(Object.values(casesList)[0]))) : changeObject(_.clone(parse(casesList[caseName])));
   model.change(writer => {
     // 获取section范围
     const elementRange = writer.createRange(modelSelection.getFirstPosition(), modelSelection.getLastPosition());
