@@ -50,17 +50,77 @@
             trigger: 'blur',
           }"
         >
-          <el-input class="case-input" v-model="domain.value" />
-          <el-button class="mt-2" type="primary" @click.prevent="submitForm(domain, dynamicValidateForm)">保存</el-button>
-          <el-button class="mt-2" @click.prevent="removeDomain(domain)">删除</el-button>
-          <el-button class="mt-2" @click.prevent="CheckDomain(domain)">切换</el-button>
-          <el-button class="mt-2" @click.prevent="CheckTopping(domain)">置顶</el-button>
+        <el-input 
+          class="case-input" 
+          v-model="domain.value"
+          :readonly="dynamicValidateForm.radio == 'applicable'"
+          @focus="()=>{dynamicValidateForm.radio == 'applicable' ? submitForm(domain, dynamicValidateForm) : ''}"
+          @change="submitForm(domain, dynamicValidateForm)"
+          v-if="dynamicValidateForm.radio !== 'applicable'"
+        >
+          <template #append
+          v-if="index == dynamicValidateForm.cases.length -1"
+          >
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="复制"
+              placement="top-start"
+            >
+            <el-button  :disabled="dynamicValidateForm.cases.length >= 2 && dynamicValidateForm.radio == 'applicable'" :icon="CopyDocument" @click="addDomain"/>
+            </el-tooltip>
+          </template>
+        </el-input>
+        <el-input 
+          class="case-input" 
+          v-model="domain.value"
+          :readonly="dynamicValidateForm.radio == 'applicable'"
+          @focus="()=>{dynamicValidateForm.radio == 'applicable' ? submitForm(domain, dynamicValidateForm) : CheckDomain(domain)}"
+          @change="submitForm(domain, dynamicValidateForm)"
+          v-if="dynamicValidateForm.radio == 'applicable'"
+            />
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="删除"
+            placement="top-start"
+            v-if="dynamicValidateForm.radio !== 'applicable'"
+          >
+            <el-button 
+              type="primary" 
+              @click.prevent="removeDomain(domain)" 
+              :icon="Delete"
+              ></el-button>
+          </el-tooltip>
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="切换"
+            placement="top-start"
+          >
+            <el-button 
+              type="primary" 
+              @click.prevent="CheckDomain(domain)" 
+              :icon="Checked"
+              ></el-button>
+          </el-tooltip>
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            content="置顶"
+            placement="top-start"
+            v-if="dynamicValidateForm.radio !== 'applicable'"
+          >
+            <el-button 
+              type="primary" 
+              @click.prevent="CheckTopping(domain)" 
+              :icon="Upload"
+            ></el-button>
+          </el-tooltip>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="submitSection">保存section</el-button>
+        <!-- <el-form-item>
           <el-button :disabled="dynamicValidateForm.cases.length >= 2 && dynamicValidateForm.radio == 'applicable'" @click="addDomain">新增cases</el-button>
-          <!-- <el-button @click="resetForm()">Reset</el-button> -->
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
     </div>
   </div>
@@ -75,6 +135,10 @@
 }
 .ck-editor {
   width: 700px !important;
+}
+/deep/ .el-form-item__content{
+  justify-content: space-between;
+  flex-wrap: nowrap;
 }
 </style>
 
@@ -94,8 +158,15 @@ import selection from "@ckeditor/ckeditor5-engine/src/model/selection";
 import { parse, stringify } from "himalaya";
 import { safeJsonStringify, safeJsonParse } from "../utils";
 import { ElMessage } from "element-plus";
+import { toRaw } from "vue";
+import {Upload,Delete,Checked,CopyDocument} from '@element-plus/icons-vue'
 export default {
-  props: ["htmlData", "nowMode", "onchange"],
+  props: ["htmlData", "nowMode", "onchange","sectionData"],
+  setup() {
+            return {
+              Upload,Delete,Checked,CopyDocument
+            }
+         },
   data() {
     return {
       editor: {},
@@ -107,8 +178,8 @@ export default {
       dynamicValidateForm: {
         cases: [
           {
-            value: "",
-          },
+            value:""
+          }
         ],
         modelName: "",
         radio: "deletable",
@@ -132,8 +203,12 @@ export default {
       .catch(error => {});
   },
   methods: {
+    aa(){
+      console.log(123)
+    },
     exportData() {
       this.onchange((window as any).devEditor.getData());
+      this.submitSection()
     },
     swtichModal() {
       this.dialogVisible = !this.dialogVisible;
@@ -155,7 +230,33 @@ export default {
       this.selectedOptions = _.cloneDeep(options);
     },
     /** section选中效果 */
-    onParagraph(e) {
+    onParagraph(e) { 
+      const model = (window as any).devEditor.model;
+      const selection: selection = model.document.selection;
+      const elementSection:any = Array.from(selection.getSelectedBlocks())[0].parent
+      const modelname = elementSection.getAttribute("modelname")
+      const cases = elementSection.getAttribute("data-cases")
+      const radio = elementSection.getAttribute("type")
+      if(this.dynamicValidateForm.modelName == ""){
+        if( cases && safeJsonParse(cases)){
+          if(this.dynamicValidateForm.cases[0].value ==""){
+            this.dynamicValidateForm.cases.splice(0,1)
+          }
+          safeJsonParse(cases).map((item,index)=>{
+            this.dynamicValidateForm.cases.push({"value":item})
+          })
+          this.dynamicValidateForm.modelName = modelname
+          this.dynamicValidateForm.radio = radio
+        }
+      }
+      if(elementSection.name == V_SECTION){
+        const data = toRaw(this.sectionData)
+
+        for (let key in data) {
+          this.SectionDataHTML.push(data[key])
+        }
+      }
+          // console.log(Array.from(selection.getSelectedBlocks())[0].parent.getChildren());
       // if(document.getElementsByClassName('ck-editor')[0].contains(e.srcElement)){
       //   let check = document.getElementsByClassName("Check")
       //   for(let i = 0;i<check.length;i++){
@@ -173,9 +274,8 @@ export default {
             check[i].classList.remove("Check");
           }
           clickDom.classList.add("Check");
-          const model = (window as any).devEditor.model;
-          const selection: selection = model.document.selection;
-          console.log(Array.from(selection.getSelectedBlocks()), "getSelectedBlocks");
+         
+         
           // const parent: any = Array.from(selection.getSelectedBlocks())[0].parent;
         } else {
           // parent 当前选中元素的父元素
@@ -208,9 +308,14 @@ export default {
     },
     /** 切换选中的section */
     CheckDomain(item) {
-      const index = this.dynamicValidateForm.cases.indexOf(item);
-      let SectionData = safeJsonParse(safeJsonStringify(this.SectionData[index]));
+      console.log(item)
+      if(item.value ==""){
+        return false;
+      }
+      const index = item == 2 ? 0 : this.dynamicValidateForm.cases.indexOf(item);
+      // let SectionData = safeJsonParse(safeJsonStringify(this.SectionData[index]));
       let SectionDataHTML = this.SectionDataHTML[index];
+      console.log(SectionDataHTML)
       const parserSection = parse(SectionDataHTML);
       const model = (window as any).devEditor.model;
       const selection = model.document.selection;
@@ -249,14 +354,23 @@ export default {
           value: "",
         });
       } else if (this.dynamicValidateForm.radio !== "applicable" && this.dynamicValidateForm.cases.length < 4) {
-        this.dynamicValidateForm.cases.push({
-          value: "",
-        });
+        if(this.dynamicValidateForm.radio == "deletable" && this.dynamicValidateForm.cases.length == 1){
+          
+          ElMessage({
+            message: "可删除类型只能有一个case。",
+            type: "warning",
+          });
+        }else{
+          this.dynamicValidateForm.cases.push({
+            value: "",
+          });
+        }
       } else {
       }
     },
     /** 保存当前cases的section数据 */
     submitForm(item, formEl) {
+      console.log(321)
       const index = this.dynamicValidateForm.cases.indexOf(item);
       const userFormData = safeJsonParse(safeJsonStringify(formEl));
       if (!userFormData.modelName || userFormData.modelName == "") return;
@@ -375,6 +489,9 @@ export default {
     createSectionInner(writer, parserDom, parentElement) {
       let text = null,
         dom = null;
+      if(this.dynamicValidateForm.radio =="applicable"){
+        this.dynamicValidateForm.cases = [{"value":"适用"},{"value":"不适用"}]
+      }
       for (let item of parserDom) {
         if (item.type === "element") {
           // 返回元素属性对象
@@ -411,14 +528,39 @@ export default {
       }
       return dom;
     },
-    changeRadio(val) {},
-  },
-  computed: {
-    nowMode() {
-      if (this.nowMode) {
-        return this.nowMode;
+    changeRadio(val) {
+      if(this.dynamicValidateForm.cases.length !== 0 && this.dynamicValidateForm.cases[0].value !==""){
+        if(val =="applicable"){
+          ElMessage({
+            message: "适用/不适用类型只能有两个case。",
+            type: "warning",
+          });
+          const model = (window as any).devEditor.model;
+          const selection: selection = model.document.selection;
+          const elementSection:any = Array.from(selection.getSelectedBlocks())[0].parent
+          console.log(elementSection)
+          const currentcase = elementSection.getAttribute("currentcase")
+          this.CheckDomain(2)
+        }
+      }else{
+        if(val =="applicable"){
+          this.dynamicValidateForm.cases = [{"value":"适用"},{"value":"不适用"}]
+        }else if(val =="deletable"){
+           ElMessage({
+            message: "可删除类型只能有一个case。",
+            type: "warning",
+          });
+        }
+        
       }
     },
+  },
+  computed: {
+    // nowMode() {
+    //   if (this.nowMode) {
+    //     return this.nowMode;
+    //   }
+    // },
   },
 };
 </script>
@@ -432,7 +574,10 @@ export default {
 .ck-editor {
   width: 700px !important;
 }
-.case-input {
-  margin-bottom: 5px;
+.el-button--primary {
+  border-radius: 0px !important;
+  background: #c3bdbd;
+  color: #0b0404;
+  margin-left: 0px !important;
 }
 </style>

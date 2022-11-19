@@ -4,7 +4,7 @@
       <el-radio :label="EditorMode.Normal" size="large">编辑模式</el-radio>
       <el-radio :label="EditorMode.Restrict" size="large">模版模式</el-radio>
     </el-radio-group>
-    <NormalCK ref="normalRef" v-if="nowMode === EditorMode.Normal" :htmlData="htmlData" :onchange="changeHtmlData" :nowMode="nowMode" @getStudentName="getStudentName" />
+    <NormalCK ref="normalRef" v-if="nowMode === EditorMode.Normal" :htmlData="htmlData" :onchange="changeHtmlData" :nowMode="nowMode" @getStudentName="getStudentName" :sectionData="sectionData"/>
     <RestrictCK ref="restrictRef" v-else :htmlData="htmlData" :sectionData="sectionData" :onchange="changeHtmlData" :nowMode="nowMode" />
   </div>
 </template>
