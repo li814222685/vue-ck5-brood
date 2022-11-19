@@ -83,8 +83,7 @@ export function toShowSectionMenu(clickDom: HTMLElement, vueObject: any) {
  */
 export function changeCaseValue(param: caseValueConfig) {
   const { caseName, currentCase, casesList, vueObject } = param;
-  const editor = (window as any).editor;
-  const { model } = editor;
+  const { model } = (window as any).editor;
   const modelSelection = model.document.selection;
   // 获取html标签字符串转换的对象
   const newParserSection = caseName== "删除" ?  changeObject(_.clone(parse(Object.values(casesList)[0]))) : changeObject(_.clone(parse(casesList[caseName])));
