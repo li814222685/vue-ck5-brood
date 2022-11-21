@@ -33,7 +33,7 @@ export default class TableControlsUI extends Plugin {
         type: "button",
         model: new Model({
           withText: true,
-          label: "插入普通CC ( ⌘ / CTRL + J )",
+          label: "插入普通CC ( ⌘ / ALT + Z )",
           cmd: COMMAND_NAME__INSERT_TABLE_NORMAL,
         }),
       });
@@ -44,7 +44,7 @@ export default class TableControlsUI extends Plugin {
         type: "button",
         model: new Model({
           withText: true,
-          label: "插入Select",
+          label: "插入Select ( ⌘ / ALT + X )",
           cmd: COMMAND_NAME__INSERT_TABLE_SELECT,
           options: [
             { label: "早安", value: "morning" },
@@ -61,7 +61,8 @@ export default class TableControlsUI extends Plugin {
         withText: true,
         label: "插入TABLE-CC",
       });
-      editor.keystrokes.set("CTRL+J", COMMAND_NAME__INSERT_TABLE_NORMAL);
+      editor.keystrokes.set("ALT+Z", COMMAND_NAME__INSERT_TABLE_NORMAL);
+      editor.keystrokes.set("ALT+X", COMMAND_NAME__INSERT_TABLE_SELECT);
 
       addListToDropdown(dropdownView, items);
 

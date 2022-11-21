@@ -183,9 +183,9 @@ export default class TableControlsEditing extends Plugin {
   listenClickForRestrictMode(target, { model, editingView }) {
     const modelSelection = model.document.selection;
     const marker = getMarkerAtPosition(this.editor, modelSelection.anchor);
+    const findOptionListFromAncestorTd = target?.findAncestor("td")?.getAttribute("optionlist");
+    if (!marker && !findOptionListFromAncestorTd) return;
 
-    if (!marker) return;
-    const findOptionListFromAncestorTd = target.findAncestor("td").getAttribute("optionlist");
     const plainOptionList = safeJsonParse(findOptionListFromAncestorTd);
 
     new Promise(res => {
