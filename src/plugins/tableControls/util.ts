@@ -260,7 +260,7 @@ export const handleSelectEvent = (dom: HTMLDOM) => {
     optionList_item[key].onclick = onOptionsClick;
   });
 
-  bindSelectListener(dropdown_text);
+  // bindSelectListener(dropdown_text);
 };
 
 /** TableSelect Handler */
@@ -306,15 +306,19 @@ class SelectClickCollection {
   static bindSelectListener(dropdownText: HTMLDOM) {
     if (!dropdownText) return;
     //select 失焦处理
-    document.onclick = function (event) {
-      const target: any = event.target;
-      if (target.tagName !== "P" && V_SELECT_DROPDOWN_TEXT_SELE != target.className) {
-        if (!document.querySelector(".v_select_optionList")) return;
-        (document.querySelector(".v_select_optionList") as any).style.display = "none";
-        document.getElementById(V_SELECT_DROPDOWN_TEXT).className = V_SELECT_DROPDOWN_TEXT;
-        document.getElementById("theme_icon").className = TRIANGlE_UP;
-      }
-    };
+    //不能这样实现失焦 覆盖onclick 不可以
+    // document.onclick = function (event) {
+    //   const target: any = event.target;
+    //   if (target.tagName !== "P" && V_SELECT_DROPDOWN_TEXT_SELE != target.className) {
+    //     if (!document.querySelector(".v_select_optionList")) return;
+    //     (document.querySelector(".v_select_optionList") as any).style.display = "none";
+    //     document.getElementById(V_SELECT_DROPDOWN_TEXT).className = V_SELECT_DROPDOWN_TEXT;
+    //     document.getElementById("theme_icon").className = TRIANGlE_UP;
+    // const dropdown_text = document.getElementById(V_SELECT_DROPDOWN_TEXT);
+
+    // emitter.emit(REPLACE_HIDDEN_ITEM_TEXT, dropdown_text.innerText);
+    //   }
+    // };
 
     /** Select ContentEditable 的onChange 和 Select 的搜索功能*/
     dropdownText.addEventListener("input", e => {

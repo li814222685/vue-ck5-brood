@@ -20,19 +20,20 @@ import {
   V_DIV_CONTAINER,
   V_SPAN,
   HIDDEN_ITEM,
+  V_SELECT_DROPDOWN_TEXT,
 } from "./constant";
 import { TableControlsCommand, TableSelectCommand, SetTableSelectOptionList } from "./command";
 import { V_SELECT } from "./constant";
 import { toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import { toWidget } from "@ckeditor/ckeditor5-widget/src/utils";
-import { emitter } from "../../components/mode/mitt";
+import { emitter, REPLACE_HIDDEN_ITEM_TEXT } from "../../components/mode/mitt";
 import {
   SWITCH_MODAL,
   SET_OPTIONS,
   SET_TARGET,
   SAVE_HIDDEN_ITEM,
 } from "../../components/mode/mitt";
-import { safeJsonParse } from "../../components/utils";
+import { safeJsonParse, safeJsonStringify } from "../../components/utils";
 import { getMarkerAtPosition } from "@/plugins/formControls/utils.js";
 
 export default class TableControlsEditing extends Plugin {
@@ -231,6 +232,13 @@ export default class TableControlsEditing extends Plugin {
         tableControlsConfig?.isRestrictMode
           ? this.listenClickForRestrictMode(target, { model, editingView })
           : this.listenClickForNormalMode(target);
+      } else {
+        const dropdown_text = document.getElementById(V_SELECT_DROPDOWN_TEXT);
+        //Table Select Blur
+        //当点击其他文档流时，让Select内的值直接替换 文本元素的文本
+        if (safeJsonStringify(dropdown_text?.innerText).replace("\\n", "") != '""') {
+          emitter.emit(REPLACE_HIDDEN_ITEM_TEXT, dropdown_text.innerText);
+        }
       }
     });
   }

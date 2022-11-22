@@ -150,6 +150,8 @@ export default {
       const model = editor.model;
       const { oldViewElement: restoreItem, oldMarker, newRange: removeRange } = toRaw(this.deposit);
       const oldRange = oldMarker.getRange();
+      removeElement(removeRange);
+
       //1.显示隐藏的元素
       removeClass(HIDDEN_CLASS, restoreItem);
 
@@ -159,7 +161,13 @@ export default {
         model.insertContent(text, oldRange);
       });
       // 3. 销毁掉Select
-      removeElement(removeRange);
+      console.log("我执行了");
+      this.deposit = {
+        oldViewElement: null,
+        newRange: null,
+        oldMarker: null,
+        dom: null,
+      };
     },
   },
   computed: {
