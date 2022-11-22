@@ -45,8 +45,10 @@ onUpdated(() => {
 });
 
 const changeHtmlData = (val: string) => {
-  console.log(val);
-  htmlData.value = val;
+  const sameStr = htmlData.value.replace(/[\r\n +]/g,"") == val.replace(/[\r\n +]/g,"")
+  if (!sameStr) {
+    htmlData.value = val;
+  }
 };
 const getStudentName = (val: string) => {
   // console.log(val);

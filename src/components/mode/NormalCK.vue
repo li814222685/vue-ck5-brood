@@ -93,20 +93,11 @@
               </el-tooltip>
             </template>
           </el-input>
-          <el-input
-            class="case-input"
-            v-model="domain.value"
-            :readonly="dynamicValidateForm.radio == 'applicable'"
-            @focus="
-              () => {
-                dynamicValidateForm.radio == 'applicable'
-                  ? submitForm(domain, dynamicValidateForm)
-                  : CheckDomain(domain);
-              }
-            "
-            @change="submitForm(domain, dynamicValidateForm)"
-            v-if="dynamicValidateForm.radio == 'applicable'"
-          />
+          <el-row v-if="dynamicValidateForm.radio == 'applicable'">
+            <span>{{ domain.value }}</span>
+            <el-divider direction="vertical" />
+            <el-button @click="submitForm(domain, dynamicValidateForm)" plain>保存</el-button>
+          </el-row>
           <el-tooltip
             class="box-item"
             effect="dark"
@@ -311,13 +302,6 @@ export default {
           this.SectionDataHTML.push(data[key]);
         }
       }
-      // console.log(Array.from(selection.getSelectedBlocks())[0].parent.getChildren());
-      // if(document.getElementsByClassName('ck-editor')[0].contains(e.srcElement)){
-      //   let check = document.getElementsByClassName("Check")
-      //   for(let i = 0;i<check.length;i++){
-      //     check[i].classList.remove('Check')
-      //   }
-      // }
       setTimeout(() => {
         const clickDom = <HTMLElement>(
           document.elementFromPoint(e.clientX, e.clientY)
@@ -331,8 +315,6 @@ export default {
             check[i].classList.remove("Check");
           }
           clickDom.classList.add("Check");
-
-          // const parent: any = Array.from(selection.getSelectedBlocks())[0].parent;
         } else {
           // parent 当前选中元素的父元素
           let parent = <HTMLElement>clickDom.parentNode;
@@ -684,13 +666,10 @@ export default {
         }
       }
     },
-  },
-  computed: {
-    // nowMode() {
-    //   if (this.nowMode) {
-    //     return this.nowMode;
-    //   }
-    // },
+    applicableClick(domain) {
+      console.log(domain);
+      this.submitForm(domain, this.dynamicValidateForm);
+    },
   },
 };
 </script>
@@ -715,15 +694,7 @@ export default {
     margin-left: 0px !important;
   }
 }
-</style>
-<style scoped>
-.hidden-item {
-  display: none;
-}
-.extendBackground {
-  background-color: rgba(255, 169, 77, 0.2) !important;
-}
-.ck-editor {
-  width: 700px !important;
+.el-divider--vertical {
+  top: 8px;
 }
 </style>
