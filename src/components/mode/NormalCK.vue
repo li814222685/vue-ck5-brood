@@ -5,7 +5,12 @@
     <br />
     <div class="content">
       <div id="devEditor"></div>
-      <el-form ref="formRef" :model="dynamicValidateForm" label-width="120px" class="demo-dynamic">
+      <el-form
+        ref="formRef"
+        :model="dynamicValidateForm"
+        label-width="120px"
+        class="demo-dynamic"
+      >
         <el-form-item
           prop="modelName"
           label="模块名称"
@@ -33,7 +38,10 @@
           ]"
           label="Type"
         >
-          <el-radio-group v-model="dynamicValidateForm.radio" @change="changeRadio">
+          <el-radio-group
+            v-model="dynamicValidateForm.radio"
+            @change="changeRadio"
+          >
             <el-radio label="deletable">可删除</el-radio>
             <el-radio label="switchable">可切换</el-radio>
             <el-radio label="applicable">适用/不适用</el-radio>
@@ -50,35 +58,55 @@
             trigger: 'blur',
           }"
         >
-        <el-input 
-          class="case-input" 
-          v-model="domain.value"
-          :readonly="dynamicValidateForm.radio == 'applicable'"
-          @focus="()=>{dynamicValidateForm.radio == 'applicable' ? submitForm(domain, dynamicValidateForm) : ''}"
-          @change="submitForm(domain, dynamicValidateForm)"
-          v-if="dynamicValidateForm.radio !== 'applicable'"
-        >
-          <template #append
-          v-if="index == dynamicValidateForm.cases.length -1"
+          <el-input
+            class="case-input"
+            v-model="domain.value"
+            :readonly="dynamicValidateForm.radio == 'applicable'"
+            @focus="
+              () => {
+                dynamicValidateForm.radio == 'applicable'
+                  ? submitForm(domain, dynamicValidateForm)
+                  : '';
+              }
+            "
+            @change="submitForm(domain, dynamicValidateForm)"
+            v-if="dynamicValidateForm.radio !== 'applicable'"
           >
-            <el-tooltip
-              class="box-item"
-              effect="dark"
-              content="复制"
-              placement="top-start"
+            <template
+              #append
+              v-if="index == dynamicValidateForm.cases.length - 1"
             >
-            <el-button  :disabled="dynamicValidateForm.cases.length >= 2 && dynamicValidateForm.radio == 'applicable'" :icon="CopyDocument" @click="addDomain"/>
-            </el-tooltip>
-          </template>
-        </el-input>
-        <el-input 
-          class="case-input" 
-          v-model="domain.value"
-          :readonly="dynamicValidateForm.radio == 'applicable'"
-          @focus="()=>{dynamicValidateForm.radio == 'applicable' ? submitForm(domain, dynamicValidateForm) : CheckDomain(domain)}"
-          @change="submitForm(domain, dynamicValidateForm)"
-          v-if="dynamicValidateForm.radio == 'applicable'"
-            />
+              <el-tooltip
+                class="box-item"
+                effect="dark"
+                content="复制"
+                placement="top-start"
+              >
+                <el-button
+                  :disabled="
+                    dynamicValidateForm.cases.length >= 2 &&
+                    dynamicValidateForm.radio == 'applicable'
+                  "
+                  :icon="CopyDocument"
+                  @click="addDomain"
+                />
+              </el-tooltip>
+            </template>
+          </el-input>
+          <el-input
+            class="case-input"
+            v-model="domain.value"
+            :readonly="dynamicValidateForm.radio == 'applicable'"
+            @focus="
+              () => {
+                dynamicValidateForm.radio == 'applicable'
+                  ? submitForm(domain, dynamicValidateForm)
+                  : CheckDomain(domain);
+              }
+            "
+            @change="submitForm(domain, dynamicValidateForm)"
+            v-if="dynamicValidateForm.radio == 'applicable'"
+          />
           <el-tooltip
             class="box-item"
             effect="dark"
@@ -86,11 +114,11 @@
             placement="top-start"
             v-if="dynamicValidateForm.radio !== 'applicable'"
           >
-            <el-button 
-              type="primary" 
-              @click.prevent="removeDomain(domain)" 
+            <el-button
+              type="primary"
+              @click.prevent="removeDomain(domain)"
               :icon="Delete"
-              ></el-button>
+            ></el-button>
           </el-tooltip>
           <el-tooltip
             class="box-item"
@@ -98,11 +126,11 @@
             content="切换"
             placement="top-start"
           >
-            <el-button 
-              type="primary" 
-              @click.prevent="CheckDomain(domain)" 
+            <el-button
+              type="primary"
+              @click.prevent="CheckDomain(domain)"
               :icon="Checked"
-              ></el-button>
+            ></el-button>
           </el-tooltip>
           <el-tooltip
             class="box-item"
@@ -111,9 +139,9 @@
             placement="top-start"
             v-if="dynamicValidateForm.radio !== 'applicable'"
           >
-            <el-button 
-              type="primary" 
-              @click.prevent="CheckTopping(domain)" 
+            <el-button
+              type="primary"
+              @click.prevent="CheckTopping(domain)"
               :icon="Upload"
             ></el-button>
           </el-tooltip>
@@ -124,29 +152,26 @@
       </el-form>
     </div>
   </div>
-  <SelectDialog :visible="dialogVisible" :change-visible="swtichModal" :table-data="selectedOptions" :insert-options-to-select="insertOptionsToSelect" />
+  <SelectDialog
+    :visible="dialogVisible"
+    :change-visible="swtichModal"
+    :table-data="selectedOptions"
+    :insert-options-to-select="insertOptionsToSelect"
+  />
 </template>
-<style scoped>
-.hidden-item {
-  display: none;
-}
-.extendBackground {
-  background-color: rgba(255, 169, 77, 0.2) !important;
-}
-.ck-editor {
-  width: 700px !important;
-}
-/deep/ .el-form-item__content{
-  justify-content: space-between;
-  flex-wrap: nowrap;
-}
-</style>
 
 <script lang="ts">
 import _ from "lodash";
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 import { NORMAL_CONFIG } from "./config.js";
-import { emitter, SWITCH_MODAL, SECTION_MODAL, Option, Section, GET_OPTIONS } from "./mitt";
+import {
+  emitter,
+  SWITCH_MODAL,
+  SECTION_MODAL,
+  Option,
+  Section,
+  GET_OPTIONS,
+} from "./mitt";
 import SelectDialog from "./SelectDialog/index.vue";
 import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
@@ -158,14 +183,17 @@ import { parse, stringify } from "himalaya";
 import { safeJsonStringify, safeJsonParse } from "../utils";
 import { ElMessage } from "element-plus";
 import { toRaw } from "vue";
-import {Upload,Delete,Checked,CopyDocument} from '@element-plus/icons-vue'
+import { Upload, Delete, Checked, CopyDocument } from "@element-plus/icons-vue";
 export default {
-  props: ["htmlData", "nowMode", "onchange","sectionData"],
+  props: ["htmlData", "nowMode", "onchange", "sectionData"],
   setup() {
-            return {
-              Upload,Delete,Checked,CopyDocument
-            }
-         },
+    return {
+      Upload,
+      Delete,
+      Checked,
+      CopyDocument,
+    };
+  },
   data() {
     return {
       editor: {},
@@ -177,38 +205,38 @@ export default {
       dynamicValidateForm: {
         cases: [
           {
-            value:""
-          }
+            value: "",
+          },
         ],
         modelName: "",
         radio: "deletable",
       },
-      ValidateDeletabl:{ 
+      ValidateDeletabl: {
         cases: [
           {
-            value:""
-          }
+            value: "",
+          },
         ],
         modelName: "",
         radio: "deletable",
       },
-      ValidateSwitchable:{ 
+      ValidateSwitchable: {
         cases: [
           {
-            value:""
-          }
+            value: "",
+          },
         ],
         modelName: "",
         radio: "switchable",
       },
-      ValidateApplicable:{ 
+      ValidateApplicable: {
         cases: [
           {
-            value:"适用"
+            value: "适用",
           },
           {
-            value:"不适用"
-          }
+            value: "不适用",
+          },
         ],
         modelName: "",
         radio: "applicable",
@@ -223,18 +251,18 @@ export default {
     //挂载Emitter
     this.hangUpAllEmitFunctions();
     ClassicEditor.create(document.querySelector("#devEditor"), NORMAL_CONFIG)
-      .then(editor => {
+      .then((editor) => {
         CKEditorInspector.attach(editor);
         //编辑器实例挂载到 Window
         (window as any).devEditor = editor;
         editor.setData(this.htmlData);
       })
-      .catch(error => {});
+      .catch((error) => {});
   },
   methods: {
     exportData() {
       this.onchange((window as any).devEditor.getData());
-      this.submitSection()
+      this.submitSection();
     },
     swtichModal() {
       this.dialogVisible = !this.dialogVisible;
@@ -256,33 +284,34 @@ export default {
       this.selectedOptions = _.cloneDeep(options);
     },
     /** section选中效果 */
-    onParagraph(e) { 
+    onParagraph(e) {
       const model = (window as any).devEditor.model;
       const selection: selection = model.document.selection;
-      const elementSection:any = Array.from(selection.getSelectedBlocks())[0].parent
-      const modelname = elementSection.getAttribute("modelname")
-      const cases = elementSection.getAttribute("data-cases")
-      const radio = elementSection.getAttribute("type")
-      if(this.dynamicValidateForm.modelName == ""){
-        if( cases && safeJsonParse(cases)){
-          if(this.dynamicValidateForm.cases[0].value ==""){
-            this.dynamicValidateForm.cases.splice(0,1)
+      const elementSection: any = Array.from(selection.getSelectedBlocks())[0]
+        .parent;
+      const modelname = elementSection.getAttribute("modelname");
+      const cases = elementSection.getAttribute("data-cases");
+      const radio = elementSection.getAttribute("type");
+      if (this.dynamicValidateForm.modelName == "") {
+        if (cases && safeJsonParse(cases)) {
+          if (this.dynamicValidateForm.cases[0].value == "") {
+            this.dynamicValidateForm.cases.splice(0, 1);
           }
-          safeJsonParse(cases).map((item,index)=>{
-            this.dynamicValidateForm.cases.push({"value":item})
-          })
-          this.dynamicValidateForm.modelName = modelname
-          this.dynamicValidateForm.radio = radio
+          safeJsonParse(cases).map((item, index) => {
+            this.dynamicValidateForm.cases.push({ value: item });
+          });
+          this.dynamicValidateForm.modelName = modelname;
+          this.dynamicValidateForm.radio = radio;
         }
       }
-      if(elementSection.name == V_SECTION){
-        const data = toRaw(this.sectionData)
+      if (elementSection.name == V_SECTION) {
+        const data = toRaw(this.sectionData);
 
         for (let key in data) {
-          this.SectionDataHTML.push(data[key])
+          this.SectionDataHTML.push(data[key]);
         }
       }
-          // console.log(Array.from(selection.getSelectedBlocks())[0].parent.getChildren());
+      // console.log(Array.from(selection.getSelectedBlocks())[0].parent.getChildren());
       // if(document.getElementsByClassName('ck-editor')[0].contains(e.srcElement)){
       //   let check = document.getElementsByClassName("Check")
       //   for(let i = 0;i<check.length;i++){
@@ -290,7 +319,9 @@ export default {
       //   }
       // }
       setTimeout(() => {
-        const clickDom = <HTMLElement>document.elementFromPoint(e.clientX, e.clientY);
+        const clickDom = <HTMLElement>(
+          document.elementFromPoint(e.clientX, e.clientY)
+        );
         const isSetion = Array.from(clickDom.classList).includes("section");
         // 点击可编辑区域时候执行
         // 是否为段落标签
@@ -300,8 +331,7 @@ export default {
             check[i].classList.remove("Check");
           }
           clickDom.classList.add("Check");
-         
-         
+
           // const parent: any = Array.from(selection.getSelectedBlocks())[0].parent;
         } else {
           // parent 当前选中元素的父元素
@@ -334,27 +364,33 @@ export default {
     },
     /** 切换选中的section */
     CheckDomain(item) {
-      console.log(item)
-      if(item.value ==""){
+      console.log(item);
+      if (item.value == "") {
         return false;
       }
-      const index = item == 2 ? 0 : this.dynamicValidateForm.cases.indexOf(item);
+      const index =
+        item == 2 ? 0 : this.dynamicValidateForm.cases.indexOf(item);
       // let SectionData = safeJsonParse(safeJsonStringify(this.SectionData[index]));
       let SectionDataHTML = this.SectionDataHTML[index];
-      console.log(SectionDataHTML)
+      console.log(SectionDataHTML);
       const parserSection = parse(SectionDataHTML);
       const model = (window as any).devEditor.model;
       const selection = model.document.selection;
       const firstRange = selection.getFirstPosition();
       const LastRange = selection.getLastPosition();
-      model.change(writer => {
+      model.change((writer) => {
         let elementRange = writer.createRange(firstRange, LastRange);
         // 通过section 范围获取到范围内的 element
         let element = model.schema.getLimitElement(elementRange);
         const range = writer.createRangeOn(element);
         // 删除section
         // 创建新的element，插入   newElement ：dom创建   sectionElement ：element元素创建
-        const newElement = this.createSectionInner(writer, parserSection, null, this);
+        const newElement = this.createSectionInner(
+          writer,
+          parserSection,
+          null,
+          this
+        );
         const newRange = model.insertObject(newElement, range);
       });
     },
@@ -375,18 +411,26 @@ export default {
     },
     /** 增加section的cases */
     addDomain() {
-      if (this.dynamicValidateForm.radio == "applicable" && this.dynamicValidateForm.cases.length <= 1) {
+      if (
+        this.dynamicValidateForm.radio == "applicable" &&
+        this.dynamicValidateForm.cases.length <= 1
+      ) {
         this.dynamicValidateForm.cases.push({
           value: "",
         });
-      } else if (this.dynamicValidateForm.radio !== "applicable" && this.dynamicValidateForm.cases.length < 4) {
-        if(this.dynamicValidateForm.radio == "deletable" && this.dynamicValidateForm.cases.length == 1){
-          
+      } else if (
+        this.dynamicValidateForm.radio !== "applicable" &&
+        this.dynamicValidateForm.cases.length < 4
+      ) {
+        if (
+          this.dynamicValidateForm.radio == "deletable" &&
+          this.dynamicValidateForm.cases.length == 1
+        ) {
           ElMessage({
             message: "可删除类型只能有一个case。",
             type: "warning",
           });
-        }else{
+        } else {
           this.dynamicValidateForm.cases.push({
             value: "",
           });
@@ -396,14 +440,15 @@ export default {
     },
     /** 保存当前cases的section数据 */
     submitForm(item, formEl) {
-      console.log(321)
+      console.log(321);
       const index = this.dynamicValidateForm.cases.indexOf(item);
       const userFormData = safeJsonParse(safeJsonStringify(formEl));
       if (!userFormData.modelName || userFormData.modelName == "") return;
-      if (userFormData.cases.some(item => !item.value || item.value == "")) return;
+      if (userFormData.cases.some((item) => !item.value || item.value == ""))
+        return;
       if (!userFormData) return;
       let cases = [];
-      userFormData.cases.map(item => {
+      userFormData.cases.map((item) => {
         cases.push(item.value);
       });
       let modelData = {
@@ -414,9 +459,11 @@ export default {
       };
       const model = (window as any).devEditor.model;
       const selection: selection = model.document.selection;
-      const blocks = Array.from(Array.from(selection.getSelectedBlocks())[0].parent.getChildren());
-      let DocumentData = blocks.map(item => item.toJSON());
-      model.change(writer => {
+      const blocks = Array.from(
+        Array.from(selection.getSelectedBlocks())[0].parent.getChildren()
+      );
+      let DocumentData = blocks.map((item) => item.toJSON());
+      model.change((writer) => {
         // 通过section 范围获取到范围内的 element
         const firstRange = selection.getFirstPosition();
         const LastRange = selection.getLastPosition();
@@ -426,8 +473,14 @@ export default {
         // 删除section
         // writer.remove(range);
         // 执行创建section元素并添加子元素
-        const sectionElement = this.createSectionElement(writer, DocumentData, modelData);
-        this.SectionData[index] = safeJsonParse(safeJsonStringify(sectionElement));
+        const sectionElement = this.createSectionElement(
+          writer,
+          DocumentData,
+          modelData
+        );
+        this.SectionData[index] = safeJsonParse(
+          safeJsonStringify(sectionElement)
+        );
         model.insertObject(sectionElement, range);
         let idname = "section" + userFormData.cases.length;
         setTimeout(() => {
@@ -439,7 +492,10 @@ export default {
     },
     /** 提交当前modelname所属的section数据 */
     submitSection(num?: number) {
-      if (this.dynamicValidateForm.radio == "applicable" && this.dynamicValidateForm.cases.length > 2) {
+      if (
+        this.dynamicValidateForm.radio == "applicable" &&
+        this.dynamicValidateForm.cases.length > 2
+      ) {
         ElMessage({
           message: "适用/不适用类型只能有两个case。",
           type: "warning",
@@ -447,15 +503,29 @@ export default {
         return;
       }
       const HTMLdata = safeJsonParse(safeJsonStringify(this.SectionDataHTML));
-      const cases = this.dynamicValidateForm.cases.map(item => item.value);
+      const cases = this.dynamicValidateForm.cases.map((item) => item.value);
       let casesList = {};
       HTMLdata.forEach((item, index) => {
         let data = item.match(/data-cases=\"(.*?)\]"/g)[0];
         let currentcases = item.match(/currentcase=\"(.*?)\"/g)[0];
-        HTMLdata[index] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
-        HTMLdata[index] = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
-        (casesList as any)[cases[index]] = HTMLdata[index].replace(currentcases, "currentcase=" + safeJsonStringify(this.dynamicValidateForm.cases[0].value));
-        (casesList as any)[cases[index]] = HTMLdata[index].replace(data, 'data-cases="' + safeJsonStringify(cases) + '"');
+        HTMLdata[index] = HTMLdata[index].replace(
+          data,
+          'data-cases="' + safeJsonStringify(cases) + '"'
+        );
+        HTMLdata[index] = HTMLdata[index].replace(
+          currentcases,
+          "currentcase=" +
+            safeJsonStringify(this.dynamicValidateForm.cases[0].value)
+        );
+        (casesList as any)[cases[index]] = HTMLdata[index].replace(
+          currentcases,
+          "currentcase=" +
+            safeJsonStringify(this.dynamicValidateForm.cases[0].value)
+        );
+        (casesList as any)[cases[index]] = HTMLdata[index].replace(
+          data,
+          'data-cases="' + safeJsonStringify(cases) + '"'
+        );
       });
       this.SectionDataHTML = HTMLdata;
       if (num == 2) {
@@ -487,7 +557,7 @@ export default {
       }
       if (DocumentData.name && DocumentData.name == "v-section") {
         const create = writer.createElement(V_SECTION, DocumentData.attributes);
-        DocumentData.children.map(item => {
+        DocumentData.children.map((item) => {
           const p = writer.createElement(item.name);
           let dataname = "";
           item.children.map((items, index) => {
@@ -499,10 +569,13 @@ export default {
         return create;
       }
       const create = writer.createElement(V_SECTION, modeData);
-      DocumentData.map(item => {
+      DocumentData.map((item) => {
         const p = writer.createElement(item.name);
         item.children.map((items, index) => {
-          let text = writer.createText(items.data || items.name, items.attributes);
+          let text = writer.createText(
+            items.data || items.name,
+            items.attributes
+          );
           writer.append(text, p);
           writer.append(p, create);
         });
@@ -512,25 +585,36 @@ export default {
     createSectionInner(writer, parserDom, parentElement) {
       let text = null,
         dom = null;
-      if(this.dynamicValidateForm.radio =="applicable"){
-        this.dynamicValidateForm.cases = [{"value":"适用"},{"value":"不适用"}]
+      if (this.dynamicValidateForm.radio == "applicable") {
+        this.dynamicValidateForm.cases = [
+          { value: "适用" },
+          { value: "不适用" },
+        ];
       }
       for (let item of parserDom) {
         if (item.type === "element") {
           // 返回元素属性对象
-          let atttibutesList = item.attributes.map(item => [item.key, item.value]);
+          let atttibutesList = item.attributes.map((item) => [
+            item.key,
+            item.value,
+          ]);
           atttibutesList = Object.fromEntries([...atttibutesList]);
           // 创建元素
           if (item.tagName === "section") {
-            const cases = this.dynamicValidateForm.cases.map(item => item.value);
+            const cases = this.dynamicValidateForm.cases.map(
+              (item) => item.value
+            );
             atttibutesList["data-cases"] = safeJsonStringify(cases);
-            atttibutesList.currentcase = this.dynamicValidateForm.cases[0].value;
+            atttibutesList.currentcase =
+              this.dynamicValidateForm.cases[0].value;
             dom = writer.createElement(V_SECTION, atttibutesList);
           } else if (item.tagName === "p") {
             dom = writer.createElement("paragraph", atttibutesList);
           } else if (item.tagName === "span") {
-            item.children.map(items => {
-              dom = writer.createText(items.content, { restrictedEditingException: true });
+            item.children.map((items) => {
+              dom = writer.createText(items.content, {
+                restrictedEditingException: true,
+              });
             });
           } else {
             atttibutesList["data-cke-ignore-events"] = true;
@@ -542,7 +626,7 @@ export default {
           }
         } else {
           // 不是元素的创建文字插入到dom中
-          writer.append( writer.createText(item.content), parentElement);
+          writer.append(writer.createText(item.content), parentElement);
         }
         // 递归
         if (item.children && item.tagName !== "span") {
@@ -554,43 +638,50 @@ export default {
     changeRadio(val) {
       this.SectionData = [];
       this.SectionDataHTML = [];
-      this.ValidateDeletabl = this.$options.data().ValidateDeletabl
-      this.ValidateSwitchable = this.$options.data().ValidateSwitchable
-      this.ValidateApplicable = this.$options.data().ValidateApplicable
-      if(val == "deletable"){
-        this.dynamicValidateForm.cases = this.ValidateDeletabl.cases
-        this.dynamicValidateForm.type = this.ValidateDeletabl.radio
+      this.ValidateDeletabl = this.$options.data().ValidateDeletabl;
+      this.ValidateSwitchable = this.$options.data().ValidateSwitchable;
+      this.ValidateApplicable = this.$options.data().ValidateApplicable;
+      if (val == "deletable") {
+        this.dynamicValidateForm.cases = this.ValidateDeletabl.cases;
+        this.dynamicValidateForm.type = this.ValidateDeletabl.radio;
       }
-      if(val == "switchable"){
-        this.dynamicValidateForm.cases = this.ValidateSwitchable.cases
-        this.dynamicValidateForm.type = this.ValidateSwitchable.radio
+      if (val == "switchable") {
+        this.dynamicValidateForm.cases = this.ValidateSwitchable.cases;
+        this.dynamicValidateForm.type = this.ValidateSwitchable.radio;
       }
-      if(val == "applicable"){
-        this.dynamicValidateForm.cases = this.ValidateApplicable.cases
-        this.dynamicValidateForm.type = this.ValidateApplicable.radio
+      if (val == "applicable") {
+        this.dynamicValidateForm.cases = this.ValidateApplicable.cases;
+        this.dynamicValidateForm.type = this.ValidateApplicable.radio;
       }
-      if(this.dynamicValidateForm.cases.length !== 0 && this.dynamicValidateForm.cases[0].value !==""){
-        if(val =="applicable"){
+      if (
+        this.dynamicValidateForm.cases.length !== 0 &&
+        this.dynamicValidateForm.cases[0].value !== ""
+      ) {
+        if (val == "applicable") {
           ElMessage({
             message: "适用/不适用类型只能有两个case。",
             type: "warning",
           });
           const model = (window as any).devEditor.model;
           const selection: selection = model.document.selection;
-          const elementSection:any = Array.from(selection.getSelectedBlocks())[0].parent
-          const currentcase = elementSection.getAttribute("currentcase")
+          const elementSection: any = Array.from(
+            selection.getSelectedBlocks()
+          )[0].parent;
+          const currentcase = elementSection.getAttribute("currentcase");
           // this.CheckDomain(2)
         }
-      }else{
-        if(val =="applicable"){
-          this.dynamicValidateForm.cases = [{"value":"适用"},{"value":"不适用"}]
-        }else if(val =="deletable"){
-           ElMessage({
+      } else {
+        if (val == "applicable") {
+          this.dynamicValidateForm.cases = [
+            { value: "适用" },
+            { value: "不适用" },
+          ];
+        } else if (val == "deletable") {
+          ElMessage({
             message: "可删除类型只能有一个case。",
             type: "warning",
           });
         }
-        
       }
     },
   },
@@ -603,7 +694,7 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style lang="less" scoped>
 .hidden-item {
   display: none;
 }
@@ -613,11 +704,26 @@ export default {
 .ck-editor {
   width: 700px !important;
 }
-.el-form-item__content >.el-button--primary {
-  border-radius: 0px !important;
-  /* background: #c3bdbd; */
-  /* color: #0b0404; */
-  border-right:1px solid #f4efef;
-  margin-left: 0px !important;
+:deep(.el-form-item__content) {
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  > .el-button--primary {
+    border-radius: 0px !important;
+    /* background: #c3bdbd; */
+    /* color: #0b0404; */
+    border-right: 1px solid #f4efef;
+    margin-left: 0px !important;
+  }
+}
+</style>
+<style scoped>
+.hidden-item {
+  display: none;
+}
+.extendBackground {
+  background-color: rgba(255, 169, 77, 0.2) !important;
+}
+.ck-editor {
+  width: 700px !important;
 }
 </style>
