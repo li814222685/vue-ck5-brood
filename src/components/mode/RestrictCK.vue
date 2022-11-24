@@ -161,7 +161,6 @@ export default {
         model.insertContent(text, oldRange);
       });
       // 3. 销毁掉Select
-      console.log("我执行了");
       this.deposit = {
         oldViewElement: null,
         newRange: null,

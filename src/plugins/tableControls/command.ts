@@ -62,13 +62,11 @@ export class TableControlsCommand extends Command {
 export class TableSelectCommand extends Command {
   execute() {
     //插入Table Select
-
     const selection = this.editor.model.document.selection;
     const mapper = this.editor.editing.mapper;
     const tableCell = [...selection.getSelectedBlocks()][0] as any;
-
+    //获取td用来添加样式和属性
     const td = mapper.toViewElement(tableCell.parent);
-
     this.editor.editing.view.change(writer => {
       writer.setStyle(
         {
@@ -78,14 +76,13 @@ export class TableSelectCommand extends Command {
       );
       writer.setAttribute("type", "select", td);
     });
-
+    //设置td 的 type 属性
     return this.editor.model.change(writer => {
       this.editor.execute("selectAll");
       const paragraph = writer.createElement("paragraph");
       writer.insertText("点击配置Select", paragraph);
       writer.setAttribute("type", "select", tableCell.parent);
       const range = (this.editor.model as any).insertContent(paragraph);
-
       this.editor.execute("selectAll");
       this.editor.editing.view.focus();
       this.editor.execute(RESTRICTED_EDITING);
@@ -94,13 +91,6 @@ export class TableSelectCommand extends Command {
   }
 
   refresh() {
-    console.log(
-      "%c🍉Lee%cline:82%c我更新！！！",
-      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-      "color:#fff;background:rgb(95, 92, 51);padding:3px;border-radius:2px",
-      "我更新！！！"
-    );
     const model = this.editor.model;
     const selection = model.document.selection;
     const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");

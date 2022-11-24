@@ -289,15 +289,6 @@ class SelectClickCollection {
   /** 监听Option点击处理逻辑 */
   static onOptionsClick(event) {
     const target = event.target;
-
-    console.log(
-      "%c🍉Lee%cline:230%cvalue",
-      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-      "color:#fff;background:rgb(114, 83, 52);padding:3px;border-radius:2px",
-      target.getAttribute(DATA_VALUE)
-    );
-    console.log(target.getAttribute(DATA_VALUE)); //可获取自定义属性值
     const dropdown_text = document.getElementById(V_SELECT_DROPDOWN_TEXT);
     dropdown_text.innerText = target.getAttribute(DATA_VALUE);
     emitter.emit(REPLACE_HIDDEN_ITEM_TEXT, target.getAttribute(DATA_VALUE));
@@ -305,25 +296,10 @@ class SelectClickCollection {
   /** 绑定Select的监听器*/
   static bindSelectListener(dropdownText: HTMLDOM) {
     if (!dropdownText) return;
-    //select 失焦处理
-    //不能这样实现失焦 覆盖onclick 不可以
-    // document.onclick = function (event) {
-    //   const target: any = event.target;
-    //   if (target.tagName !== "P" && V_SELECT_DROPDOWN_TEXT_SELE != target.className) {
-    //     if (!document.querySelector(".v_select_optionList")) return;
-    //     (document.querySelector(".v_select_optionList") as any).style.display = "none";
-    //     document.getElementById(V_SELECT_DROPDOWN_TEXT).className = V_SELECT_DROPDOWN_TEXT;
-    //     document.getElementById("theme_icon").className = TRIANGlE_UP;
-    // const dropdown_text = document.getElementById(V_SELECT_DROPDOWN_TEXT);
-
-    // emitter.emit(REPLACE_HIDDEN_ITEM_TEXT, dropdown_text.innerText);
-    //   }
-    // };
 
     /** Select ContentEditable 的onChange 和 Select 的搜索功能*/
     dropdownText.addEventListener("input", e => {
       const target: any = e.target;
-      console.log("输入了东西！", target.innerHTML);
       //select value的onchange 以及 value 对 option列表的搜索匹配功能
       const value = target.innerHTML;
       // 1.过滤掉Option 列表内所有未命中 keyWord 的option
