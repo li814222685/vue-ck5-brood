@@ -116,6 +116,7 @@ export function changeCaseValue(param: caseValueConfig) {
         vueObject: vueObject,
       });
       model.insertObject(newElement, range);
+      writer.setSelectionFocus(range.end, "end");
     }
   });
 }

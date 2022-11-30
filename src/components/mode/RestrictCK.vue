@@ -53,7 +53,6 @@ export default {
         CKEditorInspector.attach(editor);
         //编辑器实例挂载到 Window
         window.editor = editor;
-        console.log(this.htmlData);
         editor.setData(this.htmlData);
       })
       .catch(error => {
@@ -63,7 +62,7 @@ export default {
   methods: {
     exportData() {
       const markers = Array.from(window.editor.model.markers);
-      console.log(markers);
+      console.log(markers, );
       this.onchange(window.editor.getData());
     },
     importData() {
@@ -173,12 +172,13 @@ export default {
     },
   },
   watch: {
+    // 这里为什么要监听？
     htmlData: {
       immediate: true,
       handler(val) {
         if (window.editor) {
           console.log(val, "data");
-          window.editor.setData(val);
+          // window.editor.setData(val);
         }
       },
     },
