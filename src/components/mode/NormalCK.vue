@@ -306,4 +306,25 @@ export default {
 .el-divider--vertical {
   top: 8px;
 }
+.button-list {
+  padding-left: 5px;
+  background-color: #f5f7fa;
+  position: relative;
+  .el-button {
+    background-color: #f5f7fa;
+    &:focus,
+    &:hover {
+      color: #606266;
+      border-color: #dcdfe6;
+    }
+  }
+  .el-button + .el-button {
+    margin-left: 4px;
+  }
+}
+.applicable-check {
+  position: absolute;
+  right: 0;
+  top: -15px;
+}
 </style>

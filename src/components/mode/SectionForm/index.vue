@@ -20,7 +20,10 @@
       },
     ]"
   >
-    <el-input v-model="dynamicValidateForm.modelName" />
+    <el-input 
+      v-model="dynamicValidateForm.modelName"
+      @focus="inputFocus"
+    />
   </el-form-item>
   <el-form-item
     prop="radio"
@@ -52,6 +55,7 @@
       trigger: 'blur',
     }"
   >
+  <el-col :span="14" class="input-part">
     <el-input
       class="case-input"
       v-model="domain.value"
@@ -61,6 +65,7 @@
           dynamicValidateForm.type == 'applicable'
             ? submitForm(domain, dynamicValidateForm)
             : '';
+            inputFocus()
         }
       "
       @change="submitForm(domain, dynamicValidateForm)"
@@ -92,6 +97,8 @@
       <el-divider direction="vertical" />
       <el-button @click="submitForm(domain, dynamicValidateForm)" plain>保存</el-button>
     </el-row>
+  </el-col>
+  <el-col :span="10" class="button-list">
     <el-tooltip
       class="box-item"
       effect="dark"
@@ -100,7 +107,6 @@
       v-if="dynamicValidateForm.type !== 'applicable'"
     >
       <el-button
-        type="primary"
         @click.prevent="removeDomain(domain)"
         :icon="Delete"
       ></el-button>
@@ -113,6 +119,11 @@
     >
       <el-button
         type="primary"
+        :class="
+          dynamicValidateForm.type !== 'applicable'
+            ? ''
+            : 'applicable-check'
+        "
         @click.prevent="CheckDomain(domain)"
         :icon="Checked"
       ></el-button>
@@ -130,6 +141,7 @@
         :icon="Upload"
       ></el-button>
     </el-tooltip>
+  </el-col>
   </el-form-item>
 </el-form>
 </template>
@@ -196,6 +208,10 @@ let SectionDataHTML = []; // html文本
 interface DomainItem {
   value: string
 }
+/** 输入框焦点 */
+const inputFocus = () => {
+      (window as any).devEditor.ui.focusTracker.isFocused = false;
+    };
   /** 删除所选cases */
 const removeDomain = (item:DomainItem)=>{
   const index =dynamicValidateForm.cases.indexOf(item);
@@ -272,8 +288,6 @@ const submitForm = (item, formEl) => {
     const elementRange = writer.createRange(firstRange, LastRange);
     let element = model.schema.getLimitElement(elementRange);
     const range = writer.createRangeOn(element);
-    // 删除section
-    // writer.remove(range);
     // 执行创建section元素并添加子元素
     const sectionElement = createSectionElement(
       writer,
@@ -284,6 +298,7 @@ const submitForm = (item, formEl) => {
       safeJsonStringify(sectionElement)
     );
     model.insertObject(sectionElement, range);
+    writer.setSelectionFocus(range.end, "on");
     let idname = "section" + userFormData.cases.length;
     setTimeout(() => {
       // 存储section的html
@@ -338,6 +353,7 @@ const submitSection = (num?: number) => {
     submitSection(2);
   }
 };
+/** 切换type类型 */
 const changeRadio = (val) => {
       SectionData = [];
       SectionDataHTML = [];
@@ -402,6 +418,7 @@ const CheckTopping = (item) => {
   });
   CheckDomain(item);
 };
+ /** 切换当前选中cases的section */
 const CheckDomain = (item) => {
   console.log(sectionData)
   if (item.value == "") {
@@ -428,8 +445,10 @@ const CheckDomain = (item) => {
       null,
     );
     const newRange = model.insertObject(newElement, range);
+    writer.setSelectionFocus(range.end, "on");
   });
 }
+ /** 根据html文本创建元素 */
 const createSectionInner = (writer, parserDom, parentElement) => {
   let text = null,
     dom = null;
