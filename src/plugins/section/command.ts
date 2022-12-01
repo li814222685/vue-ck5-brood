@@ -21,7 +21,7 @@ interface Option {
  * range      获取选中selection的range（范围）
  */
 export class SectionCommand extends Command {
-  execute(options:any = {}) {
+  execute(options: any = {}) {
     const model = this.editor.model;
     const schema = model.schema;
     const selection = model.document.selection;
@@ -29,11 +29,11 @@ export class SectionCommand extends Command {
     const firstRange = selection.getFirstPosition();
     const LastRange = selection.getLastPosition();
     const value = options.forceValue === undefined ? !this.value : options.forceValue;
-    model.change(writer => {
+    model.change((writer) => {
       if (!value) {
-          this._removeQuote(writer, blocks.filter(findQuote));
+        this._removeQuote(writer, blocks.filter(findQuote));
       } else {
-        const blocksToQuote = blocks.filter(block => {
+        const blocksToQuote = blocks.filter((block) => {
           return findQuote(block) || checkCanBeQuoted(schema, block);
         });
         const range = writer.createRange(firstRange, LastRange);
@@ -41,7 +41,6 @@ export class SectionCommand extends Command {
       }
     });
   }
-
   refresh() {
     this.value = this._getValue();
     this.isEnabled = this._checkEnabled();
@@ -52,7 +51,6 @@ export class SectionCommand extends Command {
     const firstBlock = first(selection.getSelectedBlocks());
     return !!(firstBlock && findQuote(firstBlock));
   }
-  
   /* 选中的校验 （是否包含section）  */
   _checkEnabled() {
     if (this.value) {
@@ -64,27 +62,28 @@ export class SectionCommand extends Command {
     if (!firstBlock) {
       return false;
     }
-    if(selection.getLastPosition().path[1] == 0 && selection.getLastPosition().path[0] == 0){
+    if ( selection.getLastPosition().path[1] == 0 && selection.getLastPosition().path[0] == 0 ) {
       return false;
     }
     return checkCanBeQuoted(schema, firstBlock);
   }
   /**
-   * 
-   * @param writer  
-   * @param blocks 
+   * @param writer
+   * @param blocks
    * @effect 选中区域有section属性则取消section
    */
   _removeQuote(writer, blocks) {
     getRangesOfBlockGroups(writer, blocks)
       .reverse()
-      .forEach(groupRange => {
+      .forEach((groupRange) => {
         if (groupRange.start.isAtStart && groupRange.end.isAtEnd) {
           writer.unwrap(groupRange.start.parent);
           return;
         }
         if (groupRange.start.isAtStart) {
-          const positionBefore = writer.createPositionBefore(groupRange.start.parent);
+          const positionBefore = writer.createPositionBefore(
+            groupRange.start.parent
+          );
           writer.move(groupRange, positionBefore);
           return;
         }
@@ -96,8 +95,7 @@ export class SectionCommand extends Command {
       });
   }
   /**
-   * 
-   * @param writer 
+   * @param writer
    * @param blocks  包含的子元素
    * @param range   范围
    */
@@ -114,9 +112,13 @@ export class SectionCommand extends Command {
           quote = writer.createElement(V_SECTION);
           // writer.addMarker("set", { range, usingOperation: true } );
           writer.setAttributes({ class: "cs" }, range);
-          console.log(groupRange, range, blocks);
-          writer.wrap(groupRange, quote);
-          // writer.wrap(range, quote);
+          const newRenge = _.cloneDeep(range);
+          const selection = this.editor.model.document.selection;
+          let startPostion = newRenge.start.isAtStart ? groupRange.start : writer.split(selection.getFirstPosition()).position;
+          let endPostion =  newRenge.end.isAtEnd || newRenge.end.isAtStart ? groupRange.end : writer.split(selection.getLastPosition()).position;
+          endPostion.path = !newRenge.start.isAtStart && (newRenge.end.isAtEnd || newRenge.end.isAtStart) ? [groupRange.end.path[0] + 1] : endPostion.path
+          const sectionRange = writer.createRange(startPostion, endPostion);
+          writer.wrap(sectionRange, quote);
           this.editor.editing.view.focus();
         }
         quotesToMerge.push(quote);
@@ -131,12 +133,13 @@ export class SectionCommand extends Command {
   }
 }
 /**
- * 
  * @param elementOrPosition 判断有无section
- * @returns 
+ * @returns
  */
 function findQuote(elementOrPosition) {
-  return elementOrPosition.parent.name == V_SECTION ? elementOrPosition.parent : null;
+  return elementOrPosition.parent.name == V_SECTION
+    ? elementOrPosition.parent
+    : null;
 }
 /* 选中是否多个section 多个则合成一个  */
 function getRangesOfBlockGroups(writer, blocks) {
@@ -150,7 +153,9 @@ function getRangesOfBlockGroups(writer, blocks) {
       startPosition = writer.createPositionBefore(block);
     }
     if (!nextBlock || block.nextSibling != nextBlock) {
-      ranges.push(writer.createRange(startPosition, writer.createPositionAfter(block)));
+      ranges.push(
+        writer.createRange(startPosition, writer.createPositionAfter(block))
+      );
       startPosition = null;
     }
     i++;
@@ -166,13 +171,7 @@ function checkCanBeQuoted(schema, block) {
 export class InsertSectionCommand extends Command {
   execute(options) {
     const model = this.editor.model;
-
     const select = model.document.selection.getSelectedElement();
-    model.change(writer => {
-      console.log(writer)
-      // writer.remove(select);
-      // insertSelect(model, options);
-    });
   }
   refresh() {
     this.isEnabled = true;

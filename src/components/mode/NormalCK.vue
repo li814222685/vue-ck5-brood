@@ -32,7 +32,10 @@
             },
           ]"
         >
-          <el-input v-model="dynamicValidateForm.modelName" />
+          <el-input
+            v-model="dynamicValidateForm.modelName"
+            @focus="inputFocus"
+          />
         </el-form-item>
         <el-form-item
           prop="radio"
@@ -64,84 +67,93 @@
             trigger: 'blur',
           }"
         >
-          <el-input
-            class="case-input"
-            v-model="domain.value"
-            :readonly="dynamicValidateForm.radio == 'applicable'"
-            @focus="
-              () => {
-                dynamicValidateForm.radio == 'applicable'
-                  ? submitForm(domain, dynamicValidateForm)
-                  : '';
-              }
-            "
-            @change="submitForm(domain, dynamicValidateForm)"
-            v-if="dynamicValidateForm.radio !== 'applicable'"
-          >
-            <template
-              #append
-              v-if="index == dynamicValidateForm.cases.length - 1"
+          <el-col :span="14" class="input-part">
+            <el-input
+              class="case-input"
+              v-model="domain.value"
+              :readonly="dynamicValidateForm.radio == 'applicable'"
+              @focus="
+                () => {
+                  dynamicValidateForm.radio == 'applicable'
+                    ? submitForm(domain, dynamicValidateForm)
+                    : '';
+                  inputFocus()
+                }
+              "
+              @change="submitForm(domain, dynamicValidateForm)"
+              v-if="dynamicValidateForm.radio !== 'applicable'"
             >
-              <el-tooltip
-                class="box-item"
-                effect="dark"
-                content="复制"
-                placement="top-start"
+              <template
+                #append
+                v-if="index == dynamicValidateForm.cases.length - 1"
               >
-                <el-button
-                  :disabled="
-                    dynamicValidateForm.cases.length >= 2 &&
-                    dynamicValidateForm.radio == 'applicable'
-                  "
-                  :icon="CopyDocument"
-                  @click="addDomain"
-                />
-              </el-tooltip>
-            </template>
-          </el-input>
-          <el-row v-if="dynamicValidateForm.radio == 'applicable'">
-            <span>{{ domain.value }}</span>
-            <el-divider direction="vertical" />
-            <el-button @click="submitForm(domain, dynamicValidateForm)" plain>保存</el-button>
-          </el-row>
-          <el-tooltip
-            class="box-item"
-            effect="dark"
-            content="删除"
-            placement="top-start"
-            v-if="dynamicValidateForm.radio !== 'applicable'"
-          >
-            <el-button
-              type="primary"
-              @click.prevent="removeDomain(domain)"
-              :icon="Delete"
-            ></el-button>
-          </el-tooltip>
-          <el-tooltip
-            class="box-item"
-            effect="dark"
-            content="切换"
-            placement="top-start"
-          >
-            <el-button
-              type="primary"
-              @click.prevent="CheckDomain(domain)"
-              :icon="Checked"
-            ></el-button>
-          </el-tooltip>
-          <el-tooltip
-            class="box-item"
-            effect="dark"
-            content="置顶"
-            placement="top-start"
-            v-if="dynamicValidateForm.radio !== 'applicable'"
-          >
-            <el-button
-              type="primary"
-              @click.prevent="CheckTopping(domain)"
-              :icon="Upload"
-            ></el-button>
-          </el-tooltip>
+                <el-tooltip
+                  class="box-item"
+                  effect="dark"
+                  content="复制"
+                  placement="top-start"
+                >
+                  <el-button
+                    :disabled="
+                      dynamicValidateForm.cases.length >= 2 &&
+                      dynamicValidateForm.radio == 'applicable'
+                    "
+                    :icon="CopyDocument"
+                    @click="addDomain"
+                  />
+                </el-tooltip>
+              </template>
+            </el-input>
+            <el-row v-if="dynamicValidateForm.radio == 'applicable'">
+              <span>{{ domain.value }}</span>
+              <el-divider direction="vertical" />
+              <el-button @click="submitForm(domain, dynamicValidateForm)" plain
+                >保存</el-button
+              >
+            </el-row>
+          </el-col>
+          <el-col :span="10" class="button-list">
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="删除"
+              placement="top-start"
+              v-if="dynamicValidateForm.radio !== 'applicable'"
+            >
+              <el-button
+                @click.prevent="removeDomain(domain)"
+                :icon="Delete"
+              ></el-button>
+            </el-tooltip>
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="切换"
+              placement="top-start"
+            >
+              <el-button
+                :class="
+                  dynamicValidateForm.radio !== 'applicable'
+                    ? ''
+                    : 'applicable-check'
+                "
+                @click.prevent="CheckDomain(domain)"
+                :icon="Checked"
+              ></el-button>
+            </el-tooltip>
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="置顶"
+              placement="top-start"
+              v-if="dynamicValidateForm.radio !== 'applicable'"
+            >
+              <el-button
+                @click.prevent="CheckTopping(domain)"
+                :icon="Upload"
+              ></el-button>
+            </el-tooltip>
+          </el-col>
         </el-form-item>
       </el-form> -->
     </div>
@@ -272,15 +284,10 @@ export default {
           console.log('refSectionForm.value',refSectionForm.value)
           refSectionForm.value.submitSection();
         }
-      })
+      });
     };
-    return {
-      exportData,
-      onParagraph,
-      refSectionForm
-    }
   }
-};
+}
 </script>
 <style lang="less" scoped>
 .hidden-item {
