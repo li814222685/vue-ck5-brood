@@ -118,7 +118,6 @@
       placement="top-start"
     >
       <el-button
-        type="primary"
         :class="
           dynamicValidateForm.type !== 'applicable'
             ? ''
@@ -136,7 +135,6 @@
       v-if="dynamicValidateForm.type !== 'applicable'"
     >
       <el-button
-        type="primary"
         @click.prevent="CheckTopping(domain)"
         :icon="Upload"
       ></el-button>
@@ -581,3 +579,26 @@ defineExpose({
   onParagraphs
 })
 </script>
+<style lang="less" scoped>
+.button-list {
+  padding-left: 5px;
+  background-color: #f5f7fa;
+  position: relative;
+  .el-button {
+    background-color: #f5f7fa;
+    &:focus,
+    &:hover {
+      color: #606266;
+      border-color: #dcdfe6;
+    }
+  }
+  .el-button + .el-button {
+    margin-left: 4px;
+  }
+}
+.applicable-check {
+  position: absolute;
+  right: 0;
+  top: -15px;
+}
+</style>
