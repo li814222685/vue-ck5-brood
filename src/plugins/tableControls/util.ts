@@ -317,3 +317,89 @@ class SelectClickCollection {
     });
   }
 }
+
+//  ============================================================================================================================
+
+const toTableWidget = (viewElement, writer) => {
+  writer.setCustomProperty("table", true, viewElement);
+
+  return toWidget(viewElement, writer, { hasSelectionHandle: true });
+};
+/** cover Table 转换逻辑 */
+
+export const downcastTable = (tableUtils, options = {} as any) => {
+  return (table, { writer }) => {
+    console.log(666666);
+    const headingRows = table.getAttribute("headingRows") || 0;
+    const tableSections = [];
+
+    if (headingRows > 0) {
+      tableSections.push(
+        writer.createContainerElement(
+          "thead",
+          null,
+          writer.createSlot(
+            element => element.is("element", "tableRow") && element.index < headingRows
+          )
+        )
+      );
+    }
+
+    console.log(
+      "%cMyProject%cline:347%ctableUtils.getRows(table)",
+      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      "color:#fff;background:rgb(23, 44, 60);padding:3px;border-radius:2px",
+      tableUtils.getRows(table)
+    );
+    if (headingRows < tableUtils.getRows(table)) {
+      tableSections.push(
+        writer.createContainerElement(
+          "tbody",
+          null,
+          writer.createSlot(
+            element => element.is("element", "tableRow") && element.index >= headingRows
+          )
+        )
+      );
+    }
+
+    const figureElement = writer.createContainerElement("figure", { class: "table" }, [
+      writer.createContainerElement("table", null, tableSections),
+      writer.createSlot(element => !element.is("element", "tableRow")),
+    ]);
+    const tableCols: number = tableUtils.getRows(table);
+    const wrapperFigureElement = createTableWrapper(writer, figureElement, { tableCols });
+    //给figure 包裹 锚点Wrapper
+
+    return options.asWidget ? toTableWidget(wrapperFigureElement, writer) : wrapperFigureElement;
+  };
+};
+
+/** 创建Table 锚点Wrapper */
+const createTableWrapper = (writer: DowncastWriter, figureEle, { tableCols }) => {
+  console.log("KKKKKKKKKKKKKKKKKKKKK");
+  //创建 行锚点
+  const rowItemCollection = [] as any;
+  // for (let i = 0; i < tableCols; i++) {
+  //   rowItemCollection.push(writer.createUIElement("div", { class: "wrapper-row-item" }));
+  // }
+  const wrapperRow = writer.createUIElement("div", { class: "wrapper-row" });
+
+  //获取tableCell的列数，然后创建对应的 锚点行
+  const wrapperCol = writer.createUIElement("div", { class: "wrapper-col" });
+
+  console.log(
+    "%cMyProject%cline:376%cfigureEle",
+    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+    "color:#fff;background:rgb(96, 143, 159);padding:3px;border-radius:2px",
+    figureEle
+  );
+  const anchorTableWrapper = writer.createContainerElement("div", { class: "table-wrapper" }, [
+    wrapperRow,
+    wrapperCol,
+    figureEle,
+  ] as any);
+  return anchorTableWrapper;
+};

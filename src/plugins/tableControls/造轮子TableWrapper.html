@@ -175,7 +175,6 @@
     //target
     const table = document.getElementById("tableRoot");
     const tr = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-    console.log(tr);
     const trWidth = tr[0].clientWidth;
     const td = tr[0].getElementsByTagName("td");
     const tablePosition = table.getClientRects()[0];
@@ -212,8 +211,6 @@
       newColItem.style.height = trPosition.height - 1 + "px";
       wrapperCol.appendChild(newColItem);
     }
-
-    console.log(wrapperRow);
 
     // for (const rowItem of wrapperRow) {
     //   // console.log(tdWidth);

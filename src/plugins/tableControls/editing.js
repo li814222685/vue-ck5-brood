@@ -10,6 +10,7 @@ import {
   isCellHasTableSelect,
   converEditinghDowncastCell,
   createTableSelect,
+  downcastTable,
 } from "./util";
 import { ClickObserver } from "@ckeditor/ckeditor5-engine";
 import {
@@ -35,6 +36,7 @@ import {
 } from "../../components/mode/mitt";
 import { safeJsonParse, safeJsonStringify } from "../../components/utils";
 import { getMarkerAtPosition } from "@/plugins/formControls/utils.js";
+import TableUtils from "@ckeditor/ckeditor5-table/src/tableutils";
 
 export default class TableControlsEditing extends Plugin {
   static get requires() {
@@ -95,8 +97,18 @@ export default class TableControlsEditing extends Plugin {
 
   _defineConverters() {
     const conversion = this.editor.conversion;
+    const tableUtils = this.editor.plugins.get(TableUtils);
 
     //TableCell Cover逻辑重写
+
+    conversion.for("editingDowncast").elementToStructure({
+      model: {
+        name: "table",
+        attributes: ["headingRows"],
+      },
+      view: downcastTable(tableUtils, { asWidget: true }),
+      converterPriority: "highest",
+    });
 
     conversion.for("editingDowncast").elementToElement({
       model: "tableCell",

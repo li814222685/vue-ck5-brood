@@ -50,6 +50,7 @@ import {
   HIDDEN_ITEM,
 } from "../../plugins/tableControls/constant";
 import { Element } from "@ckeditor/ckeditor5-engine";
+import "../../plugins/tableControls/css/tableWrapper.css";
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
@@ -78,6 +79,10 @@ export default {
         //编辑器实例挂载到 Window
         (window as any).devEditor = editor;
         editor.setData(this.htmlData);
+        const widgetTypeAroundPlugin = editor.plugins.get("WidgetTypeAround");
+
+        // Disable the widget type around plugin.
+        widgetTypeAroundPlugin.forceDisabled("MyApplication");
       })
       .catch(error => {});
   },
@@ -162,6 +167,9 @@ export default {
 .ck-widget_selected,
 .ck-widget_selected:hover {
   outline: none !important;
+}
+.ck-widget__selection-handle {
+  display: none;
 }
 .v_select:hover {
   outline: none !important;
