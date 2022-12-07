@@ -28,7 +28,7 @@ enum EditorMode {
 
 const nowMode = ref(EditorMode.Normal);
 const htmlData = ref(
-  '<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p><p>&nbsp;</p><p>&nbsp;</p><figure class="table"><table><tbody><tr><td style="background-color:rgba(255, 169, 77, 0.2);" type="select" optionlist="[{&quot;label&quot;:&quot;朝阳区&quot;,&quot;value&quot;:&quot;朝阳区&quot;},{&quot;label&quot;:&quot;海淀区&quot;,&quot;value&quot;:&quot;海淀区&quot;},{&quot;label&quot;:&quot;昌平区&quot;,&quot;value&quot;:&quot;昌平区&quot;}]"><span class="restricted-editing-exception">朝阳区</span></td><td style="background-color:rgba(255, 169, 77, 0.2);" type="select" optionlist="[{&quot;label&quot;:&quot;居家&quot;,&quot;value&quot;:&quot;居家&quot;},{&quot;label&quot;:&quot;正常&quot;,&quot;value&quot;:&quot;正常&quot;}]"><span class="restricted-editing-exception">居家</span></td><td>🌟</td><td>😈</td><td>💻</td></tr><tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr><tr><td>3312213123123216</td><td>712321312321321</td><td>8321312312</td><td>12331231231</td><td>321332131232112</td></tr><tr><td>32</td><td>231</td><td>312</td><td>3213</td><td>2313</td></tr><tr><td>312321</td><td>321</td><td>312</td><td>3123</td><td>321312</td></tr></tbody></table></figure><p>&nbsp;</p>'
+  '<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p><p>&nbsp;</p><figure class="table"><table><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td style="background-color:rgba(255, 169, 77, 0.2);" type="select" optionlist="[{&quot;label&quot;:&quot;锚点&quot;,&quot;value&quot;:&quot;锚点&quot;},{&quot;label&quot;:&quot;测试&quot;,&quot;value&quot;:&quot;测试&quot;}]"><span class="restricted-editing-exception">锚点</span></td><td>312312321</td></tr><tr><td>&nbsp;</td><td>测试</td><td style="background-color:rgba(255, 169, 77, 0.2);"><span class="restricted-editing-exception">测试</span></td></tr></tbody></table></figure><p>&nbsp;</p>'
 );
 const { value: editorMode } = nowMode;
 
@@ -59,7 +59,7 @@ figure {
   background-color: rgba(255, 169, 77, 0.2) !important;
 }
 tr {
-  max-height: 20px !important;
+  // max-height: 20px !important;
 
   .ck-editor__editable .restricted-editing-exception {
     background-color: inherit !important;
@@ -67,4 +67,29 @@ tr {
     padding: 0px;
   }
 }
+.table table tbody :first-child td {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  background-color: #eeeeeeb3;
+}
+.table table tbody :first-child td:hover {
+  background-color: #cccacab3;
+}
+//去除锚点选中后的 聚焦边框和背景
+.table table tbody :first-child td:focus,
+.table table tbody tr td:first-child:focus {
+  background-color: #cccacab3 !important;
+  outline: none !important;
+}
+.table table tbody tr td:first-child {
+  background-color: #eeeeeeb3;
+  padding: 0px !important;
+  width: 22px;
+}
+.table table tbody tr td:first-child:hover {
+  background-color: #cccacab3;
+}
+// .table table tbody tr:first-child td {
+//   flex: 1;
+// }
 </style>

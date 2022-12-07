@@ -22,8 +22,14 @@ import {
   V_SPAN,
   HIDDEN_ITEM,
   V_SELECT_DROPDOWN_TEXT,
+  COMMAND_NAME__INSERT_WRAPPER_TABLE,
 } from "./constant";
-import { TableControlsCommand, TableSelectCommand, SetTableSelectOptionList } from "./command";
+import {
+  TableControlsCommand,
+  TableSelectCommand,
+  SetTableSelectOptionList,
+  InsertWrapperTableCommand,
+} from "./command";
 import { V_SELECT } from "./constant";
 import { toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import { toWidget } from "@ckeditor/ckeditor5-widget/src/utils";
@@ -58,6 +64,10 @@ export default class TableControlsEditing extends Plugin {
     this.editor.commands.add(
       COMMAND_NAME__SET_TABLE_SELECT_OPTIONS,
       new SetTableSelectOptionList(this.editor)
+    );
+    this.editor.commands.add(
+      COMMAND_NAME__INSERT_WRAPPER_TABLE,
+      new InsertWrapperTableCommand(this.editor)
     );
   }
 
@@ -97,19 +107,8 @@ export default class TableControlsEditing extends Plugin {
 
   _defineConverters() {
     const conversion = this.editor.conversion;
-    const tableUtils = this.editor.plugins.get(TableUtils);
 
     //TableCell Cover逻辑重写
-
-    conversion.for("editingDowncast").elementToStructure({
-      model: {
-        name: "table",
-        attributes: ["headingRows"],
-      },
-      view: downcastTable(tableUtils, { asWidget: true }),
-      converterPriority: "highest",
-    });
-
     conversion.for("editingDowncast").elementToElement({
       model: "tableCell",
       view: converEditinghDowncastCell({ asWidget: true }),
@@ -229,6 +228,7 @@ export default class TableControlsEditing extends Plugin {
     const viewDocument = editor.editing.view.document;
     const selection = model.document.selection;
     const mapper = editor.editing.mapper;
+    const tableUtils = this.editor.plugins.get(TableUtils);
 
     /** 获取TableControl 插件 配置参数 */
     const tableControlsConfig = editor.config.get("tableControls");
@@ -239,6 +239,25 @@ export default class TableControlsEditing extends Plugin {
       const isRestrict = isRestrictedElement(target);
       const isHasTableSelect = isCellHasTableSelect(target);
 
+      /** 当前点击的是否为锚点 */
+      const findAncestorTd = target.findAncestor({ name: "td" });
+      if (findAncestorTd) {
+        const { row, column } = tableUtils.getCellLocation(mapper.toModelElement(findAncestorTd));
+        if (row == 0 || column == 0) {
+          this.editor.model.change(writer => {
+            writer.setSelection(null);
+          });
+        }
+      }
+
+      console.log(
+        "%c🍉Lee%cline:241%ctarget",
+        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+        "color:#fff;background:rgb(118, 77, 57);padding:3px;border-radius:2px",
+        target
+      );
+
       if (isRestrict && isHasTableSelect) {
         //通过TableControls的插件配置参数，来决定 绑定哪种模式( Restrict/ Normal)的点击监听
         tableControlsConfig?.isRestrictMode
@@ -248,7 +267,8 @@ export default class TableControlsEditing extends Plugin {
         const dropdown_text = document.getElementById(V_SELECT_DROPDOWN_TEXT);
         //Table Select Blur
         //当点击其他文档流时，让Select内的值直接替换 文本元素的文本
-        if (safeJsonStringify(dropdown_text?.innerText).replace("\\n", "") != '""') {
+        const targetText = safeJsonStringify(dropdown_text?.innerText);
+        if (targetText && targetText.replace("\\n", "") != '""') {
           emitter.emit(REPLACE_HIDDEN_ITEM_TEXT, dropdown_text.innerText);
         }
       }

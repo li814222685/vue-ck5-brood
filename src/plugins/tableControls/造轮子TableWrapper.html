@@ -21,200 +21,73 @@
   </head>
   <body>
     <div class="table-wrapper">
-      <div class="wrapper-row">
+      <!-- <div class="wrapper-row"> -->
         <!-- rowItem 需要根据 tr内的td 数量动态创建 -->
       </div>
       <!-- 
         row 锚点的单元格 宽度需要动态获取，因为不同的单元格可能会出现 不同宽度
         col 也是一样的道路，col锚点单元格的高度也需要动态获取，创建div
        -->
-      <div class="wrapper-col"></div>
+      <!-- <div class="wrapper-col"></div> -->
       <table id="tableRoot">
-        <tr>
-          <td>姓名</td>
-          <td>年龄</td>
-          <td>性别</td>
+        <tr class="anchorRow" >
+          <td class="cellAnchorItem"></td>
+          <td></td>
+          <td></td>
+          <td></td>
         </tr>
         <tr>
+          <td></td>
           <td>李浩</td>
           <td>66</td>
           <td>男</td>
         </tr>
         <tr>
+          <td></td>
           <td>布丁</td>
           <td>66</td>
           <td>🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕</td>
         </tr>
         <tr>
+          <td></td>
           <td>李浩</td>
           <td>66</td>
           <td>男</td>
         </tr>
         <tr>
+          <td></td>
           <td>李浩</td>
           <td>66</td>
           <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>李浩</td>
-          <td>66</td>
-          <td>男</td>
-        </tr>
-        <tr>
-          <td>布丁</td>
-          <td>66</td>
-          <td>🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕🐕</td>
         </tr>
       </table>
     </div>
   </body>
   <style>
+    #tableRoot {
+      /* display: block; */
+      margin: 0 auto;
+    }
     .table-wrapper {
       margin: 100px auto;
       width: 800px;
       height: 200px;
       /* border: 1px solid; */
     }
-    .wrapper-row {
-      display: flex;
-      height: 14px;
-      flex-direction: row;
-      margin-left: 14px;
-      background-color: #f4f5f5;
-      border-width: 1px 0 1px 1px;
+    .anchorRow{
+      height: 10px;
     }
-
-    .wrapper-row :not(:last-child) {
-      border-right: 0px;
+    .cellAnchorItem{
+      width: 14px;
     }
-    .wrapper-row-item {
-      flex: 1;
-      border: 1px solid #cccecd;
-      margin-right: -1px;
+    tr :first-child,  .anchorRow td{
+    background-color: #f4f5f5;
     }
-    .wrapper-row-item:hover,
-    .wrapper-col-item:hover {
+    tr :first-child:hover, .anchorRow td:hover{
       background-color: #e7e9e8;
     }
-    .wrapper-col {
-      width: 14px;
-      height: auto;
-      background-color: #f4f5f5;
-    }
 
-    .wrapper-col :not(:last-child) {
-      border-bottom: 0px;
-    }
 
-    .wrapper-col-item {
-      flex: 1;
-      border: 1px solid #cccecd;
-    }
   </style>
-  <script>
-    //target
-    const table = document.getElementById("tableRoot");
-    const tr = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-    const trWidth = tr[0].clientWidth;
-    const td = tr[0].getElementsByTagName("td");
-    const tablePosition = table.getClientRects()[0];
-    console.log(tablePosition);
-    // wrapper 包裹Table
-    table.style.marginTop = "-" + tablePosition.height + "px";
-    table.style.marginLeft = "14px";
 
-    /// wrapper
-    const tableWrapper = document.getElementsByClassName("table-wrapper")[0];
-
-    const wrapperRow = tableWrapper.getElementsByClassName("wrapper-row")[0];
-    // .getElementsByClassName("wrapper-row-item");
-    // 获取tr的总宽度
-    wrapperRow.style.width = trWidth + "px";
-    //通过tr内td 的数量动态创建 row锚点
-    console.log(td.length);
-    //动态创建row锚点
-    for (let i = 0; i < td.length; i++) {
-      const newRowItem = document.createElement("div");
-      newRowItem.className = "wrapper-row-item";
-      wrapperRow.appendChild(newRowItem);
-    }
-    // 动态创建col 锚点，需要注意的是：
-    // 因每一行tableRow 的高度可能不一致（单元格内容的多少影响的），所以每一个col锚点需要动态创建
-    const wrapperCol = tableWrapper.getElementsByClassName("wrapper-col")[0];
-    wrapperCol.style.height = table.clientHeight + "px";
-    for (let i = 0; i < tr.length; i++) {
-      console.log("dd:", i);
-      const newColItem = document.createElement("div");
-      newColItem.className = "wrapper-col-item";
-      const trPosition = tr[i].getClientRects()[0];
-      console.log(tr[i].getClientRects()[0]);
-      newColItem.style.height = trPosition.height - 1 + "px";
-      wrapperCol.appendChild(newColItem);
-    }
-
-    // for (const rowItem of wrapperRow) {
-    //   // console.log(tdWidth);
-    //   // rowItem.style.width = tdWidth;
-    // }
-  </script>
 </html>

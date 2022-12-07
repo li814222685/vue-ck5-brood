@@ -11,6 +11,7 @@ import {
   COMMAND_NAME__INSERT_TABLE_NORMAL,
   COMMAND_NAME__INSERT_TABLE_SELECT,
   TABLE_CC_TOOLBAR,
+  COMMAND_NAME__INSERT_WRAPPER_TABLE,
 } from "./constant";
 
 export default class TableControlsUI extends Plugin {
@@ -49,9 +50,20 @@ export default class TableControlsUI extends Plugin {
         }),
       });
 
+      const insertWrapperTableBtn = new ButtonView(locale);
+      insertWrapperTableBtn.set({
+        type: "button",
+        model: new Model({
+          withText: true,
+          label: "插入 Table ( ⌘ / ALT + T )",
+          cmd: COMMAND_NAME__INSERT_WRAPPER_TABLE,
+        }),
+      });
+
       const items = new Collection();
       items.add(dropButton);
       items.add(insertSelectBtn);
+      items.add(insertWrapperTableBtn);
 
       dropdownView.buttonView.set({
         withText: true,

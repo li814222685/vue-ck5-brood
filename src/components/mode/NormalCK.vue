@@ -13,6 +13,7 @@
     :insert-options-to-select="insertOptionsToSelect"
     :needEditElement="needEditElement"
   />
+  <CreateTableDialog :visible="createTableVis" :change-visible="changeCreateTableVis" />
 </template>
 <style scoped>
 .hidden_item {
@@ -37,8 +38,10 @@ import {
   SAVE_HIDDEN_ITEM,
   REPLACE_HIDDEN_ITEM_TEXT,
   SET_TARGET,
+  SWITCH_ADD_TABLE_MODAL,
 } from "./mitt";
 import SelectDialog from "./SelectDialog/index.vue";
+import CreateTableDialog from "./CreateTableDialog/index.vue";
 import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import JqxDropDownList from "jqwidgets-scripts/jqwidgets-vue/vue_jqxdropdownlist.vue";
@@ -63,11 +66,12 @@ export default {
         range: null,
         element: null,
       },
+      createTableVis: false,
       dialogVisible: false,
       selectedOptions: [], //当前选中select 有哪些options，用来将options传递到弹窗表格内
     };
   },
-  components: { SelectDialog, JqxDropDownList },
+  components: { SelectDialog, JqxDropDownList, CreateTableDialog },
   mounted() {
     //挂载Emitter
     this.hangUpAllEmitFunctions();
@@ -105,6 +109,7 @@ export default {
       emitter.on(SWITCH_MODAL, this.swtichModal);
       emitter.on(SET_OPTIONS, this.setOptionListFromSelect);
       emitter.on(SET_TARGET, this.setNeedEditElement);
+      emitter.on(SWITCH_ADD_TABLE_MODAL, this.changeCreateTableVis);
     },
 
     /** 向当前select 插入options */
@@ -132,6 +137,10 @@ export default {
 
     setNeedEditElement(ele: Element) {
       this.needEditElement = ele;
+    },
+
+    changeCreateTableVis() {
+      this.createTableVis = !this.createTableVis;
     },
   },
   computed: {

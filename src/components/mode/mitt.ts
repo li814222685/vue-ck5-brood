@@ -17,3 +17,5 @@ export const SET_TARGET = "setTarget";
 export const SAVE_HIDDEN_ITEM = "saveHiddenItem";
 /**  替换隐藏元素的Text */
 export const REPLACE_HIDDEN_ITEM_TEXT = "replaceHiddenItemText";
+/** 切换创建Table的Modal visible */
+export const SWITCH_ADD_TABLE_MODAL = "switchAddTableModal";

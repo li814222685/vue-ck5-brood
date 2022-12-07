@@ -364,30 +364,71 @@ export const downcastTable = (tableUtils, options = {} as any) => {
       );
     }
 
+    console.log(
+      "%c🍉Lee%cline:366%ctable",
+      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      "color:#fff;background:rgb(179, 214, 110);padding:3px;border-radius:2px",
+      table
+    );
     const figureElement = writer.createContainerElement("figure", { class: "table" }, [
       writer.createContainerElement("table", null, tableSections),
       writer.createSlot(element => !element.is("element", "tableRow")),
     ]);
-    const tableCols: number = tableUtils.getRows(table);
-    const wrapperFigureElement = createTableWrapper(writer, figureElement, { tableCols });
+    // const wrapperFigureElement = createTableWrapper(writer, figureElement, {
+    //   tableCols: tableUtils.getColumns(table),
+    //   tableRows: tableUtils.getRows(table),
+    // });
     //给figure 包裹 锚点Wrapper
 
-    return options.asWidget ? toTableWidget(wrapperFigureElement, writer) : wrapperFigureElement;
+    return options.asWidget ? toTableWidget(figureElement, writer) : figureElement;
   };
 };
 
 /** 创建Table 锚点Wrapper */
-const createTableWrapper = (writer: DowncastWriter, figureEle, { tableCols }) => {
+const createTableWrapper = (writer: DowncastWriter, figureEle, { tableRows, tableCols }) => {
   console.log("KKKKKKKKKKKKKKKKKKKKK");
   //创建 行锚点
   const rowItemCollection = [] as any;
-  // for (let i = 0; i < tableCols; i++) {
-  //   rowItemCollection.push(writer.createUIElement("div", { class: "wrapper-row-item" }));
-  // }
-  const wrapperRow = writer.createUIElement("div", { class: "wrapper-row" });
+  for (let i = 0; i < tableCols; i++) {
+    rowItemCollection.push(writer.createUIElement("div", { class: "wrapper-row-item" }));
+  }
+  const wrapperRow = writer.createContainerElement(
+    "div",
+    {
+      class: "wrapper-row",
+    },
+    rowItemCollection
+  );
+  //创建 纵向锚点
+  const colItemCollection = [] as any;
+
+  console.log(
+    "%c🍉Lee%cline:398%ctableRows",
+    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+    "color:#fff;background:rgb(39, 72, 98);padding:3px;border-radius:2px",
+    tableRows
+  );
+  const trDomList = document.getElementsByClassName("table")[0];
+
+  console.log(
+    "%c🍉Lee%cline:407%ctrDomList",
+    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+    "color:#fff;background:rgb(38, 157, 128);padding:3px;border-radius:2px",
+    trDomList
+  );
+  for (let i = 0; i < tableRows; i++) {
+    colItemCollection.push(writer.createUIElement("div", { class: "wrapper-col-item" }));
+  }
 
   //获取tableCell的列数，然后创建对应的 锚点行
-  const wrapperCol = writer.createUIElement("div", { class: "wrapper-col" });
+  const wrapperCol = writer.createContainerElement(
+    "div",
+    { class: "wrapper-col" },
+    colItemCollection
+  );
 
   console.log(
     "%cMyProject%cline:376%cfigureEle",

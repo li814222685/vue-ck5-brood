@@ -12,6 +12,7 @@ import { toClassSelector } from "./util";
 import { toWidget } from "@ckeditor/ckeditor5-widget/src/utils";
 import { DowncastWriter } from "@ckeditor/ckeditor5-engine";
 import { safeJsonStringify } from "../../components/utils";
+import { emitter, SWITCH_ADD_TABLE_MODAL } from "../../components/mode/mitt";
 
 interface Option {
   label: string | number;
@@ -55,7 +56,8 @@ export class TableControlsCommand extends Command {
     const model = this.editor.model;
     const selection = model.document.selection;
     const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
-    this.isEnabled = allowedIn.name === "tableCell";
+    // this.isEnabled = allowedIn.name === "tableCell";
+    this.isEnabled = true;
   }
 }
 
@@ -111,6 +113,12 @@ export class TableSelectCommand extends Command {
 }
 
 export class SetTableSelectOptionList extends Command {
+  refresh() {
+    const model = this.editor.model;
+    const selection = model.document.selection;
+    const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
+    this.isEnabled = allowedIn.name === "tableCell";
+  }
   execute(options, target) {
     const model = this.editor.model;
 
@@ -129,8 +137,47 @@ export class SetTableSelectOptionList extends Command {
   }
 }
 
+/** 插入带有Wrapper 的Table */
+export class InsertWrapperTableCommand extends Command {
+  /**
+   * @inheritDoc
+   */
+  refresh() {
+    const model = this.editor.model;
+    const selection = model.document.selection;
+    const schema = model.schema;
+
+    this.isEnabled = isAllowedInParent(selection, schema);
+  }
+
+  /**
+   * @param {Object} options
+   * @param {Number} [options.rows=2]
+   * @param {Number} [options.columns=2]
+   * @param {Number} [options.headingRows]
+   * @param {Number} [options.headingColumns]
+   * @fires execute
+   */
+  execute(options = {} as any) {
+    emitter.emit(SWITCH_ADD_TABLE_MODAL);
+  }
+}
+
+//
+// @param {module:engine/model/selection~Selection|module:engine/model/documentselection~DocumentSelection} selection
+// @param {module:engine/model/schema~Schema} schema
+// @returns {Boolean}
+function isAllowedInParent(selection, schema) {
+  const positionParent = selection.getFirstPosition().parent;
+  const validParent =
+    positionParent === positionParent.root ? positionParent : positionParent.parent;
+
+  return schema.checkChild(validParent, "table");
+}
+
 export default {
   TableControlsCommand,
   TableSelectCommand,
   SetTableSelectOptionList,
+  InsertWrapperTableCommand,
 };
