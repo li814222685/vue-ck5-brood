@@ -246,6 +246,7 @@ export default class TableControlsEditing extends Plugin {
         if (row == 0 || column == 0) {
           this.editor.model.change(writer => {
             writer.setSelection(null);
+            //todo：点击设置时添加锚点的元组属性，并改变背景颜色 以表示当前为元组
           });
         }
       }
