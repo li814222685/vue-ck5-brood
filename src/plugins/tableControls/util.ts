@@ -56,14 +56,22 @@ export function converDowncastCell(options = { asWidget: true }) {
             element
           );
         }
+        if (tableCell.hasAttribute("isMetaGroup")) {
+          writer.setStyle(
+            {
+              "background-color": "#cccacab3",
+            },
+            element
+          );
+        }
+
         //model上获取tableCell 上的属性
-        const useAttrs = ["type", "optionlist"]
+        const useAttrs = ["type", "optionlist", "isMetaGroup"]
           .map(attrKey => ({
             attrKey,
             value: tableCell.getAttribute(attrKey),
           }))
           .filter(({ attrKey, value }) => value);
-
         if (useAttrs.length != 0) {
           //获取model上的attrs
           useAttrs.forEach(({ attrKey, value }) => {
@@ -124,7 +132,7 @@ export function converEditinghDowncastCell(options = { asWidget: true }) {
           );
         }
         //model上获取tableCell 上的属性
-        const useAttrs = ["type", "optionlist"]
+        const useAttrs = ["type", "optionlist", "ismetagroup"]
           .map(attrKey => ({
             attrKey,
             value: tableCell.getAttribute(attrKey),
@@ -345,13 +353,6 @@ export const downcastTable = (tableUtils, options = {} as any) => {
       );
     }
 
-    console.log(
-      "%cMyProject%cline:347%ctableUtils.getRows(table)",
-      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-      "color:#fff;background:rgb(23, 44, 60);padding:3px;border-radius:2px",
-      tableUtils.getRows(table)
-    );
     if (headingRows < tableUtils.getRows(table)) {
       tableSections.push(
         writer.createContainerElement(
@@ -364,13 +365,6 @@ export const downcastTable = (tableUtils, options = {} as any) => {
       );
     }
 
-    console.log(
-      "%c🍉Lee%cline:366%ctable",
-      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-      "color:#fff;background:rgb(179, 214, 110);padding:3px;border-radius:2px",
-      table
-    );
     const figureElement = writer.createContainerElement("figure", { class: "table" }, [
       writer.createContainerElement("table", null, tableSections),
       writer.createSlot(element => !element.is("element", "tableRow")),

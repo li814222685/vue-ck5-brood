@@ -4,7 +4,7 @@
     <div id="editor"></div>
   </div>
 </template>
-<style>
+<style lang="less">
 .hidden_item {
   display: none;
 }
@@ -13,6 +13,25 @@
   min-width: 60px;
   outline: none !important;
   border: none;
+}
+#restrictMode {
+  .table table tbody :first-child td {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    background-color: #eeeeeeb3;
+  }
+
+  //去除锚点选中后的 聚焦边框和背景
+  .table table tbody :first-child td:focus,
+  .table table tbody tr td:first-child:focus {
+    background-color: #cccacab3 !important;
+    outline: none !important;
+  }
+  .table table tbody tr td:first-child {
+    background-color: #eeeeeeb3;
+    padding: 0px !important;
+    width: 22px;
+  }
 }
 </style>
 

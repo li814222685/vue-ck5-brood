@@ -23,6 +23,7 @@ import {
   HIDDEN_ITEM,
   V_SELECT_DROPDOWN_TEXT,
   COMMAND_NAME__INSERT_WRAPPER_TABLE,
+  THEME_ICON,
 } from "./constant";
 import {
   TableControlsCommand,
@@ -94,8 +95,17 @@ export default class TableControlsEditing extends Plugin {
       ],
     });
     schema.extend("tableCell", {
-      allowAttributes: ["type", "colspan", "rowspan", "optionlist"],
+      allowAttributes: [
+        "type",
+        "colspan",
+        "rowspan",
+        "optionlist",
+        "style",
+        "isMetaGroup",
+        "ismetagroup",
+      ],
     });
+
     schema.register(V_SPAN, {
       allowWhere: "$block",
       isInline: true,
@@ -118,7 +128,7 @@ export default class TableControlsEditing extends Plugin {
       model: "tableCell",
       view: converDowncastCell(),
       converterPriority: "highest",
-      renderUnsafeAttributes: ["optionlist", "type", "style"],
+      renderUnsafeAttributes: ["optionlist", "type", "style", "isMetaGroup", "ismetagroup"],
     });
 
     conversion.for("upcast").elementToElement({
@@ -242,23 +252,55 @@ export default class TableControlsEditing extends Plugin {
       /** 当前点击的是否为锚点 */
       const findAncestorTd = target.findAncestor({ name: "td" });
       if (findAncestorTd) {
-        const { row, column } = tableUtils.getCellLocation(mapper.toModelElement(findAncestorTd));
-        if (row == 0 || column == 0) {
-          this.editor.model.change(writer => {
-            writer.setSelection(null);
+        const isMetaGroup = findAncestorTd.hasAttribute("isMetaGroup");
+
+        console.log(
+          "%c🍉Lee%cline:247%cisMetaGroup",
+          "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+          "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+          "color:#fff;background:rgb(34, 8, 7);padding:3px;border-radius:2px",
+          findAncestorTd
+        );
+        const tableCell = mapper.toModelElement(findAncestorTd);
+        const { row, column } = tableUtils.getCellLocation(tableCell);
+        //Normal 模式
+        if (!tableControlsConfig?.isRestrictMode) {
+          if (row == 0 || column == 0) {
             //todo：点击设置时添加锚点的元组属性，并改变背景颜色 以表示当前为元组
-          });
+
+            editingView.change(writer => {
+              if (isMetaGroup) {
+                writer.setStyle({ "background-color": "#eeeeeeb3" }, findAncestorTd);
+                writer.removeAttribute("isMetaGroup", findAncestorTd);
+              } else {
+                writer.setStyle({ "background-color": "#cccacab3" }, findAncestorTd);
+                writer.setAttribute("isMetaGroup", true, findAncestorTd);
+              }
+            });
+            this.editor.model.change(writer => {
+              isMetaGroup
+                ? writer.removeAttribute("isMetaGroup", tableCell)
+                : writer.setAttribute("isMetaGroup", true, tableCell);
+              writer.setSelection(null);
+            });
+          }
+        } else {
+          //Restrict 模式
+          const isHasMetaGroup = findAncestorTd.hasAttribute("ismetagroup");
+
+          console.log("777严格模式逻辑！！！");
+          if (isHasMetaGroup) {
+            console.log("777是元组！！！");
+            if (row == 0) {
+              editor.execute("selectTableColumn");
+            } else if (column == 0) {
+              editor.execute("selectTableRow");
+            }
+          }
         }
       }
 
-      console.log(
-        "%c🍉Lee%cline:241%ctarget",
-        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-        "color:#fff;background:rgb(118, 77, 57);padding:3px;border-radius:2px",
-        target
-      );
-
+      //Select 相关的逻辑
       if (isRestrict && isHasTableSelect) {
         //通过TableControls的插件配置参数，来决定 绑定哪种模式( Restrict/ Normal)的点击监听
         tableControlsConfig?.isRestrictMode

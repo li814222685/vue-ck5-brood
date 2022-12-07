@@ -96,8 +96,17 @@ export class TableSelectCommand extends Command {
     const model = this.editor.model;
     const selection = model.document.selection;
     const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
-    console.log(allowedIn);
-    this.isEnabled = allowedIn.name === "tableCell";
+
+    console.log(
+      "%c🍉Lee%cline:99%callowedIn",
+      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      "color:#fff;background:rgb(56, 13, 49);padding:3px;border-radius:2px",
+      allowedIn
+    );
+    if (allowedIn) {
+      this.isEnabled = allowedIn?.name === "tableCell";
+    }
 
     //绑定select 的events
     try {
@@ -117,7 +126,10 @@ export class SetTableSelectOptionList extends Command {
     const model = this.editor.model;
     const selection = model.document.selection;
     const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
-    this.isEnabled = allowedIn.name === "tableCell";
+
+    if (allowedIn) {
+      this.isEnabled = allowedIn.name === "tableCell";
+    }
   }
   execute(options, target) {
     const model = this.editor.model;

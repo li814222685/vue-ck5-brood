@@ -293,4 +293,28 @@ export default {
 .hidden_item {
   display: none;
 }
+#normalMode {
+  .table table tbody :first-child td {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    background-color: #eeeeeeb3;
+  }
+  .table table tbody :first-child td:hover {
+    background-color: #cccacab3;
+  }
+  //去除锚点选中后的 聚焦边框和背景
+  .table table tbody :first-child td:focus,
+  .table table tbody tr td:first-child:focus {
+    background-color: #cccacab3 !important;
+    outline: none !important;
+  }
+  .table table tbody tr td:first-child {
+    background-color: #eeeeeeb3;
+    padding: 0px !important;
+    width: 22px;
+  }
+  .table table tbody tr td:first-child:hover {
+    background-color: #cccacab3;
+  }
+}
 </style>
