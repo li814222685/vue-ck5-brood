@@ -6,7 +6,6 @@
     <div class="content">
       <div id="devEditor"></div>
       <SectionForm 
-      :form-data="dynamicValidateForm"
       :sectionData="sectionData"
       @getStudentName="getStudentName"
       ref="refSectionForm"
@@ -286,6 +285,9 @@ export default {
         }
       });
     };
+    return {
+      refSectionForm, onParagraph, exportData
+    }
   }
 }
 </script>
