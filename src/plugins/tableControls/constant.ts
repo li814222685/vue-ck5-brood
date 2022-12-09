@@ -27,9 +27,17 @@ export const HIDDEN_ITEM = "hidden_item";
 
 export const TABLE_CC_TOOLBAR = "tableCcToolbar";
 
+export const TABLE_TURPLE_TOOLBAR = "tableTurpleToolbar";
+//表格锚点工具栏(Restrict Mode)
+export const TABLE_ANCHOR_TOOLBAR = "tableAnchorToolbar";
+
 /* 工具栏 - 指令`
 -------------------------- */
+export const COMMAND_NAME__COPY_TABLE_ROW = "copyTableRow";
+
 export const COMMAND_NAME__INSERT_WRAPPER_TABLE = "insertWrapperTable";
+//设置Table 元组
+export const COMMAND_NAME__SET_TURPLE_TABLE = "setTableTurple";
 
 export const COMMAND_NAME__INSERT_TABLE_SELECT = "insertTableSelect";
 export const COMMAND_NAME__INSERT_TABLE_NORMAL = "insertTableNormal";

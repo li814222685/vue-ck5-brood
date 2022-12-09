@@ -1,4 +1,4 @@
-import { DowncastWriter, Element } from "@ckeditor/ckeditor5-engine";
+import { DocumentSelection, DowncastWriter, Element } from "@ckeditor/ckeditor5-engine";
 import TableWalker from "@ckeditor/ckeditor5-table/src/tablewalker";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import AttributeElement from "@ckeditor/ckeditor5-engine/src/view/attributeelement";
@@ -66,7 +66,7 @@ export function converDowncastCell(options = { asWidget: true }) {
         }
 
         //model上获取tableCell 上的属性
-        const useAttrs = ["type", "optionlist", "isMetaGroup"]
+        const useAttrs = ["type", "optionlist", "isMetaGroup", "turpleName"]
           .map(attrKey => ({
             attrKey,
             value: tableCell.getAttribute(attrKey),
@@ -132,7 +132,7 @@ export function converEditinghDowncastCell(options = { asWidget: true }) {
           );
         }
         //model上获取tableCell 上的属性
-        const useAttrs = ["type", "optionlist", "ismetagroup"]
+        const useAttrs = ["type", "optionlist", "ismetagroup", "turplename"]
           .map(attrKey => ({
             attrKey,
             value: tableCell.getAttribute(attrKey),
@@ -377,64 +377,4 @@ export const downcastTable = (tableUtils, options = {} as any) => {
 
     return options.asWidget ? toTableWidget(figureElement, writer) : figureElement;
   };
-};
-
-/** 创建Table 锚点Wrapper */
-const createTableWrapper = (writer: DowncastWriter, figureEle, { tableRows, tableCols }) => {
-  console.log("KKKKKKKKKKKKKKKKKKKKK");
-  //创建 行锚点
-  const rowItemCollection = [] as any;
-  for (let i = 0; i < tableCols; i++) {
-    rowItemCollection.push(writer.createUIElement("div", { class: "wrapper-row-item" }));
-  }
-  const wrapperRow = writer.createContainerElement(
-    "div",
-    {
-      class: "wrapper-row",
-    },
-    rowItemCollection
-  );
-  //创建 纵向锚点
-  const colItemCollection = [] as any;
-
-  console.log(
-    "%c🍉Lee%cline:398%ctableRows",
-    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-    "color:#fff;background:rgb(39, 72, 98);padding:3px;border-radius:2px",
-    tableRows
-  );
-  const trDomList = document.getElementsByClassName("table")[0];
-
-  console.log(
-    "%c🍉Lee%cline:407%ctrDomList",
-    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-    "color:#fff;background:rgb(38, 157, 128);padding:3px;border-radius:2px",
-    trDomList
-  );
-  for (let i = 0; i < tableRows; i++) {
-    colItemCollection.push(writer.createUIElement("div", { class: "wrapper-col-item" }));
-  }
-
-  //获取tableCell的列数，然后创建对应的 锚点行
-  const wrapperCol = writer.createContainerElement(
-    "div",
-    { class: "wrapper-col" },
-    colItemCollection
-  );
-
-  console.log(
-    "%cMyProject%cline:376%cfigureEle",
-    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-    "color:#fff;background:rgb(96, 143, 159);padding:3px;border-radius:2px",
-    figureEle
-  );
-  const anchorTableWrapper = writer.createContainerElement("div", { class: "table-wrapper" }, [
-    wrapperRow,
-    wrapperCol,
-    figureEle,
-  ] as any);
-  return anchorTableWrapper;
 };

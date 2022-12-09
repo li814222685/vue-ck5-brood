@@ -15,7 +15,12 @@ import StandardEditingMode from "@ckeditor/ckeditor5-restricted-editing/src/stan
 import SelectToolbar from "../../plugins/controlsMenu/toolbar";
 import { WIDGET_TOOLBAR_NAME__MENU } from "../../plugins/controlsMenu/constant";
 import TableControls from "../../plugins/tableControls/index";
-import { TABLE_CC_TOOLBAR } from "../../plugins/tableControls/constant";
+import TableAnchorToolbar from "../../plugins/tableControls/toolbar";
+import {
+  TABLE_CC_TOOLBAR,
+  TABLE_TURPLE_TOOLBAR,
+  // COMMAND_NAME__COPY_TABLE_ROW,
+} from "../../plugins/tableControls/constant";
 
 export const RESTRICT_CONFIG = {
   plugins: [
@@ -32,6 +37,7 @@ export const RESTRICT_CONFIG = {
     TableProperties,
     TableCellProperties,
     TableControls,
+    TableAnchorToolbar,
   ],
   restrictedEditing: {
     allowedCommands: ["bold", "simpleBox", "heading", "insertSimpleBox"],
@@ -103,6 +109,7 @@ export const NORMAL_CONFIG = {
     TableCellProperties,
     Bold,
     TableControls,
+    TableAnchorToolbar,
   ],
 
   toolbar: [
@@ -121,6 +128,7 @@ export const NORMAL_CONFIG = {
     WIDGET_TOOLBAR_NAME__MENU,
     "insertTable",
     TABLE_CC_TOOLBAR,
+    TABLE_TURPLE_TOOLBAR,
   ],
   table: {
     contentToolbar: [

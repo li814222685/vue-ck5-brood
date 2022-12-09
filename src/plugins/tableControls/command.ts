@@ -5,14 +5,16 @@
 import Command from "@ckeditor/ckeditor5-core/src/command";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import _ from "lodash";
-import { COMMAND_NAME__INSERT_TABLE_NORMAL, RESTRICTED_EDITING } from "./constant";
-import { createTableSelect, handleSelectEvent, onTableSelect } from "./util";
+import { RESTRICTED_EDITING } from "./constant";
+import { handleSelectEvent, onTableSelect } from "./util";
 import { V_SELECT } from "./constant";
 import { toClassSelector } from "./util";
-import { toWidget } from "@ckeditor/ckeditor5-widget/src/utils";
-import { DowncastWriter } from "@ckeditor/ckeditor5-engine";
 import { safeJsonStringify } from "../../components/utils";
-import { emitter, SWITCH_ADD_TABLE_MODAL } from "../../components/mode/mitt";
+import {
+  emitter,
+  SWITCH_ADD_TABLE_MODAL,
+  SWITCH_SET_TURPLE_MODAL,
+} from "../../components/mode/mitt";
 
 interface Option {
   label: string | number;
@@ -30,7 +32,6 @@ export class TableControlsCommand extends Command {
      * 1.改变单元格背景色
      * 2.单元格内部元素全部变为 严格编辑，不再需要范围
      */
-    console.log("插入TableCC！！！");
     const selection = this.editor.model.document.selection;
     const mapper = this.editor.editing.mapper;
     const tableCell = [...selection.getSelectedBlocks()][0] as any;
@@ -97,13 +98,6 @@ export class TableSelectCommand extends Command {
     const selection = model.document.selection;
     const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
 
-    console.log(
-      "%c🍉Lee%cline:99%callowedIn",
-      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-      "color:#fff;background:rgb(56, 13, 49);padding:3px;border-radius:2px",
-      allowedIn
-    );
     if (allowedIn) {
       this.isEnabled = allowedIn?.name === "tableCell";
     }
@@ -175,10 +169,6 @@ export class InsertWrapperTableCommand extends Command {
   }
 }
 
-//
-// @param {module:engine/model/selection~Selection|module:engine/model/documentselection~DocumentSelection} selection
-// @param {module:engine/model/schema~Schema} schema
-// @returns {Boolean}
 function isAllowedInParent(selection, schema) {
   const positionParent = selection.getFirstPosition().parent;
   const validParent =
@@ -187,7 +177,82 @@ function isAllowedInParent(selection, schema) {
   return schema.checkChild(validParent, "table");
 }
 
+/** 复制table行命令 */
+export class SetTurpleCommand extends Command {
+  order: string;
+  constructor(editor, options = {} as any) {
+    super(editor);
+    this.order = options.order || "below";
+  }
+
+  refresh() {
+    const selection = this.editor.model.document.selection;
+    const tableUtils = this.editor.plugins.get("TableUtils");
+    const model = this.editor.model;
+
+    const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
+
+    if (allowedIn?.name == "tableCell") {
+      const { row, column } = tableUtils.getCellLocation(allowedIn) as any;
+      this.isEnabled = row == 0 || column == 0;
+    }
+  }
+
+  execute() {
+    const selection = this.editor.model.document.selection;
+    const anchorEle = [...selection.getSelectedBlocks()][0].parent;
+
+    emitter.emit(SWITCH_SET_TURPLE_MODAL, anchorEle);
+  }
+}
+
+/** 复制table行命令 */
+export class CopyRowCommand extends Command {
+  order: string;
+  constructor(editor, options = {} as any) {
+    super(editor);
+    this.order = options.order || "below";
+  }
+
+  refresh() {
+    const selection = this.editor.model.document.selection;
+    const tableUtils = this.editor.plugins.get("TableUtils");
+    const model = this.editor.model;
+
+    const allowedIn = model.schema.findAllowedParent(selection.getFirstPosition(), "table");
+
+    if (allowedIn?.name == "tableCell") {
+      const { row, column } = tableUtils.getCellLocation(allowedIn) as any;
+      this.isEnabled = row == 0 || column == 0;
+    }
+  }
+
+  execute(model: "row" | "col") {
+    const editor = this.editor;
+    const selection = editor.model.document.selection;
+    const tableUtils = editor.plugins.get("TableUtils");
+    const insertAbove = this.order === "above";
+
+    const affectedTableCells = tableUtils.getSelectionAffectedTableCells(selection as any);
+    const rowIndexes = tableUtils.getRowIndexes(affectedTableCells);
+
+    const row = insertAbove ? rowIndexes.first : rowIndexes.last;
+    const table = affectedTableCells[0].findAncestor("table");
+
+    tableUtils.insertRows(table, {
+      at: insertAbove ? row : row + 1,
+      copyStructureFromAbove: true,
+    });
+  }
+}
+
+/** 复制table列命令 */
+
+export class CopyTableCol extends Command {}
+
 export default {
+  SetTurpleCommand,
+  CopyRowCommand,
   TableControlsCommand,
   TableSelectCommand,
   SetTableSelectOptionList,

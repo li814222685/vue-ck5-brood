@@ -6,10 +6,6 @@
       &nbsp;x&nbsp;
       <el-input-number size="small" v-model="colNum" :min="2" :max="10" />
     </p>
-    <p>
-      锚点表格：
-      <el-checkbox v-model="isNeedAnchor" />
-    </p>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="changeVisible">取消</el-button>

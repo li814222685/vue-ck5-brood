@@ -19,3 +19,5 @@ export const SAVE_HIDDEN_ITEM = "saveHiddenItem";
 export const REPLACE_HIDDEN_ITEM_TEXT = "replaceHiddenItemText";
 /** 切换创建Table的Modal visible */
 export const SWITCH_ADD_TABLE_MODAL = "switchAddTableModal";
+/** 切换设置 Table Turple 窗口 */
+export const SWITCH_SET_TURPLE_MODAL = "switchSetTurpleModal";

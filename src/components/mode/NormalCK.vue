@@ -14,6 +14,11 @@
     :needEditElement="needEditElement"
   />
   <CreateTableDialog :visible="createTableVis" :change-visible="changeCreateTableVis" />
+  <SetTurpleDialog
+    :visible="setTurpleVis"
+    :change-visible="changeSetTurpleVis"
+    :anchorCellEle="anchorCellEle"
+  />
 </template>
 <style scoped>
 .hidden_item {
@@ -35,13 +40,14 @@ import {
   SWITCH_MODAL,
   Option,
   SET_OPTIONS,
-  SAVE_HIDDEN_ITEM,
-  REPLACE_HIDDEN_ITEM_TEXT,
   SET_TARGET,
   SWITCH_ADD_TABLE_MODAL,
+  SWITCH_SET_TURPLE_MODAL,
 } from "./mitt";
 import SelectDialog from "./SelectDialog/index.vue";
 import CreateTableDialog from "./CreateTableDialog/index.vue";
+import SetTurpleDialog from "./SetTurpleDialog/index.vue";
+
 import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import JqxDropDownList from "jqwidgets-scripts/jqwidgets-vue/vue_jqxdropdownlist.vue";
@@ -53,7 +59,6 @@ import {
   HIDDEN_ITEM,
 } from "../../plugins/tableControls/constant";
 import { Element } from "@ckeditor/ckeditor5-engine";
-import "../../plugins/tableControls/css/tableWrapper.css";
 
 export default {
   props: ["htmlData", "nowMode", "onchange"],
@@ -66,12 +71,14 @@ export default {
         range: null,
         element: null,
       },
+      anchorCellEle: null, //当前配置Turple的锚点元素
+      setTurpleVis: false,
       createTableVis: false,
       dialogVisible: false,
       selectedOptions: [], //当前选中select 有哪些options，用来将options传递到弹窗表格内
     };
   },
-  components: { SelectDialog, JqxDropDownList, CreateTableDialog },
+  components: { SelectDialog, JqxDropDownList, CreateTableDialog, SetTurpleDialog },
   mounted() {
     //挂载Emitter
     this.hangUpAllEmitFunctions();
@@ -110,6 +117,7 @@ export default {
       emitter.on(SET_OPTIONS, this.setOptionListFromSelect);
       emitter.on(SET_TARGET, this.setNeedEditElement);
       emitter.on(SWITCH_ADD_TABLE_MODAL, this.changeCreateTableVis);
+      emitter.on(SWITCH_SET_TURPLE_MODAL, this.changeSetTurpleVis);
     },
 
     /** 向当前select 插入options */
@@ -141,6 +149,11 @@ export default {
 
     changeCreateTableVis() {
       this.createTableVis = !this.createTableVis;
+    },
+    changeSetTurpleVis(anchorEle?) {
+      !this.setTurpleVis ? (this.anchorCellEle = anchorEle) : (this.anchorCellEle = null);
+
+      this.setTurpleVis = !this.setTurpleVis;
     },
   },
   computed: {
@@ -299,22 +312,22 @@ export default {
     padding-bottom: 0px !important;
     background-color: #eeeeeeb3;
   }
-  .table table tbody :first-child td:hover {
-    background-color: #cccacab3;
-  }
+  // .table table tbody :first-child td:hover {
+  //   background-color: #cccacab3;
+  // }
   //去除锚点选中后的 聚焦边框和背景
-  .table table tbody :first-child td:focus,
-  .table table tbody tr td:first-child:focus {
-    background-color: #cccacab3 !important;
-    outline: none !important;
-  }
+  // .table table tbody :first-child td:focus,
+  // .table table tbody tr td:first-child:focus {
+  //   background-color: #cccacab3 !important;
+  //   outline: none !important;
+  // }
   .table table tbody tr td:first-child {
     background-color: #eeeeeeb3;
     padding: 0px !important;
     width: 22px;
   }
-  .table table tbody tr td:first-child:hover {
-    background-color: #cccacab3;
-  }
+  // .table table tbody tr td:first-child:hover {
+  //   background-color: #cccacab3;
+  // }
 }
 </style>
