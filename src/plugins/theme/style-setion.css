@@ -36,9 +36,9 @@
 .ck .ck-widget:hover {
   outline-color: var(--ck-color-widget-hover-border);
 }
-.section {
+/* .section {
   padding: 10px 20px;
-}
+} */
 .Check {
   border: 3px solid #409EFF !important;
   border-radius: 5px;
@@ -49,4 +49,7 @@
 } */
 .ck-editor {
   width: 700px !important;
+}
+.ck p {
+  margin-block-end: 0;
 }
