@@ -75,8 +75,7 @@ export const createControlsToolbar = context => {
 
       const dropButton = new ButtonView(locale);
       dropButton.bind("isOn", "isEnabled").to(command, "value", "isEnabled");
-      console.log(dropButton);
-      console.log(dropButton.set);
+
       dropButton.set({
         withText: true,
         label: "配置",

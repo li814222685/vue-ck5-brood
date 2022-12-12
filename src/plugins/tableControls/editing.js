@@ -25,13 +25,13 @@ import {
   COMMAND_NAME__INSERT_WRAPPER_TABLE,
   COMMAND_NAME__COPY_TABLE_ROW,
   COMMAND_NAME__SET_TURPLE_TABLE,
+  COMMAND_NAME__TABLE_HANDLER,
 } from "./constant";
 import {
   TableControlsCommand,
   TableSelectCommand,
   SetTableSelectOptionList,
   InsertWrapperTableCommand,
-  CopyRowCommand,
   SetTurpleCommand,
 } from "./command";
 import { V_SELECT } from "./constant";
@@ -47,6 +47,7 @@ import {
 import { safeJsonParse, safeJsonStringify } from "../../components/utils";
 import { getMarkerAtPosition } from "@/plugins/formControls/utils.js";
 import TableUtils from "@ckeditor/ckeditor5-table/src/tableutils";
+import { TableRowAndColHandlertCommand } from "./tableAnchor/command";
 
 export default class TableControlsEditing extends Plugin {
   static get requires() {
@@ -73,8 +74,11 @@ export default class TableControlsEditing extends Plugin {
       COMMAND_NAME__INSERT_WRAPPER_TABLE,
       new InsertWrapperTableCommand(this.editor)
     );
-    this.editor.commands.add(COMMAND_NAME__COPY_TABLE_ROW, new CopyRowCommand(this.editor));
     this.editor.commands.add(COMMAND_NAME__SET_TURPLE_TABLE, new SetTurpleCommand(this.editor));
+    this.editor.commands.add(
+      COMMAND_NAME__TABLE_HANDLER,
+      new TableRowAndColHandlertCommand(this.editor)
+    );
   }
 
   _defineSchema() {
@@ -278,15 +282,12 @@ export default class TableControlsEditing extends Plugin {
           //Restrict 模式
           const isHasMetaGroup = findAncestorTd.hasAttribute("ismetagroup");
 
-          console.log("777严格模式逻辑！！！");
           if (isHasMetaGroup) {
-            console.log("777是元组！！！");
             if (row == 0) {
               editor.execute("selectTableColumn");
             } else if (column == 0) {
               try {
                 editor.execute("selectTableRow");
-                editor.execute(COMMAND_NAME__COPY_TABLE_ROW);
               } catch (error) {
                 console.error(error);
               }

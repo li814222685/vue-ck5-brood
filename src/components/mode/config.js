@@ -19,8 +19,9 @@ import TableAnchorToolbar from "../../plugins/tableControls/toolbar";
 import {
   TABLE_CC_TOOLBAR,
   TABLE_TURPLE_TOOLBAR,
-  // COMMAND_NAME__COPY_TABLE_ROW,
-} from "../../plugins/tableControls/constant";
+  TABLE_ANCHOR_TOOLBAR,
+  COMMAND_NAME__TABLE_HANDLER,
+} from "../../plugins/tableControls/constant.ts";
 
 export const RESTRICT_CONFIG = {
   plugins: [
@@ -40,8 +41,25 @@ export const RESTRICT_CONFIG = {
     TableAnchorToolbar,
   ],
   restrictedEditing: {
-    allowedCommands: ["bold", "simpleBox", "heading", "insertSimpleBox"],
-    allowedAttributes: ["bold", "simpleBox", "heading", "class", "control-select", "controlType"],
+    allowedCommands: [
+      "bold",
+      "simpleBox",
+      "heading",
+      "insertSimpleBox",
+      COMMAND_NAME__TABLE_HANDLER,
+      "insertTableRowAbove",
+    ],
+    allowedAttributes: [
+      "bold",
+      "simpleBox",
+      "heading",
+      "class",
+      "control-select",
+      "controlType",
+      TABLE_ANCHOR_TOOLBAR,
+      TABLE_TURPLE_TOOLBAR,
+      "insertTableRowAbove",
+    ],
   },
   toolbar: [
     "heading",
@@ -57,6 +75,7 @@ export const RESTRICT_CONFIG = {
     "bubble",
     "simpleBox",
     "restrictedEditing",
+    TABLE_TURPLE_TOOLBAR,
   ],
   tableControls: {
     isRestrictMode: true,

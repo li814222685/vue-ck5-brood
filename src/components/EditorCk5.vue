@@ -26,9 +26,9 @@ enum EditorMode {
   Restrict = "restrict",
 }
 
-const nowMode = ref(EditorMode.Normal);
+const nowMode = ref(EditorMode.Restrict);
 const htmlData = ref(
-  '<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p><p>&nbsp;</p><figure class="table"><table><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td style="background-color:rgba(255, 169, 77, 0.2);" type="select" optionlist="[{&quot;label&quot;:&quot;锚点&quot;,&quot;value&quot;:&quot;锚点&quot;},{&quot;label&quot;:&quot;测试&quot;,&quot;value&quot;:&quot;测试&quot;}]"><span class="restricted-editing-exception">锚点</span></td><td>312312321</td></tr><tr><td>&nbsp;</td><td>测试</td><td style="background-color:rgba(255, 169, 77, 0.2);"><span class="restricted-editing-exception">测试</span></td></tr></tbody></table></figure><p>&nbsp;</p>'
+  '<p>你的姓名：Lee nickName:<span class="restricted-editing-exception">Lee</span></p><p>&nbsp;</p><figure class="table"><table><tbody><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td>&nbsp;</td><td style="background-color:rgba(255, 169, 77, 0.2);" type="select" optionlist="[{&quot;label&quot;:&quot;锚点&quot;,&quot;value&quot;:&quot;锚点&quot;},{&quot;label&quot;:&quot;测试&quot;,&quot;value&quot;:&quot;测试&quot;}]"><span class="restricted-editing-exception">锚点</span></td><td>312312321</td></tr><tr><td style="background-color:#cccacab3;" ismetagroup="true" turplename="321">&nbsp;</td><td>测试</td><td style="background-color:rgba(255, 169, 77, 0.2);"><span class="restricted-editing-exception">测试</span></td></tr></tbody></table></figure><p>&nbsp;</p>'
 );
 const { value: editorMode } = nowMode;
 

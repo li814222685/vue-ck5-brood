@@ -31,6 +31,10 @@ export const TABLE_TURPLE_TOOLBAR = "tableTurpleToolbar";
 //表格锚点工具栏(Restrict Mode)
 export const TABLE_ANCHOR_TOOLBAR = "tableAnchorToolbar";
 
+export const TABLE_ANCHOR_COPY = "tableAnchorCopy";
+
+export const TABLE_ANCHOR_BUTTON_TOOLBAR = "tableAnchorButtonToolbar";
+
 /* 工具栏 - 指令`
 -------------------------- */
 export const COMMAND_NAME__COPY_TABLE_ROW = "copyTableRow";
@@ -46,6 +50,15 @@ export const COMMAND_NAME__SET_TABLE_SELECT_OPTIONS = "setTableSelectOptions";
 export const COMMAND_NAME__OPEN_CONTROL_MODAL = "openControlModal";
 
 export const COMMAND_NAME__INSERT_OPTIONS = "insertOptions";
+
+//Table 锚点 功能指令
+export const COMMAND_NAME__TABLE_HANDLER = "tableHandler";
+
+export const COMMAND_NAME__COPY_TABLE_THAT = "copyTableThat";
+
+export const COMMAND_NAME__COPY_ROW_ABOVE = "copyRowAbove";
+
+export const COMMAND_NAME__COPY_ROW_BELOW = "copyRowBelow";
 
 /* 功能类
 -------------------------- */

@@ -4,10 +4,7 @@ import { CUSTOM_PROPERTY__SELECT, RESTRICTED_CELL_BGCOLOR } from "./constant";
 import { emitter, SET_OPTIONS, Option } from "../../components/mode/mitt";
 import EditableElement from "@ckeditor/ckeditor5-engine/src/view/editableelement";
 import TableWalker from "@ckeditor/ckeditor5-table/src/tablewalker";
-import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
-import ContainerElement from "@ckeditor/ckeditor5-engine/src/view/containerelement";
-import AttributeElement from "@ckeditor/ckeditor5-engine/src/view/attributeelement";
-import Text from "@ckeditor/ckeditor5-engine/src/view/text";
+import {  toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import { RESTRICTED_EDITING } from "./constant";
 
 /** 获取选中的控件 */
