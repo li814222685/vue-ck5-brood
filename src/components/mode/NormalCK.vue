@@ -311,6 +311,10 @@ export default {
     padding-top: 0px !important;
     padding-bottom: 0px !important;
     background-color: #eeeeeeb3;
+    cursor: pointer !important;
+    span {
+      cursor: pointer !important;
+    }
   }
   // .table table tbody :first-child td:hover {
   //   background-color: #cccacab3;
@@ -325,6 +329,11 @@ export default {
     background-color: #eeeeeeb3;
     padding: 0px !important;
     width: 22px;
+    cursor: pointer !important;
+
+    span {
+      cursor: pointer !important;
+    }
   }
   // .table table tbody tr td:first-child:hover {
   //   background-color: #cccacab3;

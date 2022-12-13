@@ -145,6 +145,7 @@ export default class TableControlsEditing extends Plugin {
         "isMetaGroup",
         "ismetagroup",
         "turplename",
+        "ismetagroup",
       ],
     });
 

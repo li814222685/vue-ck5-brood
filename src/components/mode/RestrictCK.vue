@@ -19,6 +19,10 @@
     padding-top: 0px !important;
     padding-bottom: 0px !important;
     background-color: #eeeeeeb3;
+    cursor: pointer !important;
+    span {
+      cursor: pointer !important;
+    }
   }
 
   //去除锚点选中后的 聚焦边框和背景
@@ -31,6 +35,10 @@
     background-color: #eeeeeeb3;
     padding: 0px !important;
     width: 22px;
+    cursor: pointer !important;
+    span {
+      cursor: pointer !important;
+    }
   }
 }
 </style>

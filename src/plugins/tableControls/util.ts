@@ -66,7 +66,7 @@ export function converDowncastCell(options = { asWidget: true }) {
         }
 
         //model上获取tableCell 上的属性
-        const useAttrs = ["type", "optionlist", "isMetaGroup", "turpleName"]
+        const useAttrs = ["type", "optionlist", "isMetaGroup", "turpleName", "ismetagroup"]
           .map(attrKey => ({
             attrKey,
             value: tableCell.getAttribute(attrKey),

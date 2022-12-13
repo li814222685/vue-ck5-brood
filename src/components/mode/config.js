@@ -19,9 +19,9 @@ import TableAnchorToolbar from "../../plugins/tableControls/toolbar";
 import {
   TABLE_CC_TOOLBAR,
   TABLE_TURPLE_TOOLBAR,
-  TABLE_ANCHOR_TOOLBAR,
   COMMAND_NAME__TABLE_HANDLER,
-} from "../../plugins/tableControls/constant.ts";
+} from "../../plugins/tableControls/constant";
+import TableAnchorColToolbar from "../../plugins/tableControls/anchorColToolbar";
 
 export const RESTRICT_CONFIG = {
   plugins: [
@@ -39,6 +39,7 @@ export const RESTRICT_CONFIG = {
     TableCellProperties,
     TableControls,
     TableAnchorToolbar,
+    TableAnchorColToolbar,
   ],
   restrictedEditing: {
     allowedCommands: [
@@ -56,7 +57,6 @@ export const RESTRICT_CONFIG = {
       "class",
       "control-select",
       "controlType",
-      TABLE_ANCHOR_TOOLBAR,
       TABLE_TURPLE_TOOLBAR,
       "insertTableRowAbove",
     ],

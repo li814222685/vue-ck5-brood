@@ -31,7 +31,14 @@ export const TABLE_TURPLE_TOOLBAR = "tableTurpleToolbar";
 //表格锚点工具栏(Restrict Mode)
 export const TABLE_ANCHOR_TOOLBAR = "tableAnchorToolbar";
 
-export const TABLE_ANCHOR_COPY = "tableAnchorCopy";
+export const TABLE_ANCHOR_ROW_BELOW = "tableAnchorRowBelow";
+
+export const TABLE_ANCHOR_DEL = "tableAnchorDel";
+//// 列 toolbar
+export const TABLE_ANCHOR_COL_TOOLBAR = "tableAnchorColToolbar";
+export const TABLE_ANCHOR_COL_LEFT = "tableAnchorColLeft";
+export const TABLE_ANCHOR_COL_RIGHT = "tableAnchorColRight";
+export const TABLE_ANCHOR_COL_DEL = "tableAnchorColDel";
 
 export const TABLE_ANCHOR_BUTTON_TOOLBAR = "tableAnchorButtonToolbar";
 

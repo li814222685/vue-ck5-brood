@@ -15,9 +15,13 @@ import {
   COMMAND_NAME__INSERT_WRAPPER_TABLE,
   COMMAND_NAME__SET_TURPLE_TABLE,
   TABLE_ANCHOR_TOOLBAR,
-  TABLE_ANCHOR_COPY,
+  TABLE_ANCHOR_DEL,
   COMMAND_NAME__TABLE_HANDLER,
   COMMAND_NAME__COPY_ROW_ABOVE,
+  TABLE_ANCHOR_ROW_BELOW,
+  TABLE_ANCHOR_COL_LEFT,
+  TABLE_ANCHOR_COL_RIGHT,
+  TABLE_ANCHOR_COL_DEL,
 } from "./constant";
 import _ from "lodash";
 
@@ -86,24 +90,48 @@ export class TableControlsUI extends Plugin {
   }
 }
 
+const isCol = eles => eles.every(ele => ele.parent.name === "tableCell");
+
 /** 限制模式下：创建Table的周边锚点 */
-export const createTableAnchorToolbar = context => {
+export const createTableRowToolbar = context => {
   const { editor } = context;
+  const tableUtils = editor.plugins.get("TableUtils");
+  const selection = editor.model.document.selection;
+
   editor.ui.componentFactory.add(TABLE_ANCHOR_TOOLBAR, locale => {
     try {
-      // const command = editor.commands.get("insertSelect");
-
       const dropButton = new ButtonView(locale);
-      // dropButton.bind("isOn", "isEnabled").to(command, "value", "isEnabled");
 
       dropButton.set({
         withText: true,
-        label: "-_-",
-        cmd: COMMAND_NAME__SET_TURPLE_TABLE,
+        label: "向上复制一行",
       });
 
       context.listenTo(dropButton, "execute", ({ source }) => {
-        console.log("copy");
+        const affectedTableCells = tableUtils.getSelectionAffectedTableCells(selection);
+        const columnIndexes = tableUtils.getColumnIndexes(affectedTableCells);
+        const rowIndexes = tableUtils.getRowIndexes(affectedTableCells);
+        const table = affectedTableCells[0].findAncestor("table");
+
+        if (columnIndexes.first === columnIndexes.last) {
+          //列复制
+          editor.model.change(writer => {
+            const rows = table.getChildren();
+            for (const tableRow of rows) {
+              const tableCell = tableRow.getChild(columnIndexes.first);
+              const cloneItem = writer.cloneElement(tableCell, true);
+              writer.insert(cloneItem, tableRow, columnIndexes.first);
+            }
+            // const cloneItem = writer.cloneElement(tr, true);
+          });
+        } else {
+          //行复制
+          editor.model.change(writer => {
+            const tr = table.getChild(rowIndexes.first);
+            const cloneItem = writer.cloneElement(tr, true);
+            writer.insert(cloneItem, table, rowIndexes.first);
+          });
+        }
       });
 
       return dropButton;
@@ -111,37 +139,130 @@ export const createTableAnchorToolbar = context => {
       console.error(error);
     }
   });
-
-  editor.ui.componentFactory.add(TABLE_ANCHOR_COPY, locale => {
+  editor.ui.componentFactory.add(TABLE_ANCHOR_ROW_BELOW, locale => {
     try {
-      const command = editor.commands.get("insertTableRowAbove");
-
       const dropButton = new ButtonView(locale);
-      dropButton.bind("isOn").to(command);
+
+      dropButton.set({
+        withText: true,
+        label: "向下复制一行",
+      });
+
+      context.listenTo(dropButton, "execute", ({ source }) => {
+        const affectedTableCells = tableUtils.getSelectionAffectedTableCells(selection);
+        const rowIndexes = tableUtils.getRowIndexes(affectedTableCells);
+        const table = affectedTableCells[0].findAncestor("table");
+
+        editor.model.change(writer => {
+          const tr = table.getChild(rowIndexes.first);
+          const cloneItem = writer.cloneElement(tr, true);
+          writer.insert(cloneItem, table, rowIndexes.first + 1);
+        });
+      });
+
+      return dropButton;
+    } catch (error) {
+      console.error(error);
+    }
+  });
+  editor.ui.componentFactory.add(TABLE_ANCHOR_DEL, locale => {
+    try {
+      const dropButton = new ButtonView(locale);
 
       dropButton.set({
         withText: true,
         label: "删除",
+        cmd: "insertTableRowAbove",
       });
 
       context.listenTo(dropButton, "execute", ({ source }) => {
-        const selection = editor.model.document.selection;
-        const tableUtils = editor.plugins.get("TableUtils");
-
         const affectedTableCells = tableUtils.getSelectionAffectedTableCells(selection);
         const rowIndexes = tableUtils.getRowIndexes(affectedTableCells);
 
-        const row = rowIndexes.first;
         const table = affectedTableCells[0].findAncestor("table");
-        const targetRow = _.cloneDeep(table.getChild(row));
 
-        // tableUtils.insertRows(table, {
-        //   at: row,
-        // });
-        tableUtils.removeRows(table, {
-          at: row,
-          rows: 1,
+        editor.model.change(writer => {
+          const tr = table.getChild(rowIndexes.first);
+          writer.remove(tr);
         });
+      });
+
+      return dropButton;
+    } catch (error) {
+      console.error(error);
+    }
+  });
+};
+
+const createTableColToolbar = context => {
+  const { editor } = context;
+  const tableUtils = editor.plugins.get("TableUtils");
+  const selection = editor.model.document.selection;
+
+  editor.ui.componentFactory.add(TABLE_ANCHOR_COL_LEFT, locale => {
+    try {
+      const dropButton = new ButtonView(locale);
+      dropButton.set({
+        withText: true,
+        label: "向左复制一列",
+      });
+
+      context.listenTo(dropButton, "execute", ({ source }) => {
+        const affectedTableCells = tableUtils.getSelectionAffectedTableCells(selection);
+        const columnIndexes = tableUtils.getColumnIndexes(affectedTableCells);
+        const table = affectedTableCells[0].findAncestor("table");
+        //列复制
+        editor.model.change(writer => {
+          const rows = table.getChildren();
+          for (const tableRow of rows) {
+            const tableCell = tableRow.getChild(columnIndexes.first);
+            const cloneItem = writer.cloneElement(tableCell, true);
+            writer.insert(cloneItem, tableRow, columnIndexes.first);
+          }
+        });
+      });
+
+      return dropButton;
+    } catch (error) {
+      console.error(error);
+    }
+  });
+  editor.ui.componentFactory.add(TABLE_ANCHOR_COL_RIGHT, locale => {
+    try {
+      const dropButton = new ButtonView(locale);
+      dropButton.set({
+        withText: true,
+        label: "向右复制一列",
+      });
+      context.listenTo(dropButton, "execute", ({ source }) => {
+        const affectedTableCells = tableUtils.getSelectionAffectedTableCells(selection);
+        const columnIndexes = tableUtils.getColumnIndexes(affectedTableCells);
+        const table = affectedTableCells[0].findAncestor("table");
+        //列复制
+        editor.model.change(writer => {
+          const rows = table.getChildren();
+          for (const tableRow of rows) {
+            const tableCell = tableRow.getChild(columnIndexes.first);
+            const cloneItem = writer.cloneElement(tableCell, true);
+            writer.insert(cloneItem, tableRow, columnIndexes.first + 1);
+          }
+        });
+      });
+      return dropButton;
+    } catch (error) {
+      console.error(error);
+    }
+  });
+  editor.ui.componentFactory.add(TABLE_ANCHOR_COL_DEL, locale => {
+    try {
+      const dropButton = new ButtonView(locale);
+      dropButton.set({
+        withText: true,
+        label: "删除",
+        cmd: "removeTableColumn",
+      });
+      context.listenTo(dropButton, "execute", ({ source }) => {
+        editor.execute(source.cmd);
       });
 
       return dropButton;
@@ -178,7 +299,8 @@ export class TableTurpleUI extends Plugin {
       return buttonView;
     });
 
-    createTableAnchorToolbar(this);
+    createTableRowToolbar(this);
+    createTableColToolbar(this);
   }
 }
 
