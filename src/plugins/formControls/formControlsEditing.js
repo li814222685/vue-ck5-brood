@@ -144,7 +144,6 @@ export default class FormControlEditing extends Plugin {
     conversion.for("upcast").elementToElement({
       view: "control-select",
       model: (ele, { writer }) => {
-        console.log(ele.getClassNames());
         return writer.createElement("control-select", {
           class: [...ele.getClassNames()].join(" "),
         });
@@ -162,7 +161,6 @@ export default class FormControlEditing extends Plugin {
           },
           [writer.createText("我就是控件点我试试？")]
         );
-        console.log(span);
         return span;
       },
       converterPriority: "highest",
@@ -172,7 +170,6 @@ export default class FormControlEditing extends Plugin {
       model: "restrictedEditingException",
       // Use callback to return new object every time new marker instance is created - otherwise it will be seen as the same marker.
       view: (data, { writer }) => {
-        console.log(data);
         return {
           name: "span",
           classes: "restricted-editing-exception",
