@@ -131,25 +131,50 @@ const createAnchorRowBtn = ({ context, uiName, label, extraNumber }) => {
           const tr = table.getChild(rowIndexes.first);
           const cloneItem = writer.cloneElement(tr, true);
           writer.insert(cloneItem, table, rowIndexes.first + extraNumber);
-          //李博看这
-          // writer.addMarker("restrictedEditingException", { range, usingOperation: true });
-          // [...tr.getChildren()].forEach((cell, index) => {
-          //   if (index == 0) return;
-          //   const start = writer.createPositionBefore(cell);
-          //   const range = writer.createRange(start);
-          //   writer.addMarker("restrictedEditingException:10", {
-          //     range,
-          //     usingOperation: true,
-          //     affectsData: true,
-          //   });
-          // });
-          // console.log(
-          //   "%cMyProject%cline:135%ctr",
-          //   "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-          //   "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-          //   "color:#fff;background:rgb(20, 68, 106);padding:3px;border-radius:2px",
-          //   [...tr.getChildren()]
-          // );
+          const maxMarkerNumber = editor.model.markers._markers.size;
+
+          [...cloneItem.getChildren()].forEach((cell, index) => {
+            [...cell.getChildren()].forEach(content => {
+              const path = content.getPath();
+              const child = content.getChild(0);
+              if (child) {
+                const start = writer.createPositionBefore(child);
+                const end = writer.createPositionAfter(child);
+                const range = writer.createRange(start, end);
+                writer.addMarker(`restrictedEditingException:${maxMarkerNumber + index + 1}`, {
+                  range,
+                  usingOperation: true,
+                  affectsData: true,
+                });
+              }
+
+              // const end = writer.createPositionAfter(content.getChild(0));
+
+              // const start = writer.createPositionBefore(content);
+              // const after = writer.createPositionAfter(content);
+
+              // console.log(
+              //   "%cMyProject%cline:149%cstart",
+              //   "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+              //   "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+              //   "color:#fff;background:rgb(251, 178, 23);padding:3px;border-radius:2px",
+              //   start
+              // );
+              // const range = writer.createRange(start, after);
+              // writer.addMarker(`restrictedEditingException:${maxMarkerNumber + index + 1}`, {
+              //   range,
+              //   usingOperation: true,
+              //   affectsData: true,
+              // });
+            });
+            console.log(
+              "%cMyProject%cline:147%ccell",
+              "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+              "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+              "color:#fff;background:rgb(248, 147, 29);padding:3px;border-radius:2px",
+              cell
+            );
+          });
         });
       });
       return dropButton;
@@ -205,6 +230,29 @@ const createAnchorColBtn = ({ context, uiName, label, extraNumber }) => {
             const tableCell = tableRow.getChild(columnIndexes.first);
             const cloneItem = writer.cloneElement(tableCell, true);
             writer.insert(cloneItem, tableRow, columnIndexes.first + extraNumber);
+            const maxMarkerNumber = editor.model.markers._markers.size;
+
+            [...cloneItem.getChildren()].forEach((cell, index) => {
+              console.log("cell:", cell);
+
+              [...cell.getChildren()].forEach(content => {
+                if (content) {
+                  const start = writer.createPositionBefore(content);
+                  const end = writer.createPositionAfter(content);
+                  const range = writer.createRange(start, end);
+
+                  const emptyText = writer.createElement("paragraph");
+                  writer.appendText(" ", emptyText);
+
+                  editor.model.insertObject(emptyText, range);
+                  writer.addMarker(`restrictedEditingException:${maxMarkerNumber + index + 1}`, {
+                    range,
+                    usingOperation: true,
+                    affectsData: true,
+                  });
+                }
+              });
+            });
           }
         });
       });
