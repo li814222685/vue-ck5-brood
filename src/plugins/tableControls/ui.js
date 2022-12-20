@@ -138,16 +138,17 @@ const createAnchorRowBtn = ({ context, uiName, label, extraNumber }) => {
               const path = content.getPath();
               const child = content.getChild(0);
               if (child) {
+                child._data = ""
                 const start = writer.createPositionBefore(child);
                 const end = writer.createPositionAfter(child);
                 const range = writer.createRange(start, end);
-                writer.addMarker(`restrictedEditingException:${maxMarkerNumber + index + 1}`, {
+                // 复制时第一列没有进入这里，maxMarkerNumber + index + 1 会让marker的名字会多1，复制列的时候会导致报错
+                writer.addMarker(`restrictedEditingException:${maxMarkerNumber + index}`, {
                   range,
                   usingOperation: true,
                   affectsData: true,
                 });
               }
-
               // const end = writer.createPositionAfter(content.getChild(0));
 
               // const start = writer.createPositionBefore(content);
@@ -240,11 +241,7 @@ const createAnchorColBtn = ({ context, uiName, label, extraNumber }) => {
                   const start = writer.createPositionBefore(content);
                   const end = writer.createPositionAfter(content);
                   const range = writer.createRange(start, end);
-
-                  const emptyText = writer.createElement("paragraph");
-                  writer.appendText(" ", emptyText);
-
-                  editor.model.insertObject(emptyText, range);
+                  content._data = ""
                   writer.addMarker(`restrictedEditingException:${maxMarkerNumber + index + 1}`, {
                     range,
                     usingOperation: true,
