@@ -5,10 +5,10 @@
     <br />
     <div class="content">
       <div id="devEditor"></div>
-      <SectionForm 
-      :sectionData="sectionData"
-      @getStudentName="getStudentName"
-      ref="refSectionForm"
+      <SectionForm
+        :sectionData="sectionData"
+        @getStudentName="getStudentName"
+        ref="refSectionForm"
       />
       <!-- <el-form
         ref="formRef"
@@ -162,7 +162,6 @@
       :table-data="selectedOptions"
       :insert-options-to-select="insertOptionsToSelect"
     /> -->
- 
   </div>
 </template>
 
@@ -183,9 +182,9 @@ import SectionForm from "./SectionForm/index.vue";
 import { COMMAND_NAME__INSERT_OPTIONS } from "../../plugins/controlsMenu/constant";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import "../../plugins/theme/style-setion.css";
-import { toRaw , ref,nextTick,getCurrentInstance  } from "vue";
+import { toRaw, ref, nextTick, getCurrentInstance } from "vue";
 export default {
-  components: { SelectDialog , SectionForm},
+  components: { SelectDialog, SectionForm },
   props: ["htmlData", "nowMode", "onchange", "sectionData"],
   data() {
     return {
@@ -200,7 +199,7 @@ export default {
     };
   },
   mounted() {
-    console.log(this.sectionData)
+    console.log(this.sectionData);
     window.addEventListener("mousedown", this.onParagraph);
     //挂载Emitter
     this.hangUpAllEmitFunctions();
@@ -233,22 +232,22 @@ export default {
     setOptionListFromSelect(options: Option[]) {
       this.selectedOptions = _.cloneDeep(options);
     },
-    getStudentName(data){
+    getStudentName(data) {
       this.$emit("getStudentName", data);
     },
   },
 
   /** vue3获取 vue2实例 */
-  setup(prop,{emit}){
-    let { proxy } :any = getCurrentInstance();
+  setup(prop, { emit }) {
+    let { proxy }: any = getCurrentInstance();
     const refSectionForm = ref();
-    const onParagraph = (e)=>{
+    const onParagraph = (e) => {
       nextTick(() => {
         if (refSectionForm.value) {
-          console.log('refSectionForm.value',refSectionForm.value)
+          console.log("refSectionForm.value", refSectionForm.value);
           refSectionForm.value.onParagraphs(proxy.sectionData);
         }
-      })
+      });
       setTimeout(() => {
         const clickDom = <HTMLElement>(
           document.elementFromPoint(e.clientX, e.clientY)
@@ -276,20 +275,22 @@ export default {
         }
       }, 1);
     };
-    const exportData = ()=> { 
+    const exportData = () => {
       proxy.onchange((window as any).devEditor.getData());
       nextTick(() => {
         if (refSectionForm.value) {
-          console.log('refSectionForm.value',refSectionForm.value)
+          console.log("refSectionForm.value", refSectionForm.value);
           refSectionForm.value.submitSection();
         }
       });
     };
     return {
-      refSectionForm, onParagraph, exportData
-    }
-  }
-}
+      refSectionForm,
+      onParagraph,
+      exportData,
+    };
+  },
+};
 </script>
 <style lang="less" scoped>
 .hidden-item {
