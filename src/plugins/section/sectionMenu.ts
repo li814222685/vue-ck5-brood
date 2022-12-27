@@ -59,6 +59,7 @@ export function toShowSectionMenu(clickDom: HTMLElement, vueObject: any) {
   } else {
     vueObject.positionRange = [];
     vueObject.menuVisible = false;
+    document.body.style.overflow = "visible";
   }
   if (sectionDom) {
     vueObject.attributsList = [

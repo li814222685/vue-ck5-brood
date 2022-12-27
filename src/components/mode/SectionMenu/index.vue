@@ -49,7 +49,7 @@ watch(
       const menuBtn = <HTMLImageElement>document.querySelector("#menuBtn");
       if (!menuBtn) return;
       menuBtn.style.left = <any>value[0] - 35 + "px";
-      menuBtn.style.top = <any>value[1] - 3 + "px";
+      menuBtn.style.top = document.documentElement.scrollTop + <any>value[1] - 3 + "px";
     });
   },
   { immediate: true, deep: true }
@@ -61,6 +61,7 @@ watch(menuVisible, (value: boolean) => {
 });
 
 const showList = () => {
+  document.body.style.overflow = "hidden";
   const attributes = toRaw(attributsList.value);
   data.currentCase = attributes.filter(item => item.key == "currentcase")[0].value;
   data.casetype = attributes.filter(item => item.key == "type")[0].value;
@@ -77,7 +78,7 @@ const showList = () => {
     const menuBtn = <HTMLImageElement>document.querySelector(".box-card");
     const range = toRaw(positionRange.value);
     menuBtn.style.left = <any>range[0] - 55 - 100 + "px";
-    menuBtn.style.top = <any>range[1] - 3 + "px";
+    menuBtn.style.top = document.documentElement.scrollTop + <any>range[1] - 3 + "px";
   });
 };
 
