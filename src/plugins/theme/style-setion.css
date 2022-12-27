@@ -1,8 +1,17 @@
+.ck .ck-editor__nested-editable.ck-editor__nested-editable_focused, .ck .ck-editor__nested-editable:focus {
+  box-sizing: border-box;
+  box-shadow: 0 0 0 3px #409EFF !important;
+  border-radius: 5px;
+}
 .content {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
+/* .ck p {
+  margin-block-end: 0;
+  margin-bottom: 18px !important;
+} */
 
 .simple-box {
   width: 98%;
@@ -28,9 +37,6 @@
 .simple-box:hover > .simple-box-description {
   background-color: rgb(227, 228, 226);
   border-radius: 5px;
-  /* border: 3px solid var(--ck-color-widget-hover-border);
-  border-radius: 5px;
-  outline-color: var(--ck-color-widget-hover-border); */
 }
 .simple-box-title {
   margin-bottom: 10px;
@@ -38,8 +44,11 @@
 .ck .ck-widget:hover {
   outline-color: var(--ck-color-widget-hover-border);
 }
-/* .section {
-  padding: 3px 0px;
+.section p:first-child,.section p:last-child{
+  margin: 0px !important;
+}
+/* .section p{
+  margin-bottom: 0px !important;
 } */
 .Check {
   box-sizing: border-box;
@@ -51,7 +60,4 @@
 } */
 .ck-editor {
   width: 700px !important;
-}
-.ck p {
-  margin-block-end: 0;
 }
