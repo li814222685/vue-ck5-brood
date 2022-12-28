@@ -281,21 +281,12 @@ export default class TableControlsEditing extends Plugin {
     const tableControlsConfig = editor.config.get("tableControls");
 
     editingView.addObserver(ClickObserver);
-    this.listenTo(viewDocument, "focus", (event, data) => {
-      console.log(
-        "%c🍉Lee%cline:266%cdata",
-        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-        "color:#fff;background:rgb(161, 23, 21);padding:3px;border-radius:2px",
-        data
-      );
-      const td = data.target;
-      const isRestrict = isRestrictedElement(td);
-      const isHasTableSelect = isCellHasTableSelect(td);
-
+    this.listenTo(viewDocument, "click", (event, data) => {
+      const target = data.target;
       /** 当前点击的是否为锚点 */
-      if (td.name === "td") {
-        const tableCell = mapper.toModelElement(td);
+      const findAncestorTd = target.findAncestor({ name: "td" });
+      if (findAncestorTd) {
+        const tableCell = mapper.toModelElement(findAncestorTd);
         const { row, column } = tableUtils.getCellLocation(tableCell);
         //Normal 模式
         if (!tableControlsConfig?.isRestrictMode) {
@@ -306,7 +297,7 @@ export default class TableControlsEditing extends Plugin {
           }
         } else {
           //Restrict 模式
-          const isHasMetaGroup = td.hasAttribute("ismetagroup");
+          const isHasMetaGroup = findAncestorTd.hasAttribute("ismetagroup");
 
           if (isHasMetaGroup) {
             if (row == 0) {
@@ -321,6 +312,11 @@ export default class TableControlsEditing extends Plugin {
           }
         }
       }
+    });
+    this.listenTo(viewDocument, "focus", (event, data) => {
+      const td = data.target;
+      const isRestrict = isRestrictedElement(td);
+      const isHasTableSelect = isCellHasTableSelect(td);
 
       //Select 相关的逻辑
       if (isRestrict && isHasTableSelect) {

@@ -114,6 +114,13 @@ const createRemoveButton = (context, uiName, cmd) => {
  *
  */
 const replaceTextByCell = (cell, child) => {
+  console.log(
+    "%c🍉Lee%cline:117%ccell",
+    "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+    "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+    "color:#fff;background:rgb(222, 125, 44);padding:3px;border-radius:2px",
+    cell
+  );
   if (cell.getAttribute("type") === "select") {
     child._data = "请选择";
   } else {
@@ -225,7 +232,7 @@ const createAnchorColBtn = ({ context, uiName, label, extraNumber }) => {
             [...cloneItem.getChildren()].forEach((cell, index) => {
               [...cell.getChildren()].forEach(content => {
                 if (content) {
-                  replaceTextByCell(cell, child);
+                  replaceTextByCell(cell.parent, content);
                   const start = writer.createPositionBefore(content);
                   const end = writer.createPositionAfter(content);
                   const range = writer.createRange(start, end);
