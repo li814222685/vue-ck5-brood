@@ -176,7 +176,7 @@ export default {
 .v_select {
   /* 事实上Select 的宽高应该是自适应的，支持外部参数来改变 Select 对应的宽高 */
   width: inherit;
-  height: 30px;
+  height: 20px;
   background: #ffefdf;
   .ck-widget__type-around__button {
     display: none !important;
@@ -231,7 +231,7 @@ export default {
 .v_select_dropDown_text_sele {
   display: block;
   padding: 0 10px;
-  line-height: 38px;
+  height: 30px;
   /* border: 1px solid #1769fe; */
   border: 1px solid rgba(218, 130, 36, 0.437);
 
@@ -289,10 +289,14 @@ export default {
 /* Option 列表   */
 
 .v_select_optionList {
-  border: 1px solid rgba(218, 130, 36, 0.437);
+  // border: 1px solid rgba(218, 130, 36, 0.437);
+  background-color: antiquewhite;
   border-top: none;
   display: none;
   border-radius: 4px;
+  position: absolute;
+  z-index: 999;
+  border: 1px solid rgba(218, 130, 36, 0.437) !important;
 }
 
 .v_select_optionList_item {

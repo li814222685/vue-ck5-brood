@@ -96,7 +96,8 @@
             border-top: none;
             display: none;
             border-radius: 4px;
-
+            position: absolute;
+            z-index: 999;
         }
 
         .v_select_optionList_item {
@@ -116,7 +117,8 @@
 
 <body>
     <div class="v_select" onclick="onClickSelect()">
-        <div class="v_select_dropDown">
+        <div style="border: 1px solid;">
+                    <div class="v_select_dropDown">
             <div id="v_select_dropDown_text" class="v_select_dropDown_text" contenteditable="true">自定义自定义
             </div>
             <span id="theme_icon" class="triangle_up" contenteditable="false"></span>
@@ -130,6 +132,8 @@
             <div class="v_select_optionList_item" data-value="通州区" onclick="clickOption();">通州区</div>
 
         </div>
+        </div>
+
         <script>
             const V_SELECT = "v_select"
             const V_SELECT_DROPDOWN_TEXT="v_select_dropDown_text"
@@ -147,6 +151,10 @@
                 document.querySelector('.v_select_optionList').style.display = "block"
                 document.querySelector(".v_select_dropDown_text").className = V_SELECT_DROPDOWN_TEXT_SELE;
                 document.getElementById("theme_icon").className = TRIANGlE_DOWN;
+              const selectWidth =   document.querySelector('.v_select')?.offsetWidth
+              
+              console.log('%c🍉Lee%cline:155%cselectWidth', 'color:#fff;background:#ee6f57;padding:3px;border-radius:2px', 'color:#fff;background:#1f3c88;padding:3px;border-radius:2px', 'color:#fff;background:rgb(114, 83, 52);padding:3px;border-radius:2px', selectWidth)
+                              document.querySelector('.v_select_optionList').style.width = selectWidth+'px'              
             }
 
             /** Option的点击事件*/

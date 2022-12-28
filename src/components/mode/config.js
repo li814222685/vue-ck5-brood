@@ -22,6 +22,7 @@ import {
   COMMAND_NAME__TABLE_HANDLER,
 } from "../../plugins/tableControls/constant";
 import TableAnchorColToolbar from "../../plugins/tableControls/anchorColToolbar";
+import TableColumnResize from "@ckeditor/ckeditor5-table/src/tablecolumnresize";
 
 export const RESTRICT_CONFIG = {
   plugins: [
@@ -40,6 +41,7 @@ export const RESTRICT_CONFIG = {
     TableControls,
     TableAnchorToolbar,
     TableAnchorColToolbar,
+    TableColumnResize,
   ],
   restrictedEditing: {
     allowedCommands: [
@@ -129,6 +131,7 @@ export const NORMAL_CONFIG = {
     Bold,
     TableControls,
     TableAnchorToolbar,
+    TableColumnResize,
   ],
 
   toolbar: [

@@ -61,7 +61,7 @@ export default class TableAnchorToolbar extends Plugin {
     const tableUtils = editor.plugins.get("TableUtils");
 
     try {
-      ["removeTableRow"].forEach(cmd => {
+      ["removeTableRow", "resizeTableWidth", "resizeColumnWidths"].forEach(cmd => {
         this.editor.plugins.get("RestrictedEditingModeEditing").enableCommand(cmd);
       });
     } catch (error) {}

@@ -23,6 +23,7 @@ import { EditorClasses } from "../../components/mode/define";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
 import { emitter, Option, REPLACE_HIDDEN_ITEM_TEXT } from "../../components/mode/mitt";
 import _ from "lodash";
+import EditableElement from "@ckeditor/ckeditor5-engine/src/view/editableelement";
 
 /** Table Cell dataDowncast逻辑重写 */
 /**
@@ -160,13 +161,13 @@ const isCellChildHasRestricted = (ele: Element): any => {
 };
 
 /** 当前点击的元素是否是限制编辑元素 */
-export const isRestrictedElement = (ele: AttributeElement): boolean => {
-  return [...ele.getClassNames()].includes(EditorClasses.EDITABLE_CLASS);
+export const isRestrictedElement = (cell: EditableElement): boolean => {
+  return Boolean(cell.getAttribute("contenteditable"));
 };
 
 /** 当前点击的元素是否为TableSelect */
-export const isCellHasTableSelect = (ele: AttributeElement): boolean => {
-  return ele.findAncestor({ name: "td" })?.getAttribute("type") === "select";
+export const isCellHasTableSelect = (cell: EditableElement): boolean => {
+  return cell?.getAttribute("type") === "select";
 };
 
 /** 创建Table-Select Struct */
@@ -286,10 +287,13 @@ class SelectClickCollection {
   /** 监听Select点击处理逻辑 */
   static onSelectClick() {
     try {
+      const optionListElement: any = document.querySelector(".v_select_optionList");
       if (document.querySelector(".v_select_dropDown_text_sele")) return;
-      (document.querySelector(".v_select_optionList") as any).style.display = "block";
+      optionListElement.style.display = "block";
       document.querySelector(".v_select_dropDown_text").className = V_SELECT_DROPDOWN_TEXT_SELE;
       document.getElementById("theme_icon").className = TRIANGlE_DOWN;
+      const selectWidth = (document.querySelector(".v_select") as any)?.offsetWidth;
+      optionListElement.style.width = selectWidth - 1 + "px";
     } catch (error) {
       console.error(error);
     }

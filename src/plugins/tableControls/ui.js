@@ -107,6 +107,20 @@ const createRemoveButton = (context, uiName, cmd) => {
     }
   });
 };
+
+/** 清空或替换单元格文本内容
+ *  @param {cell} 当前迭代单元格
+ *  @param {child} 当前文本元素
+ *
+ */
+const replaceTextByCell = (cell, child) => {
+  if (cell.getAttribute("type") === "select") {
+    child._data = "请选择";
+  } else {
+    child._data = " ";
+  }
+};
+
 /**创建行锚点toolbar按钮 */
 const createAnchorRowBtn = ({ context, uiName, label, extraNumber }) => {
   const { editor } = context;
@@ -135,10 +149,9 @@ const createAnchorRowBtn = ({ context, uiName, label, extraNumber }) => {
 
           [...cloneItem.getChildren()].forEach((cell, index) => {
             [...cell.getChildren()].forEach(content => {
-              const path = content.getPath();
               const child = content.getChild(0);
               if (child) {
-                child._data = ""
+                replaceTextByCell(cell, child);
                 const start = writer.createPositionBefore(child);
                 const end = writer.createPositionAfter(child);
                 const range = writer.createRange(start, end);
@@ -149,32 +162,7 @@ const createAnchorRowBtn = ({ context, uiName, label, extraNumber }) => {
                   affectsData: true,
                 });
               }
-              // const end = writer.createPositionAfter(content.getChild(0));
-
-              // const start = writer.createPositionBefore(content);
-              // const after = writer.createPositionAfter(content);
-
-              // console.log(
-              //   "%cMyProject%cline:149%cstart",
-              //   "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-              //   "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-              //   "color:#fff;background:rgb(251, 178, 23);padding:3px;border-radius:2px",
-              //   start
-              // );
-              // const range = writer.createRange(start, after);
-              // writer.addMarker(`restrictedEditingException:${maxMarkerNumber + index + 1}`, {
-              //   range,
-              //   usingOperation: true,
-              //   affectsData: true,
-              // });
             });
-            console.log(
-              "%cMyProject%cline:147%ccell",
-              "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-              "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-              "color:#fff;background:rgb(248, 147, 29);padding:3px;border-radius:2px",
-              cell
-            );
           });
         });
       });
@@ -230,18 +218,18 @@ const createAnchorColBtn = ({ context, uiName, label, extraNumber }) => {
           for (const tableRow of rows) {
             const tableCell = tableRow.getChild(columnIndexes.first);
             const cloneItem = writer.cloneElement(tableCell, true);
+
             writer.insert(cloneItem, tableRow, columnIndexes.first + extraNumber);
             const maxMarkerNumber = editor.model.markers._markers.size;
 
             [...cloneItem.getChildren()].forEach((cell, index) => {
-              console.log("cell:", cell);
-
               [...cell.getChildren()].forEach(content => {
                 if (content) {
+                  replaceTextByCell(cell, child);
                   const start = writer.createPositionBefore(content);
                   const end = writer.createPositionAfter(content);
                   const range = writer.createRange(start, end);
-                  content._data = ""
+
                   writer.addMarker(`restrictedEditingException:${maxMarkerNumber + index + 1}`, {
                     range,
                     usingOperation: true,

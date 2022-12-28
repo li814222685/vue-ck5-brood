@@ -208,30 +208,49 @@ export default class TableControlsEditing extends Plugin {
   /** Normal模式 Document 监听逻辑 */
   listenClickForNormalMode(target) {
     /** 向上寻找td 的optionList属性 */
-    const findOptionListFromAncestorTd = target.findAncestor("td").getAttribute("optionlist");
+    const findOptionListFromAncestorTd = target.getAttribute("optionlist");
+    const mapper = this.editor.editing.mapper;
 
+    const tableCell = mapper.toModelElement(target);
+    const targetSpan = tableCell.getChild(0).getChild(0);
+
+    this.editor.model.change(writer => {
+      writer.setSelection(writer.createPositionAfter(targetSpan));
+    });
     if (findOptionListFromAncestorTd) {
       const plainOptionList = safeJsonParse(findOptionListFromAncestorTd);
       emitter.emit(SET_OPTIONS, plainOptionList);
     }
-    emitter.emit(SET_TARGET, target.findAncestor("td"));
+    emitter.emit(SET_TARGET, target);
     //在这里传递当前单元格的select-options
     emitter.emit(SWITCH_MODAL);
   }
 
-  /** Restrict模式 Document 监听逻辑 */
-  listenClickForRestrictMode(target, { model, editingView }) {
-    const modelSelection = model.document.selection;
-    const marker = getMarkerAtPosition(this.editor, modelSelection.anchor);
-    const findOptionListFromAncestorTd = target?.findAncestor("td")?.getAttribute("optionlist");
-    if (!marker && !findOptionListFromAncestorTd) return;
+  /** findMarker */
+  findMarkerById(id, editor) {
+    let res = null;
+    for (const marker of editor.model.markers) {
+      if (marker.name === id) {
+        res = marker;
+      }
+    }
+    return res;
+  }
 
+  /** Restrict模式 点击Document 监听逻辑 */
+  listenClickForRestrictMode(target, { model, editingView }) {
+    const findOptionListFromAncestorTd = target?.getAttribute("optionlist");
+
+    console.log("来到这里了！");
     const plainOptionList = safeJsonParse(findOptionListFromAncestorTd);
+    const targetSpan = target.getChild(0).getChild(0);
+    const marker = this.findMarkerById(targetSpan.id, this.editor);
+    if (!marker && !findOptionListFromAncestorTd) return;
 
     new Promise(res => {
       editingView.change(writer => {
-        writer.addClass(HIDDEN_ITEM, target);
-        res(target);
+        writer.addClass(HIDDEN_ITEM, targetSpan);
+        res(targetSpan);
       });
     }).then(hidEle => {
       model.change(writer => {
@@ -262,15 +281,21 @@ export default class TableControlsEditing extends Plugin {
     const tableControlsConfig = editor.config.get("tableControls");
 
     editingView.addObserver(ClickObserver);
-    this.listenTo(viewDocument, "click", (event, data) => {
-      const target = data.target;
-      const isRestrict = isRestrictedElement(target);
-      const isHasTableSelect = isCellHasTableSelect(target);
+    this.listenTo(viewDocument, "focus", (event, data) => {
+      console.log(
+        "%c🍉Lee%cline:266%cdata",
+        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+        "color:#fff;background:rgb(161, 23, 21);padding:3px;border-radius:2px",
+        data
+      );
+      const td = data.target;
+      const isRestrict = isRestrictedElement(td);
+      const isHasTableSelect = isCellHasTableSelect(td);
 
       /** 当前点击的是否为锚点 */
-      const findAncestorTd = target.findAncestor({ name: "td" });
-      if (findAncestorTd) {
-        const tableCell = mapper.toModelElement(findAncestorTd);
+      if (td.name === "td") {
+        const tableCell = mapper.toModelElement(td);
         const { row, column } = tableUtils.getCellLocation(tableCell);
         //Normal 模式
         if (!tableControlsConfig?.isRestrictMode) {
@@ -281,7 +306,7 @@ export default class TableControlsEditing extends Plugin {
           }
         } else {
           //Restrict 模式
-          const isHasMetaGroup = findAncestorTd.hasAttribute("ismetagroup");
+          const isHasMetaGroup = td.hasAttribute("ismetagroup");
 
           if (isHasMetaGroup) {
             if (row == 0) {
@@ -301,8 +326,8 @@ export default class TableControlsEditing extends Plugin {
       if (isRestrict && isHasTableSelect) {
         //通过TableControls的插件配置参数，来决定 绑定哪种模式( Restrict/ Normal)的点击监听
         tableControlsConfig?.isRestrictMode
-          ? this.listenClickForRestrictMode(target, { model, editingView })
-          : this.listenClickForNormalMode(target);
+          ? this.listenClickForRestrictMode(td, { model, editingView })
+          : this.listenClickForNormalMode(td);
       } else {
         const dropdown_text = document.getElementById(V_SELECT_DROPDOWN_TEXT);
         //Table Select Blur
