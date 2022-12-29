@@ -231,15 +231,15 @@ export default {
 .v_select_dropDown_text_sele {
   display: block;
   padding: 0 10px;
-  height: 30px;
+  height: 28px;
   /* border: 1px solid #1769fe; */
-  border: 1px solid rgba(218, 130, 36, 0.437);
+  border-bottom: 2px solid rgba(218, 130, 36, 0.437);
 
   border-radius: 4px;
   font-size: 16px;
   /* color: #1968ff; */
   /* background: #dce9ff; */
-  background: rgba(255, 169, 77, 0.2);
+  // background: rgba(255, 169, 77, 0.2);
 }
 
 .v_select_dropDown_text,
@@ -270,7 +270,7 @@ export default {
   position: absolute;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-top: 8px solid #323232;
+  border-top: 8px solid rgba(235, 142, 42, 0.437);
 }
 
 .triangle_down {
@@ -301,6 +301,7 @@ export default {
 
 .v_select_optionList_item {
   padding: 5px;
+  border-bottom: 1px solid rgba(218, 130, 36, 0.437) !important;
 }
 
 .v_select_optionList_item:hover {
