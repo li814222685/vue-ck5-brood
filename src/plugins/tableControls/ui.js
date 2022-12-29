@@ -20,6 +20,7 @@ import {
   TABLE_ANCHOR_COL_LEFT,
   TABLE_ANCHOR_COL_RIGHT,
   TABLE_ANCHOR_COL_DEL,
+  COMMAND_NAME__CLEAN_CONTROLS,
 } from "./constant";
 import _ from "lodash";
 
@@ -43,7 +44,7 @@ export class TableControlsUI extends Plugin {
         type: "button",
         model: new Model({
           withText: true,
-          label: "插入普通CC ( ⌘ / ALT + Z )",
+          label: "插入普通CC ( ⌘ / ALT + P )",
           cmd: COMMAND_NAME__INSERT_TABLE_NORMAL,
         }),
       });
@@ -54,7 +55,7 @@ export class TableControlsUI extends Plugin {
         type: "button",
         model: new Model({
           withText: true,
-          label: "插入Select ( ⌘ / ALT + X )",
+          label: "插入Select ( ⌘ / ALT + O )",
           cmd: COMMAND_NAME__INSERT_TABLE_SELECT,
         }),
       });
@@ -64,8 +65,18 @@ export class TableControlsUI extends Plugin {
         type: "button",
         model: new Model({
           withText: true,
-          label: "插入 Table ( ⌘ / ALT + T )",
+          label: "插入 Table ( ⌘ / ALT + Y )",
           cmd: COMMAND_NAME__INSERT_WRAPPER_TABLE,
+        }),
+      });
+
+      const cleanControlsBtn = new ButtonView(locale);
+      cleanControlsBtn.set({
+        type: "button",
+        model: new Model({
+          withText: true,
+          label: "清空CC ( ⌘ / ALT + Y )",
+          cmd: COMMAND_NAME__CLEAN_CONTROLS,
         }),
       });
 
@@ -73,13 +84,23 @@ export class TableControlsUI extends Plugin {
       items.add(dropButton);
       items.add(insertSelectBtn);
       items.add(insertWrapperTableBtn);
+      items.add(cleanControlsBtn);
 
       dropdownView.buttonView.set({
         withText: true,
         label: "插入TABLE-CC",
       });
-      editor.keystrokes.set("ALT+Z", COMMAND_NAME__INSERT_TABLE_NORMAL);
-      editor.keystrokes.set("ALT+X", COMMAND_NAME__INSERT_TABLE_SELECT);
+      editor.keystrokes.set("ALT+P", COMMAND_NAME__INSERT_TABLE_NORMAL);
+      editor.keystrokes.set("Cmd+P", COMMAND_NAME__INSERT_TABLE_NORMAL);
+
+      editor.keystrokes.set("ALT+O", COMMAND_NAME__INSERT_TABLE_SELECT);
+      editor.keystrokes.set("Cmd+O", COMMAND_NAME__INSERT_TABLE_SELECT);
+
+      editor.keystrokes.set("ALT+Y", COMMAND_NAME__INSERT_WRAPPER_TABLE);
+      editor.keystrokes.set("Cmd+Y", COMMAND_NAME__INSERT_WRAPPER_TABLE);
+
+      editor.keystrokes.set("ALT+J", COMMAND_NAME__CLEAN_CONTROLS);
+      editor.keystrokes.set("Cmd+J", COMMAND_NAME__CLEAN_CONTROLS);
 
       addListToDropdown(dropdownView, items);
 

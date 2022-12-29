@@ -25,6 +25,11 @@
     }
   }
 
+  //fix 删除表格行列后，后面的行/列 单元格存在错位问题
+  .ck-editor__editable .restricted-editing-exception.restricted-editing-exception_collapsed {
+    padding-left: 0 !important;
+  }
+
   //去除锚点选中后的 聚焦边框和背景
   .table table tbody :first-child td:focus,
   .table table tbody tr td:first-child:focus {

@@ -26,6 +26,7 @@ import {
   COMMAND_NAME__COPY_TABLE_ROW,
   COMMAND_NAME__SET_TURPLE_TABLE,
   COMMAND_NAME__TABLE_HANDLER,
+  COMMAND_NAME__CLEAN_CONTROLS,
 } from "./constant";
 import {
   TableControlsCommand,
@@ -33,6 +34,7 @@ import {
   SetTableSelectOptionList,
   InsertWrapperTableCommand,
   SetTurpleCommand,
+  CleanControlsCommand,
 } from "./command";
 import { V_SELECT } from "./constant";
 import { toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
@@ -79,6 +81,7 @@ export default class TableControlsEditing extends Plugin {
       COMMAND_NAME__TABLE_HANDLER,
       new TableRowAndColHandlertCommand(this.editor)
     );
+    this.editor.commands.add(COMMAND_NAME__CLEAN_CONTROLS, new CleanControlsCommand(this.editor));
   }
 
   _defineSchema() {

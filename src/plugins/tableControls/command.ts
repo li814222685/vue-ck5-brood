@@ -4,7 +4,7 @@
 
 import Command from "@ckeditor/ckeditor5-core/src/command";
 import Writer from "@ckeditor/ckeditor5-engine/src/model/writer";
-import _ from "lodash";
+import _, { words } from "lodash";
 import { RESTRICTED_EDITING } from "./constant";
 import { handleSelectEvent, onTableSelect } from "./util";
 import { V_SELECT } from "./constant";
@@ -248,7 +248,34 @@ export class CopyRowCommand extends Command {
 
 /** 复制table列命令 */
 
-export class CopyTableCol extends Command {}
+export class CleanControlsCommand extends Command {
+  // refresh() {
+  //   const model = this.editor.model;
+  //   const selection = model.document.selection;
+  //   const schema = model.schema;
+
+  //   this.isEnabled = isAllowedInParent(selection, schema);
+  // }
+
+  execute(options = {} as any) {
+    const selection = this.editor.model.document.selection;
+    const mapper = this.editor.editing.mapper;
+    const tableCell = [...selection.getSelectedBlocks()][0].parent as any;
+    const td = mapper.toViewElement(tableCell);
+    this.editor.model.change(writer => {
+      writer.removeAttribute("style", tableCell);
+      writer.removeAttribute("tableCellBackgroundColor", tableCell);
+      writer.removeAttribute("type", tableCell);
+      writer.removeAttribute("optionlist", tableCell);
+    });
+
+    this.editor.editing.view.change(() => {
+      (td as any)._removeStyle("background-color");
+    });
+    this.editor.execute("selectAll");
+    this.editor.execute("restrictedEditingException");
+  }
+}
 
 export default {
   SetTurpleCommand,
@@ -257,4 +284,5 @@ export default {
   TableSelectCommand,
   SetTableSelectOptionList,
   InsertWrapperTableCommand,
+  CleanControlsCommand,
 };

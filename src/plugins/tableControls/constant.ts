@@ -47,6 +47,9 @@ export const TABLE_ANCHOR_BUTTON_TOOLBAR = "tableAnchorButtonToolbar";
 export const COMMAND_NAME__COPY_TABLE_ROW = "copyTableRow";
 
 export const COMMAND_NAME__INSERT_WRAPPER_TABLE = "insertWrapperTable";
+
+export const COMMAND_NAME__CLEAN_CONTROLS = "cleanControls";
+
 //设置Table 元组
 export const COMMAND_NAME__SET_TURPLE_TABLE = "setTableTurple";
 
