@@ -75,7 +75,7 @@ export class TableControlsUI extends Plugin {
         type: "button",
         model: new Model({
           withText: true,
-          label: "清空CC ( ⌘ / ALT + Y )",
+          label: "清空CC ( ⌘ / ALT + J",
           cmd: COMMAND_NAME__CLEAN_CONTROLS,
         }),
       });
@@ -145,7 +145,7 @@ const replaceTextByCell = (cell, child) => {
   if (cell.getAttribute("type") === "select") {
     child._data = "请选择";
   } else {
-    child._data = " ";
+    child._data = "";
   }
 };
 

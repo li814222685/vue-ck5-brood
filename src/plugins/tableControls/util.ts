@@ -189,14 +189,14 @@ export const createTableSelect = (writer: Writer, options?: Option[]) => {
   });
   /**下拉框文字 */
   const dropDown_text = writer.createElement(V_DIV, {
-    class: V_SELECT_DROPDOWN_TEXT,
+    class: V_SELECT_DROPDOWN_TEXT_SELE,
     id: V_SELECT_DROPDOWN_TEXT,
     contenteditable: true,
   });
   /**图标 */
   const dorpDown_icon = writer.createElement(V_SPAN, {
     id: THEME_ICON,
-    class: TRIANGlE_UP,
+    class: TRIANGlE_DOWN,
     contenteditable: false,
   });
   [dropDown_text, dorpDown_icon].forEach(item => {
@@ -300,6 +300,13 @@ class SelectClickCollection {
   }
   /** 监听Option点击处理逻辑 */
   static onOptionsClick(event) {
+    console.log(
+      "%c🍉Lee%cline:303%c点击了",
+      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      "color:#fff;background:rgb(20, 68, 106);padding:3px;border-radius:2px",
+      "点击了"
+    );
     const target = event.target;
     const dropdown_text = document.getElementById(V_SELECT_DROPDOWN_TEXT);
     dropdown_text.innerText = target.getAttribute(DATA_VALUE);
@@ -316,7 +323,7 @@ class SelectClickCollection {
       const value = target.innerHTML;
       // 1.过滤掉Option 列表内所有未命中 keyWord 的option
       const originOptions = document.querySelectorAll(".v_select_optionList_item");
-      const _options = [...originOptions].forEach(opt => {
+      [...originOptions].forEach(opt => {
         //option是否包含关键字
         const isIncludes = opt.innerHTML.includes(value);
         //option 是否隐藏
@@ -341,7 +348,6 @@ const toTableWidget = (viewElement, writer) => {
 
 export const downcastTable = (tableUtils, options = {} as any) => {
   return (table, { writer }) => {
-    console.log(666666);
     const headingRows = table.getAttribute("headingRows") || 0;
     const tableSections = [];
 

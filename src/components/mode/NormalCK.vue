@@ -290,9 +290,10 @@ export default {
 
 .v_select_optionList {
   // border: 1px solid rgba(218, 130, 36, 0.437);
+  width: 100%;
   background-color: antiquewhite;
   border-top: none;
-  display: none;
+  display: block;
   border-radius: 4px;
   position: absolute;
   z-index: 999;
@@ -301,6 +302,7 @@ export default {
 
 .v_select_optionList_item {
   padding: 5px;
+  background-color: rgb(250, 235, 215);
   border-bottom: 1px solid rgba(218, 130, 36, 0.437) !important;
 }
 

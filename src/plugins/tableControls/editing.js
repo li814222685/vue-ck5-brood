@@ -95,7 +95,8 @@ export default class TableControlsEditing extends Plugin {
     });
     schema.register(V_DIV, {
       allowIn: [V_DIV, V_DIV_CONTAINER],
-      isLimit: true,
+      inheritAllFrom: "$blockObject",
+
       allowContentOf: "$root",
       allowAttributes: [
         "class",
@@ -209,7 +210,7 @@ export default class TableControlsEditing extends Plugin {
   }
 
   /** Normal模式 Document 监听逻辑 */
-  listenClickForNormalMode(target) {
+  listenFocusForNormalMode(target) {
     /** 向上寻找td 的optionList属性 */
     const findOptionListFromAncestorTd = target.getAttribute("optionlist");
     const mapper = this.editor.editing.mapper;
@@ -241,10 +242,9 @@ export default class TableControlsEditing extends Plugin {
   }
 
   /** Restrict模式 点击Document 监听逻辑 */
-  listenClickForRestrictMode(target, { model, editingView }) {
+  listenFocusForRestrictMode(target, { model, editingView }) {
     const findOptionListFromAncestorTd = target?.getAttribute("optionlist");
 
-    console.log("来到这里了！");
     const plainOptionList = safeJsonParse(findOptionListFromAncestorTd);
     const targetSpan = target.getChild(0).getChild(0);
     const marker = this.findMarkerById(targetSpan.id, this.editor);
@@ -262,6 +262,7 @@ export default class TableControlsEditing extends Plugin {
           createTableSelect(writer, plainOptionList),
           targetEndPosition
         );
+
         emitter.emit(SAVE_HIDDEN_ITEM, {
           oldViewElement: hidEle,
           oldMarker: marker,
@@ -285,6 +286,13 @@ export default class TableControlsEditing extends Plugin {
 
     editingView.addObserver(ClickObserver);
     this.listenTo(viewDocument, "click", (event, data) => {
+      console.log(
+        "%c🍉Lee%cline:291%cdata.target",
+        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+        "color:#fff;background:rgb(39, 72, 98);padding:3px;border-radius:2px",
+        data.target
+      );
       const target = data.target;
       /** 当前点击的是否为锚点 */
       const findAncestorTd = target.findAncestor({ name: "td" });
@@ -325,8 +333,8 @@ export default class TableControlsEditing extends Plugin {
       if (isRestrict && isHasTableSelect) {
         //通过TableControls的插件配置参数，来决定 绑定哪种模式( Restrict/ Normal)的点击监听
         tableControlsConfig?.isRestrictMode
-          ? this.listenClickForRestrictMode(td, { model, editingView })
-          : this.listenClickForNormalMode(td);
+          ? this.listenFocusForRestrictMode(td, { model, editingView })
+          : this.listenFocusForNormalMode(td);
       } else {
         const dropdown_text = document.getElementById(V_SELECT_DROPDOWN_TEXT);
         //Table Select Blur
