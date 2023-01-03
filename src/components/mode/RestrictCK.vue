@@ -31,11 +31,11 @@
   }
 
   //去除锚点选中后的 聚焦边框和背景
-  .table table tbody :first-child td:focus,
-  .table table tbody tr td:first-child:focus {
-    background-color: #cccacab3 !important;
-    outline: none !important;
-  }
+  // .table table tbody :first-child td:focus,
+  // .table table tbody tr td:first-child:focus {
+  //   background-color: #cccacab3 !important;
+  //   outline: none !important;
+  // }
   .table table tbody tr td:first-child {
     background-color: #eeeeeeb3;
     padding: 0px !important;

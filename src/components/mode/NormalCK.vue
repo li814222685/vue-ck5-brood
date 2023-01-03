@@ -91,8 +91,6 @@ export default {
         (window as any).devEditor = editor;
         editor.setData(this.htmlData);
         const widgetTypeAroundPlugin = editor.plugins.get("WidgetTypeAround");
-
-        // Disable the widget type around plugin.
         widgetTypeAroundPlugin.forceDisabled("MyApplication");
       })
       .catch(error => {});
@@ -290,7 +288,7 @@ export default {
 
 .v_select_optionList {
   // border: 1px solid rgba(218, 130, 36, 0.437);
-  width: 100%;
+  width: inherit;
   background-color: antiquewhite;
   border-top: none;
   display: block;
