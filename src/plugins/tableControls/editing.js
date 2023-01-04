@@ -96,7 +96,6 @@ export default class TableControlsEditing extends Plugin {
     schema.register(V_DIV, {
       allowIn: [V_DIV, V_DIV_CONTAINER],
       inheritAllFrom: "$blockObject",
-
       allowContentOf: "$root",
       allowAttributes: [
         "class",
@@ -180,10 +179,20 @@ export default class TableControlsEditing extends Plugin {
     conversion.for("editingDowncast").elementToElement({
       model: V_DIV,
       view: (modelEle, { writer }) => {
-        return toWidgetEditable(
-          writer.createEditableElement("div", modelEle.getAttributes()),
-          writer
-        );
+        // modelEle 是否为 optionItem元素
+        const isOptionItem = modelEle.getAttribute("class") === "v_select_optionList_item";
+        if (isOptionItem) {
+          const element = writer.createEditableElement("div", modelEle.getAttributes());
+          writer.setAttribute("contenteditable", "false", element);
+          writer.setCustomProperty("widget", true, element);
+          element.getFillerOffset = null;
+          return element;
+        } else {
+          return toWidgetEditable(
+            writer.createEditableElement("div", modelEle.getAttributes()),
+            writer
+          );
+        }
       },
       renderUnsafeAttributes: ["data-cke-ignore-events"],
     });
@@ -191,7 +200,10 @@ export default class TableControlsEditing extends Plugin {
     conversion.for("editingDowncast").elementToElement({
       model: V_SPAN,
       view: (modelEle, { writer }) => {
-        return writer.createAttributeElement("span", modelEle.getAttributes());
+        const isIcon = modelEle.getAttribute("id") === "theme_icon";
+        return isIcon
+          ? writer.createAttributeElement("i", modelEle.getAttributes())
+          : writer.createAttributeElement("span", modelEle.getAttributes());
       },
     });
 
@@ -247,9 +259,16 @@ export default class TableControlsEditing extends Plugin {
 
     const plainOptionList = safeJsonParse(findOptionListFromAncestorTd);
     const targetSpan = target.getChild(0).getChild(0);
+    const targetText = targetSpan.getChild(0)._textData;
     const marker = this.findMarkerById(targetSpan.id, this.editor);
     if (!marker && !findOptionListFromAncestorTd) return;
-
+    console.log(
+      "%c🍉Lee%cline:259%ctarget",
+      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      "color:#fff;background:rgb(229, 187, 129);padding:3px;border-radius:2px",
+      targetText
+    );
     new Promise(res => {
       editingView.change(writer => {
         writer.addClass(HIDDEN_ITEM, targetSpan);
@@ -259,8 +278,12 @@ export default class TableControlsEditing extends Plugin {
       model.change(writer => {
         const targetEndPosition = marker.getEnd();
         const tableSelectRange = model.insertObject(
-          createTableSelect(writer, plainOptionList),
-          targetEndPosition
+          createTableSelect(writer, targetText, plainOptionList),
+          targetEndPosition,
+          null,
+          {
+            setSelection: "on",
+          }
         );
 
         emitter.emit(SAVE_HIDDEN_ITEM, {
@@ -286,13 +309,6 @@ export default class TableControlsEditing extends Plugin {
 
     editingView.addObserver(ClickObserver);
     this.listenTo(viewDocument, "click", (event, data) => {
-      console.log(
-        "%c🍉Lee%cline:291%cdata.target",
-        "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-        "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-        "color:#fff;background:rgb(39, 72, 98);padding:3px;border-radius:2px",
-        data.target
-      );
       const target = data.target;
       /** 当前点击的是否为锚点 */
       const findAncestorTd = target.findAncestor({ name: "td" });

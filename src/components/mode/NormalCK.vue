@@ -228,8 +228,8 @@ export default {
 /* 打开Option列表 选择框选中后的样式 */
 .v_select_dropDown_text_sele {
   display: block;
-  padding: 0 10px;
-  height: 28px;
+  // padding: 0 10px;
+  // height: 28px;
   /* border: 1px solid #1769fe; */
   border-bottom: 2px solid rgba(218, 130, 36, 0.437);
 
@@ -272,16 +272,26 @@ export default {
 }
 
 .triangle_down {
+  transform: rotate(-135deg) !important;
+  -webkit-transform: rotate(-135deg) !important;
+  border: 3px solid black;
+  /* 上、右、下、左 四个边框的宽度 */
+  border-width: 0px 1px 1px 0px;
+
+  display: inline-block;
+  /* padding值控制箭头大小 */
+  padding: 5px;
+
   width: 0;
   height: 0;
-  right: 20px;
-  top: 17px;
+  right: 8px;
+  top: 12px;
   position: absolute;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid rgba(235, 142, 42, 0.437);
-  transform: rotate(180deg);
-  transition: transform 0.2s linear;
+  // border-left: 8px solid transparent;
+  // border-right: 8px solid transparent;
+  // border-top: 8px solid rgba(235, 142, 42, 0.437);
+  // transform: rotate(180deg);
+  // transition: transform 0.2s linear;
 }
 
 /* Option 列表   */
@@ -289,23 +299,41 @@ export default {
 .v_select_optionList {
   // border: 1px solid rgba(218, 130, 36, 0.437);
   width: inherit;
-  background-color: antiquewhite;
-  border-top: none;
+  background-color: white;
   display: block;
-  border-radius: 4px;
   position: absolute;
+  max-height: 105px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  box-shadow: 4px 6px 6px -5px #000;
   z-index: 999;
-  border: 1px solid rgba(218, 130, 36, 0.437) !important;
+  border-top: 2px solid #0077be !important;
+  border-left: 1px solid #e0e0e0 !important;
+  border-right: 1px solid #e0e0e0 !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  padding-right: 10px;
+  margin-left: -6px;
+  margin-top: -1px;
+  animation: slideContentUp 0.2s linear both;
+}
+
+@keyframes slideContentUp {
+  from {
+    height: 0;
+  }
+  to {
+    height: 105px;
+  }
 }
 
 .v_select_optionList_item {
+  width: 100%;
   padding: 5px;
-  background-color: rgb(250, 235, 215);
-  border-bottom: 1px solid rgba(218, 130, 36, 0.437) !important;
+  // background-color: rgb(250, 235, 215);
 }
 
 .v_select_optionList_item:hover {
-  background-color: rgba(255, 169, 77, 0.2);
+  background-color: #eeeeeeb3;
 }
 
 .hidden_item {

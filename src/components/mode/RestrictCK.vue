@@ -24,6 +24,9 @@
       cursor: pointer !important;
     }
   }
+  #editor {
+    height: 800px !important;
+  }
 
   //fix 删除表格行列后，后面的行/列 单元格存在错位问题
   .ck-editor__editable .restricted-editing-exception.restricted-editing-exception_collapsed {
@@ -58,6 +61,10 @@ import { regExpReplacer, removeClass, removeElement } from "../utils";
 import { EditorClasses } from "./define";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import { emitter, SAVE_HIDDEN_ITEM, REPLACE_HIDDEN_ITEM_TEXT } from "./mitt.ts";
+import {
+  V_SELECT_OPTION_LIST_ITEM,
+  V_SELECT_DROPDOWN_TEXT_SELE,
+} from "@/plugins/tableControls/constant.ts";
 
 const { HIDDEN_CLASS, EDITABLE_CLASS, V_SELECT } = EditorClasses;
 
@@ -94,6 +101,25 @@ export default {
       .catch(error => {});
   },
   methods: {
+    handleTableSelectOptionClick(dom) {
+      const isTableSelectOptionElement =
+        dom.getAttribute("class")?.indexOf(V_SELECT_OPTION_LIST_ITEM) !== -1;
+
+      const isSelectTextDom =
+        dom.getAttribute("class")?.indexOf(V_SELECT_DROPDOWN_TEXT_SELE) !== -1;
+
+      const { oldMarker } = toRaw(this.deposit);
+
+      if (isTableSelectOptionElement) {
+        const optionItemValue = dom.getAttribute("data-value");
+        emitter.emit(REPLACE_HIDDEN_ITEM_TEXT, optionItemValue);
+      } else {
+        if (!isSelectTextDom && oldMarker) {
+          emitter.emit(REPLACE_HIDDEN_ITEM_TEXT, "");
+        }
+      }
+    },
+
     /**
      * @description 全局点击事件
      * @param {event} e
@@ -103,6 +129,7 @@ export default {
         const editor = window.editor;
         const { model, editing } = editor;
         const clickDom = document.elementFromPoint(e.clientX, e.clientY);
+        this.handleTableSelectOptionClick(clickDom);
         const isSelected = Array.from(clickDom.classList).includes(V_SELECT);
         // 点击可编辑区域时候执行
         if (isSelected) {
@@ -176,22 +203,27 @@ export default {
       this.deposit = deposit;
     },
 
-    /** TableSelect的值填入 可编辑文字元素 */
+    /** TableSelect的值填入 可编辑文字元素
+     * @param {val} 选择的单元格文本值，当val传入"" 空字符时，表示删除控件不修改任何值
+     */
     setRestrictedTextFromTableSelect(val) {
       const editor = window.editor;
       const model = editor.model;
       const { oldViewElement: restoreItem, oldMarker, newRange: removeRange } = toRaw(this.deposit);
+      if (!oldMarker) return;
       const oldRange = oldMarker.getRange();
       removeElement(removeRange);
-
       //1.显示隐藏的元素
       removeClass(HIDDEN_CLASS, restoreItem);
 
       //2.将value 替换 元素内的文本
-      model.change(writer => {
-        const text = writer.createText(val, restoreItem.getAttributes());
-        model.insertContent(text, oldRange);
-      });
+      if (val !== "") {
+        model.change(writer => {
+          const text = writer.createText(val, restoreItem.getAttributes());
+          model.insertContent(text, oldRange);
+        });
+      }
+
       // 3. 销毁掉Select
       this.deposit = {
         oldViewElement: null,

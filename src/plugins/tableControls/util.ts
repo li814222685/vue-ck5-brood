@@ -171,7 +171,7 @@ export const isCellHasTableSelect = (cell: EditableElement): boolean => {
 };
 
 /** 创建Table-Select Struct */
-export const createTableSelect = (writer: Writer, options?: Option[]) => {
+export const createTableSelect = (writer: Writer, selectText: string, options?: Option[]) => {
   /**最外层容器 */
   const selectContainer = writer.createElement(V_DIV_CONTAINER, {
     class: V_SELECT,
@@ -193,6 +193,7 @@ export const createTableSelect = (writer: Writer, options?: Option[]) => {
     id: V_SELECT_DROPDOWN_TEXT,
     contenteditable: true,
   });
+  writer.appendText(selectText, dropDown_text);
   /**图标 */
   const dorpDown_icon = writer.createElement(V_SPAN, {
     id: THEME_ICON,
@@ -300,13 +301,6 @@ class SelectClickCollection {
   }
   /** 监听Option点击处理逻辑 */
   static onOptionsClick(event) {
-    console.log(
-      "%c🍉Lee%cline:303%c点击了",
-      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
-      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
-      "color:#fff;background:rgb(20, 68, 106);padding:3px;border-radius:2px",
-      "点击了"
-    );
     const target = event.target;
     const dropdown_text = document.getElementById(V_SELECT_DROPDOWN_TEXT);
     dropdown_text.innerText = target.getAttribute(DATA_VALUE);
