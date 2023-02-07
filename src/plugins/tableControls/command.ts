@@ -87,7 +87,7 @@ export class TableSelectCommand extends Command {
       writer.setAttribute("type", "select", tableCell.parent);
       const range = (this.editor.model as any).insertContent(paragraph);
       this.editor.execute("selectAll");
-      this.editor.editing.view.focus();
+      // this.editor.editing.view.focus();
       this.editor.execute(RESTRICTED_EDITING);
       writer.setSelection(null);
     });
@@ -131,6 +131,13 @@ export class SetTableSelectOptionList extends Command {
     const selection = this.editor.model.document.selection;
     const tableCell = [...selection.getSelectedBlocks()][0] as any;
 
+    console.log(
+      "%c🍉Lee%cline:134%ctableCell",
+      "color:#fff;background:#ee6f57;padding:3px;border-radius:2px",
+      "color:#fff;background:#1f3c88;padding:3px;border-radius:2px",
+      "color:#fff;background:rgb(118, 77, 57);padding:3px;border-radius:2px",
+      tableCell
+    );
     //将optionList 存储到 Model 的tableCell上
     model.change(writer => {
       writer.setAttribute("optionlist", safeJsonStringify(options), tableCell.parent);
